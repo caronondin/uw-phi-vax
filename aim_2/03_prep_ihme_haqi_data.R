@@ -18,11 +18,20 @@ dt1 <- dt1 %>% filter(indicator_name=="Healthcare Access and Quality")
 # keep only certain columns
 dt1 <- dt1 %>% select(location_id, location_name, year_id, val)
 
+# Load the location name codebook
+location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_mapping.RDS")) 
+
+# Merge to ensure only national-level data is saved
+haqi_dataset <- dt1 %>% 
+  inner_join(location_map, by=c('location_id'='gbd_location_id'))
+
+# Subset to columns of interest
+haqi_dataset <- haqi_dataset %>% select(location, year_id, location_id, iso_code, iso_num_code, val)
+
 # rename the "val" variable
-dt1 <- rename(dt1, 
+haqi_dataset <- rename(haqi_dataset, 
        haqi = val,
        gbd_location_id = location_id, 
-       location = location_name, 
        year = year_id)
 
 # save the new data set
