@@ -35,4 +35,4 @@ haqi_dataset <- rename(haqi_dataset,
        year = year_id)
 
 # save the new data set
-saveRDS(dt1, file = paste0(prepped_data_dir, "aim_2/02_prepped_ihme_haqi_data.RDS"))
+saveRDS(haqi_dataset, file = paste0(prepped_data_dir, "aim_2/02_prepped_ihme_haqi_data.RDS"))

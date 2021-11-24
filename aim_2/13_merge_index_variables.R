@@ -11,23 +11,22 @@ prepped_file_05 <- readRDS(paste0(prepped_data_dir, "aim_2/05_prepped_un_immigra
 prepped_file_06 <- readRDS(paste0(prepped_data_dir, "aim_2/06_prepped_un_net_migr_rate_data.RDS"))
 prepped_file_07 <- readRDS(paste0(prepped_data_dir, "aim_2/07_prepped_un_perc_urban_data.RDS"))
 prepped_file_08 <- readRDS(paste0(prepped_data_dir, "aim_2/08_prepped_vaccine_confidence_data.RDS"))
-prepped_file_09 <- readRDS(paste0(prepped_data_dir, "aim_2/09_prepped_worldbank__primschoolcomplt_data.RDS"))
-prepped_file_10 <- readRDS(paste0(prepped_data_dir, "aim_2/10_prepped_worldbank__birthweight_data.RDS"))
-prepped_file_11 <- readRDS(paste0(prepped_data_dir, "aim_2/11_prepped_who_ghe_data.RDS"))
-
+prepped_file_09 <- readRDS(paste0(prepped_data_dir, "aim_2/09_prepped_who_ghe_data.RDS"))
+prepped_file_10 <- readRDS(paste0(prepped_data_dir, "aim_2/10_prepped_worldbank__primschoolcomplt_data.RDS"))
+prepped_file_11 <- readRDS(paste0(prepped_data_dir, "aim_2/11_prepped_worldbank__birthrate_data.RDS"))
 
 # Making 
 mergeVars <- c("location", "year", "gbd_location_id", "iso_code", "iso_num_code")
-merged_data <- prepped_file_04 %>% 
-  # full_join(prepped_file_02, by=mergeVars) %>%
-  # full_join(prepped_file_03, by=mergeVars) %>%
-  # full_join(prepped_file_04, by=mergeVars) %>% 
-  # full_join(prepped_file_05, by=mergeVars) %>% 
-  # full_join(prepped_file_06, by=mergeVars) %>% 
+merged_data <- prepped_file_01 %>% 
+  full_join(prepped_file_02, by=mergeVars) %>%
+  full_join(prepped_file_03, by=mergeVars) %>%
+  full_join(prepped_file_04, by=mergeVars) %>%
+  full_join(prepped_file_05, by=mergeVars) %>%
+  full_join(prepped_file_06, by=mergeVars) %>%
   full_join(prepped_file_07, by=mergeVars) %>% 
-  # full_join(prepped_file_08, by=mergeVars) %>% 
-  # full_join(prepped_file_09, by=mergeVars) %>% 
-  # full_join(prepped_file_10, by=mergeVars) %>% 
+  full_join(prepped_file_08, by=mergeVars) %>%
+  full_join(prepped_file_09, by=mergeVars) %>%
+  full_join(prepped_file_10, by=mergeVars) %>%
   full_join(prepped_file_11, by=mergeVars)
 
 # Save Final Prepped Data

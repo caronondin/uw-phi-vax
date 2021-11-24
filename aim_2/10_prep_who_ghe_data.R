@@ -18,7 +18,7 @@ dt2 <- dt1 %>% select(country, `country code`, year, gghed_che, hc62_g_gghed, hc
 # Load location map
 location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_mapping.RDS"))
 
-# Mere to make sure names are standardized
+# Merge to make sure names are standardized
 dt2 <- dt2 %>% left_join(location_map, by=c("country code"="iso_code"))
 
 # Rename columns of interest
