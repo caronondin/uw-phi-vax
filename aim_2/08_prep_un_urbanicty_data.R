@@ -68,9 +68,14 @@ dt1$iso_num_code[which(dt1$iso_num_code=="16")] <- "016"
 dt2 <- data.table(dt1)
 prepped_urban_dataset <- melt(dt2, id.vars=c("country", "iso_num_code"),
                                   value.name = "perc_urban", 
-                                  variable.name = "year")
+                                  variable.name = "year_factor")
 
-# Merge location name mapping
+# Extract year variable from the data set
+prepped_urban_dataset$year <- sub('.*(\\d{4}).*', '\\1', prepped_urban_dataset$year_factor)
+
+# Change format of data
+prepped_urban_dataset$year <- as.numeric(prepped_urban_dataset$year)
+
 # Load location codebook to standardize names
 location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_mapping.RDS"))
 

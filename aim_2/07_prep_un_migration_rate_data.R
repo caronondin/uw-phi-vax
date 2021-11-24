@@ -77,7 +77,11 @@ prepped_migr_rate_dataset <- prepped_migr_rate_dataset %>% select(country, iso_n
 # Reformat variable
 prepped_migr_rate_dataset$mig_rate <- as.numeric(prepped_migr_rate_dataset$mig_rate)
 
-# Load location codebook to standardize names
+# create new year variable
+prepped_migr_rate_dataset$year <- sub('.*(\\d{4}).*', '\\1', prepped_migr_rate_dataset$year_range)
+prepped_migr_rate_dataset$year <- as.numeric(prepped_migr_rate_dataset$year)
+
+# Load location code book to standardize names
 location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_mapping.RDS"))
 
 # Merge location map onto the data
@@ -85,7 +89,7 @@ prepped_migr_rate_dataset <- prepped_migr_rate_dataset %>%
   inner_join(location_map, by="iso_num_code")
 
 # Keep columns of interest
-prepped_migr_rate_dataset <- prepped_migr_rate_dataset %>% select(location, year_range, gbd_location_id, iso_code, iso_num_code, mig_rate)
+prepped_migr_rate_dataset <- prepped_migr_rate_dataset %>% select(location, year, gbd_location_id, iso_code, iso_num_code, mig_rate)
 
 # Save file in the prepped data folder
 saveRDS(prepped_migr_rate_dataset, file = paste0(prepped_data_dir, "aim_2/06_prepped_un_net_migr_rate_data.RDS"))

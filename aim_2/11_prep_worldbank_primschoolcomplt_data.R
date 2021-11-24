@@ -4,7 +4,7 @@
 
 # Load libraries and data file
 library("tidyr")  
-dt1 <- read.csv(file = "G:/My Drive/Merck Vaccine Improvement Index Project/Data/raw_data/index_variables/world_bank/API_SE.PRM.CMPT.ZS_DS2_en_csv_v2_3163677/API_SE.PRM.CMPT.ZS_DS2_en_csv_v2_3163677.csv", skip=4)
+dt1 <- read.csv(file = paste0(raw_data_dir,"index_variables/world_bank/API_SE.PRM.CMPT.ZS_DS2_en_csv_v2_3163677/API_SE.PRM.CMPT.ZS_DS2_en_csv_v2_3163677.csv"), skip=4)
 
 # Remove unnecessary columns
 dt1 <- dt1[-c(2:4)]
@@ -28,5 +28,9 @@ dt1_long$prim_school_complt <- as.numeric(dt1_long$prim_school_complt)
 # Update data name
 prim_school_complt_dataset <- dt1_long
 
+# Load location map to merge standard place names
+location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_mapping.RDS"))
+
+
 # Save cleaned dataset in Google Drive folder 
-saveRDS(prim_school_complt_dataset, file = "09_prepped_worldbank__primschoolcomplt_data.rds")
+saveRDS(prim_school_complt_dataset, file = paste0(prepped_data_dir, "aim_2/10_prepped_worldbank__primschoolcomplt_data.rds"))

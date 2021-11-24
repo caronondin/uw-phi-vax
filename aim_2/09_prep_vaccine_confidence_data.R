@@ -55,6 +55,14 @@ dt1$country[which(dt1$country=="Vietnam")] <- "Viet Nam"
 # dt1$country[which(dt$country=="Kosovo")] <- ""
 # dt1$country[which(dt$country=="Northern Cyprus")] <- ""
 
+# Extract the year portion of the time variable
+# prepped_migr_rate_dataset$year <- 
+dt1$year <- sub('.*(\\d{4}).*', '\\1', dt1$time)
+dt1$year <- as.numeric(dt1$year)
+dt1$time <- as.numeric(dt1$time)
+dt1$month_digit <- dt1$time - dt1$year
+dt1$month <- round((dt1$month_digit * 12) + 1)
+
 # Merge location map onto the data
 prepped_vacc_confid_dataset <- dt1 %>%
   inner_join(location_map, by=c("country"="location"))
@@ -62,7 +70,16 @@ prepped_vacc_confid_dataset <- dt1 %>%
 prepped_vacc_confid_dataset <- prepped_vacc_confid_dataset %>% rename(location=country)
 
 # Keep variables of interest
-prepped_vacc_confid_dataset <- prepped_vacc_confid_dataset %>% select(location, time, gbd_location_id, iso_code, iso_num_code, mean_agree_vac_safe)
+prepped_vacc_confid_dataset <- prepped_vacc_confid_dataset %>% select(location, year, month, gbd_location_id, iso_code, iso_num_code, mean_agree_vac_safe)
+
+# use data table to average across columns
+prepped_vacc_confid_dataset <- as.data.table(prepped_vacc_confid_dataset)
+
+test <- prepped_vacc_confid_dataset[,.(mean_agree_vac_safe=mean(mean_agree_vac_safe, na.rm = TRUE)), 
+                by = c("location","year","gbd_location_id",
+                       "iso_code","iso_num_code")]
+
+prepped_vacc_confid_dataset <- as_tibble(test)
 
 # Save prepped data source
 saveRDS(prepped_vacc_confid_dataset, paste0(prepped_data_dir, "aim_2/08_prepped_vaccine_confidence_data.RDS"))

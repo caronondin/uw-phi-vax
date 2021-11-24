@@ -25,7 +25,7 @@ dt1 <- dt1[-1,]
 # Remove unnecessary columns
 dt1 <- dt1 %>% select(1, 3, 5:11)
 
-# assign correct names to columns
+# Assign correct names to columns
 colnames(dt1)[1] <- "country"
 colnames(dt1)[2] <- "iso_num_code"
 
@@ -67,11 +67,17 @@ dt1$iso_num_code[which(dt1$iso_num_code=="16")] <- "016"
 dt2 <- data.table(dt1)
 imm_pop_dataset <- melt(dt2, id.vars=c("country", "iso_num_code"),
                      value.name = "imm_pop_perc",
-                     variable.name = "year")
+                     variable.name = "year_factor")
+
+# Create variable to replace year
+imm_pop_dataset$year <- sub('.*(\\d{4}).*', '\\1', imm_pop_dataset$year_factor)
+
+# replace "missing" code with NA
+imm_pop_dataset$imm_pop_perc[ imm_pop_dataset$imm_pop_perc == ".." ] <- NA
 
 # Reformat numeric columns
 imm_pop_dataset$imm_pop_perc <- as.numeric(imm_pop_dataset$imm_pop_perc)
-# imm_pop_dataset$iso_num_code <- as.character(imm_pop_dataset$iso_num_code)
+imm_pop_dataset$year <- as.numeric(imm_pop_dataset$year)
 
 # Load location codebook to standardize names
 location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_mapping.RDS"))

@@ -41,23 +41,16 @@ dt2 <- dt2[-1,]
 # melt data long
 cpi_dataset = melt(dt2, id.vars = c('country', 'iso_code'), 
                       value.name = "cpi", 
-                   variable.name = "year")
+                   variable.name = "year_factor")
 
-# re-code the year variable
-levels(cpi_dataset$year)[1] <-"2020"
-levels(cpi_dataset$year)[2] <-"2019"
-levels(cpi_dataset$year)[3] <-"2018"
-levels(cpi_dataset$year)[4] <-"2017"
-levels(cpi_dataset$year)[5] <-"2016"
-levels(cpi_dataset$year)[6] <-"2015"
-levels(cpi_dataset$year)[7] <-"2014"
-levels(cpi_dataset$year)[8] <-"2013"
-levels(cpi_dataset$year)[9] <-"2012"
+# Extract four consecutive numeric digits from the year_factor variable
+cpi_dataset$year <- sub('.*(\\d{4}).*', '\\1', cpi_dataset$year_factor)
 
-# save CPI as numeric
+# save year and CPI as numeric
+cpi_dataset$year <- as.numeric(cpi_dataset$year)
 cpi_dataset$cpi <- as.numeric(cpi_dataset$cpi)
 
-# Load the location name codebook
+# Load the location name code book
 location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_mapping.RDS"))
 
 # Merge to ensure only national-level data is saved

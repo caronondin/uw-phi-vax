@@ -19,7 +19,7 @@ val_col <- 6
 
 # rename
 names(dt1)[loc_col] <- "geographic_area"
-names(dt1)[year_col] <- "year"
+names(dt1)[year_col] <- "time_period"
 names(dt1)[val_col] <- "perc_skil_attend"
 
 # keep only relevant columns
@@ -31,6 +31,10 @@ dt1 <- as_tibble(dt1)
 dt2 <- dt1 %>% separate(geographic_area, c("iso_code", "geographic_area"), sep = ":")
 dt2$geographic_area <- str_trim(dt2$geographic_area, side="left")
 
+# clean years that have month variable
+# Extract four consecutive numeric digits from the year variable
+dt2$year <- sub('.*(\\d{4}).*', '\\1', dt2$time_period)
+
 # Merge location map to standardize names of countries
 location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_mapping.RDS"))
 
@@ -39,6 +43,9 @@ birth_attendant_data <- dt2 %>%
 
 # Keep only columns of interest
 birth_attendant_data <- birth_attendant_data %>% select(location, year, gbd_location_id, iso_code, iso_num_code, perc_skil_attend)
+
+# Reformat columns
+birth_attendant_data$year <- as.numeric(birth_attendant_data$year)
 
 # save the file on the prepped data folder
 saveRDS(birth_attendant_data, file = paste0(prepped_data_dir, "aim_2/04_prepped_un_birth_attendant_data.RDS"))

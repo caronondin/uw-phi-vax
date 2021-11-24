@@ -28,7 +28,10 @@ dt2 <- rename(dt2,
 # Keep columns of interest
 prepped_ghe_dataset <- dt2 %>% select(location, year, gbd_location_id, iso_code, iso_num_code, gghed_che, hc62_g_gghed, hc62_che)
 
+# Save year variable as numeric
+prepped_ghe_dataset$year <- as.numeric(prepped_ghe_dataset$year)
+
 # Save final dataset
-saveRDS(prepped_ghe_dataset, paste0(prepped_data_dir, "aim_2/11_prepped_who_ghe_data.RDS"))
+saveRDS(prepped_ghe_dataset, paste0(prepped_data_dir, "aim_2/09_prepped_who_ghe_data.RDS"))
 
 
