@@ -25,14 +25,14 @@ location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_map
 haqi_dataset <- dt1 %>% 
   inner_join(location_map, by=c('location_id'='gbd_location_id'))
 
-# Subset to columns of interest
-haqi_dataset <- haqi_dataset %>% select(location, year_id, location_id, iso_code, iso_num_code, val)
-
 # rename the "val" variable
 haqi_dataset <- rename(haqi_dataset, 
        haqi = val,
        gbd_location_id = location_id, 
        year = year_id)
+
+# Subset to columns of interest
+haqi_dataset <- haqi_dataset %>% select(location, year, gbd_location_id, iso_code, iso_num_code, haqi)
 
 # save the new data set
 saveRDS(haqi_dataset, file = paste0(prepped_data_dir, "aim_2/02_prepped_ihme_haqi_data.RDS"))

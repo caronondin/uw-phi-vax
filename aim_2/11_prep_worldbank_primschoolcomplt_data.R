@@ -30,7 +30,7 @@ dt1_long$prim_school_complt <- as.numeric(dt1_long$prim_school_complt)
 location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_mapping.RDS"))
 
 # Merge to make sure names are standardized
-dt1_long <- dt1_long %>% right_join(location_map, by=c("iso_code"))
+dt1_long <- dt1_long %>% inner_join(location_map, by=c("iso_code"))
 
 # Update data name and keep select variables
 prim_school_complt_dataset <- dt1_long %>% select(location, year, gbd_location_id, iso_code, iso_num_code, prim_school_complt)

@@ -18,6 +18,9 @@ dt1 <- dt1 %>% filter(elim_ch==0)
 # Subset columns
 dt1 <- dt1 %>% select(year, source, recipient_isocode, recipient_country, gbd_location_id, nch_cnv_dah_20)
 
+# replace missing values with NA
+dt1$nch_cnv_dah_20[dt1$nch_cnv_dah_20=="-"] <- NA
+
 # Transform column from character to numeric
 dt1$nch_cnv_dah_20 <- as.numeric(dt1$nch_cnv_dah_20)
 
@@ -29,7 +32,7 @@ dt1 <- dt1[, .(nch_cnv_dah_20=sum(nch_cnv_dah_20, na.rm = T)), by=c('year', 'rec
 location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_mapping.RDS"))
 
 # Merge location names onto dataset
-dah_dataset <- merge(dt1, location_map, by.x = c('recipient_isocode', 'gbd_location_id'), by.y = c('iso_code', 'gbd_location_id'), all.x = TRUE)
+dah_dataset <- dt1 %>% inner_join(location_map, by=c('recipient_isocode'='iso_code', 'gbd_location_id'))
 
 # Change the name of the variables to make sure they are standardized
 setnames(dah_dataset, 

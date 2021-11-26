@@ -29,5 +29,13 @@ merged_data <- prepped_file_01 %>%
   full_join(prepped_file_10, by=mergeVars) %>%
   full_join(prepped_file_11, by=mergeVars)
 
+# Join SDI variable
+sdi_dat <- readRDS(paste0(prepped_data_dir, "02_sdi.RDS"))
+
+sdi_dat <- sdi_dat %>% select(location_id, year_id, sdi)
+
+final_merged_data <- merged_data %>% 
+  left_join(sdi_dat, by=c("gbd_location_id"="location_id", "year"="year_id"))
+
 # Save Final Prepped Data
-saveRDS(merged_data, file = paste0(prepped_data_dir, "aim_2/12_merged_dataset.RDS"))
+saveRDS(final_merged_data, file = paste0(prepped_data_dir, "aim_2/12_merged_dataset.RDS"))

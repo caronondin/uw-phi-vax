@@ -39,7 +39,7 @@ dt2$year <- sub('.*(\\d{4}).*', '\\1', dt2$time_period)
 location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_mapping.RDS"))
 
 birth_attendant_data <- dt2 %>% 
-  left_join(location_map, by='iso_code')
+  inner_join(location_map, by='iso_code')
 
 # Keep only columns of interest
 birth_attendant_data <- birth_attendant_data %>% select(location, year, gbd_location_id, iso_code, iso_num_code, perc_skil_attend)
