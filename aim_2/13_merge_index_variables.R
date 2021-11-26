@@ -31,7 +31,6 @@ merged_data <- prepped_file_01 %>%
 
 # Join SDI variable
 sdi_dat <- readRDS(paste0(prepped_data_dir, "02_sdi.RDS"))
-
 sdi_dat <- sdi_dat %>% select(location_id, year_id, sdi)
 
 final_merged_data <- merged_data %>% 
