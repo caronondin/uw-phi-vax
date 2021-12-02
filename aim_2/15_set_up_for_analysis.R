@@ -115,13 +115,9 @@ histograms_untr = lapply(indexVars, function(v) {
     theme_minimal()
 })
 
-# calculate the skewness for each variable for plot
-# lapply(indexVars, function(v){
-#   l = labelTable[variable==v]$Label
-#   
-# })
+# QQ Plot each of the transformations -----
 
-
+# Plot the untransformed variables
 for (id in unique(plot_untr_dt$variable)){
   sub_Data <- plot_untr_dt[which(plot_untr_dt$variable == id), ]$value
   
@@ -130,10 +126,70 @@ for (id in unique(plot_untr_dt$variable)){
   qqline(sub_Data, col="red", lty =2, lwd = 3)
   dev.off()
 }
+
+# Log transformations
+for (id in unique(plotdt1$variable)){
+  sub_Data <- plotdt1[which(plotdt1$variable == id), ]$value
   
+  pdf(paste0(visDir, "aim_2/qqplots_transformed_data/1_natural_log/ln_log_", id, ".pdf"))
+  qqnorm(sub_Data, main=paste("Variable =", id))
+  qqline(sub_Data, col="red", lty =2, lwd = 3)
+  dev.off()
+}
+
+# Multiplied by 1000 then natural Log transformations
+for (id in unique(plotdt2$variable)){
+  sub_Data <- plotdt2[which(plotdt2$variable == id), ]$value
+  
+  pdf(paste0(visDir, "aim_2/qqplots_transformed_data/2_1000_natural_log/1000ln_log_", id, ".pdf"))
+  qqnorm(sub_Data, main=paste("Variable =", id))
+  qqline(sub_Data, col="red", lty =2, lwd = 3)
+  dev.off()
+}
+
+# Square root transformations
+for (id in unique(plotdt3$variable)){
+  sub_Data <- plotdt3[which(plotdt3$variable == id), ]$value
+  
+  pdf(paste0(visDir, "aim_2/qqplots_transformed_data/3_square_root/sqrt_", id, ".pdf"))
+  qqnorm(sub_Data, main=paste("Variable =", id))
+  qqline(sub_Data, col="red", lty =2, lwd = 3)
+  dev.off()
+}
+
+# Squared transformations
+for (id in unique(plotdt4$variable)){
+  sub_Data <- plotdt4[which(plotdt4$variable == id), ]$value
+  
+  pdf(paste0(visDir, "aim_2/qqplots_transformed_data/4_squared/sqrd_", id, ".pdf"))
+  qqnorm(sub_Data, main=paste("Variable =", id))
+  qqline(sub_Data, col="red", lty =2, lwd = 3)
+  dev.off()
+}
+
 # this could be rewritten into a loop perhaps that will populate a table?
-skewness(dt1$imm_pop_perc)
-skewness(untransformed$imm_pop_perc)
+skewness_table <- data.table(
+  variable = indexVars,
+  skewness_untr = c(NA),
+  skewness_ln = c(NA),
+  skewness_1000ln = c(NA), 
+  skewness_sqrt = c(NA),
+  skewness_sqrd = c(NA)
+  )
+
+# Use a loop to calculate the skewness of each variable
+i <- 1
+for (i in i:length(indexVars)){
+  l <- indexVars[i]
+  skewness_table$skewness_untr[i] <- skewness(plot_untr_dt[variable==l]$value)
+  skewness_table$skewness_ln[i] <- skewness(plotdt1[variable==l]$value)
+  skewness_table$skewness_1000ln[i] <- skewness(plotdt2[variable==l]$value)
+  skewness_table$skewness_sqrt[i] <- skewness(plotdt3[variable==l]$value)
+  skewness_table$skewness_sqrd[i] <- skewness(plotdt4[variable==l]$value)
+}
+
+# Save the skewness table values 
+write.csv(skewness_table, file = paste0(visDir, "aim_2/skewness_table.csv"))
 
 # print(paste('Saving:', outputFile4c)C)
 outputFile15 <- paste0(visDir, "aim_2/transformed_data_exploration.pdf")
@@ -154,18 +210,18 @@ dev.off()
 # dt2 <- unlist(dt2[,-c(6,11)])
 
 # Calcualte geometric mean
-dt2$result <- dt2[, 6:7]
-
-dt2$Result <- apply(dt2, 1, function(x) (prod(x[x!=0]))^(1/sum(x!=0)))
-dt2[, v1 := Reduce(`+`, lapply(.SD, function(x) x!=0)), .SDcols = 6:18]
-dt2[, result2 := round((Reduce(`*`, lapply(.SD, function(x) 
-  replace(x, x==0, 1))))^(1/v1), 2), .SDcols = 6:18][, v1 := NULL][]
-
-# calculate skewness in r
-# install.packages("moments")
-
-# Variables requiring inverse transformation
-dt1[,c(8, 10, 11, 18)] <- 1/dt1[, c(8, 10, 11, 18)] 
+# dt2$result <- dt2[, 6:7]
+# 
+# dt2$Result <- apply(dt2, 1, function(x) (prod(x[x!=0]))^(1/sum(x!=0)))
+# dt2[, v1 := Reduce(`+`, lapply(.SD, function(x) x!=0)), .SDcols = 6:18]
+# dt2[, result2 := round((Reduce(`*`, lapply(.SD, function(x) 
+#   replace(x, x==0, 1))))^(1/v1), 2), .SDcols = 6:18][, v1 := NULL][]
+# 
+# # calculate skewness in r
+# # install.packages("moments")
+# 
+# # Variables requiring inverse transformation
+# dt1[,c(8, 10, 11, 18)] <- 1/dt1[, c(8, 10, 11, 18)] 
 
 
 # refers to variables that are proportions
