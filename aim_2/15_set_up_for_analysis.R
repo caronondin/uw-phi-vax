@@ -6,6 +6,9 @@ library(mice)
 library(VIM)
 library(car)
 library(psych)
+library(moments)
+
+# Make sure all variables have a complete time series -----
 
 # Load prepped and merged data
 dt <- read_rds(paste0(prepped_data_dir, "aim_2/12_merged_dataset.RDS"))
@@ -13,59 +16,142 @@ dt <- read_rds(paste0(prepped_data_dir, "aim_2/12_merged_dataset.RDS"))
 # subset data to specific time frame
 dt <- dt %>% filter(year < 2020 & year > 1990)
 
-
-# investigate missingness
-# mice_plot <- aggr(dt1, col=c('navyblue', 'yellow'),
-#                   numbers=TRUE, sortVars=TRUE)
-
-
 # ensure all variables have a complete time series
 imputed_Data <- mice(dt, m=5, maxit = 50, method = 'pmm', seed = 500)
+
+# save imputed data set in prepped data folder
+saveRDS(imputed_Data, file=paste0(prepped_data_dir, "aim_2/imputed_data_list.RDS"))
 
 # get first completed dataset to observe trends
 completeDT <- complete(imputed_Data, 1)
 
-# save copy of untransformed data
+# save copy of untransformed first completed data set 
 untransformed <- copy(completeDT)
+untransformed <- as.data.table(untransformed)
 
+# Test transformation 1: natural log transformation -----
+dt1 <- as.data.table(completeDT)
+dt1[,c(6:19)] <- log(dt1[, c(6:19)])
+
+# Test transformation 2: multiply by 1000 then log transformation -----
 dt2 <- as.data.table(completeDT)
+dt2[,c(6:19)] <- log(1000*dt2[, c(6:19)])
 
-# Variables requiring inverse transformation
-dt2[,c(8, 10, 11, 18)] <- 1/dt2[, c(8, 10, 11, 18)]
+# Test transformation 3: sqrt transformation -----
+dt3 <- as.data.table(completeDT)
+dt3[,c(6:19)] <- sqrt(dt3[, c(6:19)])
 
-# Variables that require log transformation to achieve normality
-dt2[,c(7:19)] <- log(1000*dt2[, c(7:19)])
+# Test transformation 4: squared transformation -----
+dt4 <- as.data.table(completeDT)
+dt4[,c(6:19)] <- (dt3[,c(6:19)]^2)
+
+# Fourth transformation: cumulative, log, logit and lag. ----
+# pending
 
 # Load "codeTable" for easy labeling
 codeTable <- as.data.table(read_xlsx(path=paste0(codebook_directory, "vaccine_index_variable_codebook.xlsx")))
 labelTable <- unique(codeTable[,.(Variable, Label)])
 
-# Make histogram of all the variables
+# Reshape each transformed data for plotting
 idVars <- unique(codeTable$Variable)[1:5]
-df2 <- melt(dt2, id.vars = idVars, variable.name = 'variable')
-indexVars <- unique(df2$variable)
+plotdt1 <- melt(dt1, id.vars = idVars, variable.name = 'variable')
+plotdt2 <- melt(dt2, id.vars = idVars, variable.name = 'variable')
+plotdt3 <- melt(dt3, id.vars = idVars, variable.name = 'variable')
+plotdt4 <- melt(dt4, id.vars = idVars, variable.name = 'variable')
 
-histograms = lapply(indexVars, function(v) {
+indexVars <- unique(plotdt1$variable)
+
+# Transformed data used to create index
+histograms1 = lapply(indexVars, function(v) {
   l = labelTable[Variable==v]$Label
-  ggplot(df2[variable==v], aes(value)) + 
-    geom_histogram() + 
-    # facet_wrap(~vaccine_name) + 
-    labs(title = paste('Histograms of', l), y = 'Value', x = l) + 
+  ggplot(plotdt1[variable==v], aes(value)) + 
+    geom_histogram() +
+    labs(title = paste('Histogram of', l), y = 'Value', x = l,
+         caption='Variables are post-transformation. Transformation: 
+			natural log.') + 
     theme_minimal()
 })
+
+histograms2 = lapply(indexVars, function(v) {
+  l = labelTable[Variable==v]$Label
+  ggplot(plotdt2[variable==v], aes(value)) + 
+    geom_histogram() +
+    labs(title = paste('Histogram of', l), y = 'Value', x = l,
+         caption='Variables are post-transformation. Transformation: 
+			values multiplied by 1000, and natural log.') + 
+    theme_minimal()
+})
+
+histograms3 = lapply(indexVars, function(v) {
+  l = labelTable[Variable==v]$Label
+  ggplot(plotdt3[variable==v], aes(value)) + 
+    geom_histogram() +
+    labs(title = paste('Histogram of', l), y = 'Value', x = l,
+         caption='Variables are post-transformation. Transformation: 
+			square root.') + 
+    theme_minimal()
+})
+
+histograms4 = lapply(indexVars, function(v) {
+  l = labelTable[Variable==v]$Label
+  ggplot(plotdt4[variable==v], aes(value)) + 
+    geom_histogram() +
+    labs(title = paste('Histogram of', l), y = 'Value', x = l,
+         caption='Variables are post-transformation. Transformation: 
+			squared.') + 
+    theme_minimal()
+})
+
+# Reshape untransformed data for plotting
+plot_untr_dt <- melt(untransformed, id.vars = idVars, variable.name = 'variable')
+
+# Untransformed data
+histograms_untr = lapply(indexVars, function(v) {
+  l = labelTable[Variable==v]$Label
+  ggplot(plot_untr_dt[variable==v], aes(value)) +
+    geom_histogram() +
+    labs(title = paste('Histograms of untransformed', l), y = 'value', x =l,
+         caption='Variables are pre-transformation.')+
+    theme_minimal()
+})
+
+# calculate the skewness for each variable for plot
+# lapply(indexVars, function(v){
+#   l = labelTable[variable==v]$Label
+#   
+# })
+
+
+for (id in unique(plot_untr_dt$variable)){
+  sub_Data <- plot_untr_dt[which(plot_untr_dt$variable == id), ]$value
+  
+  pdf(paste0(visDir, "aim_2/qqplots_untransformed_data/untr", id, ".pdf"))
+  qqnorm(sub_Data, main=paste("Variable =", id))
+  qqline(sub_Data, col="red", lty =2, lwd = 3)
+  dev.off()
+}
+  
+# this could be rewritten into a loop perhaps that will populate a table?
+skewness(dt1$imm_pop_perc)
+skewness(untransformed$imm_pop_perc)
 
 # print(paste('Saving:', outputFile4c)C)
 outputFile15 <- paste0(visDir, "aim_2/transformed_data_exploration.pdf")
 pdf(outputFile15, height=5.5, width=9)
 
-for(i in seq(length(histograms))) { 
-  print(histograms[[i]])
-  # print(histograms_untr[[i]])
+for(i in seq(length(histograms_untr))) { 
+  print(histograms_untr[[i]])
+  print(histograms1[[i]])
+  print(histograms2[[i]])
+  print(histograms3[[i]])
+  print(histograms4[[i]])
 }
 dev.off()
 
+# Drop columns that won't be used
+
 # Use DT2 to drop columsn we don't need:
-dt2 <- unlist(dt2[,-c(6,11)])
+# dt2 <- unlist(dt2[,-c(6,11)])
 
 # Calcualte geometric mean
 dt2$result <- dt2[, 6:7]
@@ -75,6 +161,11 @@ dt2[, v1 := Reduce(`+`, lapply(.SD, function(x) x!=0)), .SDcols = 6:18]
 dt2[, result2 := round((Reduce(`*`, lapply(.SD, function(x) 
   replace(x, x==0, 1))))^(1/v1), 2), .SDcols = 6:18][, v1 := NULL][]
 
+# calculate skewness in r
+# install.packages("moments")
+
+# Variables requiring inverse transformation
+dt1[,c(8, 10, 11, 18)] <- 1/dt1[, c(8, 10, 11, 18)] 
 
 
 # refers to variables that are proportions
@@ -112,6 +203,13 @@ dt2[, result2 := round((Reduce(`*`, lapply(.SD, function(x)
 #   dt2[get(v), (v):=1000*v]
 #   dt2[, (v):=logTransform(get(v))]
 # }
+# investigate missingness
+# mice_plot <- aggr(dt1, col=c('navyblue', 'yellow'),
+#                   numbers=TRUE, sortVars=TRUE)
+
+
+
+
 
 # extrapolate where necessary using GLM
 
