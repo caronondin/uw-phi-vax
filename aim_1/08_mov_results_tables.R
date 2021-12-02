@@ -2,6 +2,9 @@
 # Purpose: create table of coverage cascade for vaccinations
 # Date: Last modified October 13 2021
 
+# Source set up file with required packages and file paths
+source("./aim_1/01_set_up_R.R")
+
 # Load data
 data <- readRDS(outputFile06)
 
