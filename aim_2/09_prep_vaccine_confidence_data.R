@@ -10,61 +10,73 @@ file_list <- read_excel(paste0(g_drive, "data/list_of_data_used.xlsx")) %>%
 file_path <- paste0(raw_data_dir, file_list$data_type[8], "/", file_list$data_source[8], "/", file_list$file_name[8])
 
 # Read data sheet
-dt1 <- read_xlsx(file_path, sheet = 6)
+dt1 <- read_xlsx(file_path, sheet = 6) # vaccines are safe
+dt2 <- read_xlsx(file_path, sheet = 7) # vaccines are important
+dt3 <- read_xlsx(file_path, sheet = 8) # vaccines are effective
 
 # subset rows where population strongly agrees
 dt1 <- filter(dt1, response=="strongly agree")
+dt2 <- filter(dt2, response=="strongly agree")
+dt3 <- filter(dt3, response=="strongly agree")
 
-# rename columns
-colnames(dt1)[1] <- "country"
+# rename columns to facilitate merge
 colnames(dt1)[5] <- "mean_agree_vac_safe"
+colnames(dt2)[5] <- "mean_agree_vac_important"
+colnames(dt3)[5] <- "mean_agree_vac_effective"
 
-# Load location codebook to standardize names
+# merge together the three different sheets
+mergeVars <- c('country or territory', 'who_region', 'time', 'response')
+dataset <- dt1 %>% 
+  full_join(dt2, by=mergeVars) %>%
+  full_join(dt3, by=mergeVars)
+  
+# rename column with country name
+colnames(dataset)[1] <- "country"
+
+# Load location code book to standardize names
 location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_mapping.RDS"))
 
 # Double check whether all location names in vaccine confidence match names in the codebook
-conf_concat <- paste0(dt1$country)
+conf_concat <- paste0(dataset$country)
 loca_concat <- paste0(location_map$location)
-dt1$keep <- !conf_concat%in%loca_concat
-unmapped_locs <- dt1 %>% filter(keep==TRUE)
+dataset$keep <- !conf_concat%in%loca_concat
+unmapped_locs <- dataset %>% filter(keep==TRUE)
 
 # show which country names do not match the location names in the module map
 unique(unmapped_locs$country)
 
 # Fix country names in the database
-dt1$country[which(dt1$country=="Ivory Coast")] <- "Côte d'Ivoire"
-dt1$country[which(dt1$country=="Republic of Congo")] <- "Congo"
-dt1$country[which(dt1$country=="Swaziland")] <- "Eswatini"
-dt1$country[which(dt1$country=="Tanzania")] <- "United Republic of Tanzania"
-dt1$country[which(dt1$country=="Bolivia")] <- "Bolivia (Plurinational State of)"
-dt1$country[which(dt1$country=="USA")] <- "United States of America"
-dt1$country[which(dt1$country=="Venezuela")] <- "Venezuela (Bolivarian Republic of)"
-dt1$country[which(dt1$country=="Iran")] <- "Venezuela (Bolivarian Republic of)"
-dt1$country[which(dt1$country=="Syria")] <- "Syrian Arab Republic"
-dt1$country[which(dt1$country=="Czech Republic")] <- "Czechia"
-dt1$country[which(dt1$country=="Macedonia")] <- "North Macedonia"
-dt1$country[which(dt1$country=="Moldova")] <- "Republic of Moldova"
-dt1$country[which(dt1$country=="Russia")] <- "Russian Federation"
-dt1$country[which(dt1$country=="UK")] <- "United Kingdom"
-dt1$country[which(dt1$country=="Laos")] <- "Lao People's Democratic Republic"
-dt1$country[which(dt1$country=="South Korea")] <- "Republic of Korea"
-dt1$country[which(dt1$country=="Taiwan")] <- "Taiwan (Province of China)"
-dt1$country[which(dt1$country=="Vietnam")] <- "Viet Nam"
+dataset$country[which(dataset$country=="Ivory Coast")] <- "Côte d'Ivoire"
+dataset$country[which(dataset$country=="Republic of Congo")] <- "Congo"
+dataset$country[which(dataset$country=="Swaziland")] <- "Eswatini"
+dataset$country[which(dataset$country=="Tanzania")] <- "United Republic of Tanzania"
+dataset$country[which(dataset$country=="Bolivia")] <- "Bolivia (Plurinational State of)"
+dataset$country[which(dataset$country=="USA")] <- "United States of America"
+dataset$country[which(dataset$country=="Venezuela")] <- "Venezuela (Bolivarian Republic of)"
+dataset$country[which(dataset$country=="Iran")] <- "Venezuela (Bolivarian Republic of)"
+dataset$country[which(dataset$country=="Syria")] <- "Syrian Arab Republic"
+dataset$country[which(dataset$country=="Czech Republic")] <- "Czechia"
+dataset$country[which(dataset$country=="Macedonia")] <- "North Macedonia"
+dataset$country[which(dataset$country=="Moldova")] <- "Republic of Moldova"
+dataset$country[which(dataset$country=="Russia")] <- "Russian Federation"
+dataset$country[which(dataset$country=="UK")] <- "United Kingdom"
+dataset$country[which(dataset$country=="Laos")] <- "Lao People's Democratic Republic"
+dataset$country[which(dataset$country=="South Korea")] <- "Republic of Korea"
+dataset$country[which(dataset$country=="Taiwan")] <- "Taiwan (Province of China)"
+dataset$country[which(dataset$country=="Vietnam")] <- "Viet Nam"
 
 # Kosovo, Hong Kong, and Northern Cyprus had no equivalent in the GBD location map
-# dt1$country[which(dt$country=="Kosovo")] <- ""
-# dt1$country[which(dt$country=="Northern Cyprus")] <- ""
 
 # Extract the year portion of the time variable
 # prepped_migr_rate_dataset$year <- 
-dt1$year <- sub('.*(\\d{4}).*', '\\1', dt1$time)
-dt1$year <- as.numeric(dt1$year)
-dt1$time <- as.numeric(dt1$time)
-dt1$month_digit <- dt1$time - dt1$year
-dt1$month <- round((dt1$month_digit * 12) + 1)
+dataset$year <- sub('.*(\\d{4}).*', '\\1', dataset$time)
+dataset$year <- as.numeric(dataset$year)
+dataset$time <- as.numeric(dataset$time)
+dataset$month_digit <- dataset$time - dataset$year
+dataset$month <- round((dataset$month_digit * 12) + 1)
 
 # Merge location map onto the data
-prepped_vacc_confid_dataset <- dt1 %>%
+prepped_vacc_confid_dataset <- dataset %>%
   inner_join(location_map, by=c("country"="location"))
 
 prepped_vacc_confid_dataset <- prepped_vacc_confid_dataset %>% rename(location=country)
