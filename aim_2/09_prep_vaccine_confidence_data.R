@@ -82,15 +82,19 @@ prepped_vacc_confid_dataset <- dataset %>%
 prepped_vacc_confid_dataset <- prepped_vacc_confid_dataset %>% rename(location=country)
 
 # Keep variables of interest
-prepped_vacc_confid_dataset <- prepped_vacc_confid_dataset %>% select(location, year, month, gbd_location_id, iso_code, iso_num_code, mean_agree_vac_safe)
+prepped_vacc_confid_dataset <- prepped_vacc_confid_dataset %>% select(location, year, month, gbd_location_id, iso_code, iso_num_code, 
+                                                                      mean_agree_vac_safe, mean_agree_vac_important, mean_agree_vac_effective)
 
 # use data table to average across columns
 prepped_vacc_confid_dataset <- as.data.table(prepped_vacc_confid_dataset)
 
-test <- prepped_vacc_confid_dataset[,.(mean_agree_vac_safe=mean(mean_agree_vac_safe, na.rm = TRUE)), 
+test <- prepped_vacc_confid_dataset[,.(mean_agree_vac_safe=mean(mean_agree_vac_safe, na.rm = TRUE), 
+                                       mean_agree_vac_important=mean(mean_agree_vac_important, na.rm = TRUE), 
+                                       mean_agree_vac_effective=mean(mean_agree_vac_effective, na.rm=TRUE)), 
                 by = c("location","year","gbd_location_id",
                        "iso_code","iso_num_code")]
 
+# Save over dataset
 prepped_vacc_confid_dataset <- as_tibble(test)
 
 # Save prepped data source
