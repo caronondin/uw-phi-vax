@@ -27,6 +27,13 @@ if (impute_new==TRUE){
   # save imputed data set in prepped data folder
   saveRDS(imputed_Data, file=paste0(prepped_data_dir, "aim_2/imputed_data_list.RDS"))
   
+  # get first completed dataset to observe trends
+  completeDT <- complete(imputed_Data, 1)
+  
+  # save copy of untransformed first completed data set 
+  untransformed <- copy(completeDT)
+  untransformed <- as.data.table(untransformed)
+  
 } else {
   imputed_Data <- read_rds(paste0(prepped_data_dir, "aim_2/imputed_data_list.RDS"))
   
