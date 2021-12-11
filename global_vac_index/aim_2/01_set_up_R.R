@@ -13,7 +13,7 @@ library(tidyverse)
 # set shared team Google drive and code repo dynamically
 if (Sys.info()[2]=='10 x64'){
   g_drive  <- 'G:/.shortcut-targets-by-id/1P7ITMVB9x01fuYfHW8-uWogw4SpbuvwO/Merck Vaccine Improvement Index Project/'
-  code_dir <- 'C:/Users/frc2/Documents/uw-phi-vax/'
+  code_dir <- 'C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/'
 } else if (Sys.info()[2]=='Server x64'){
   g_drive  <- 'G:/Shared with Me/Merck Vaccine Improvement Index Project/'
   code_dir <- 'H:/uw-phi-vax/'
