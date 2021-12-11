@@ -107,5 +107,8 @@ dah_dataset <- dah_dataset %>%
 # save as numeric variable
 dah_dataset$nch_cnv_dah_20_cat <- as.numeric(dah_dataset$nch_cnv_dah_20_cat)
 
+# select only one value variable to keep
+dah_dataset <- dah_dataset %>% select(-c(nch_cnv_dah_20))
+
 # Save data
 saveRDS(dah_dataset, file=paste0(prepped_data_dir, "aim_2/01_prepped_ihme_dah_data.RDS"))
