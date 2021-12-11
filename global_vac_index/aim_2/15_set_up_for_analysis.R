@@ -10,24 +10,33 @@ library(moments)
 
 # Make sure all variables have a complete time series -----
 
-# Load prepped and merged data
-dt <- read_rds(paste0(prepped_data_dir, "aim_2/12_merged_dataset.RDS"))
+# impute data once more or read in previously imputed data
+impute_new <- FALSE
 
-# subset data to specific time frame
-dt <- dt %>% filter(year < 2020 & year > 1990)
-
-# ensure all variables have a complete time series
-imputed_Data <- mice(dt, m=5, maxit = 50, method = 'pmm', seed = 500)
-
-# save imputed data set in prepped data folder
-saveRDS(imputed_Data, file=paste0(prepped_data_dir, "aim_2/imputed_data_list.RDS"))
-
-# get first completed dataset to observe trends
-completeDT <- complete(imputed_Data, 1)
-
-# save copy of untransformed first completed data set 
-untransformed <- copy(completeDT)
-untransformed <- as.data.table(untransformed)
+if (impute_new==TRUE){
+  
+  # Load prepped and merged data
+  dt <- read_rds(paste0(prepped_data_dir, "aim_2/12_merged_dataset.RDS"))
+  
+  # subset data to specific time frame
+  dt <- dt %>% filter(year < 2020 & year > 1990)
+  
+  # ensure all variables have a complete time series
+  imputed_Data <- mice(dt, m=5, maxit = 50, method = 'pmm', seed = 500)
+  
+  # save imputed data set in prepped data folder
+  saveRDS(imputed_Data, file=paste0(prepped_data_dir, "aim_2/imputed_data_list.RDS"))
+  
+} else {
+  imputed_Data <- read_rds(paste0(prepped_data_dir, "aim_2/imputed_data_list.RDS"))
+  
+  # get first completed dataset to observe trends
+  completeDT <- complete(imputed_Data, 1)
+  
+  # save copy of untransformed first completed data set 
+  untransformed <- copy(completeDT)
+  untransformed <- as.data.table(untransformed)
+}
 
 # Test transformation 1: natural log transformation -----
 dt1 <- as.data.table(completeDT)
