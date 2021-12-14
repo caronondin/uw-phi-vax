@@ -14,3 +14,4 @@ df$result <- result
 # take the nth rooth of the new result
 n <- 3 # in our index this will be 3
 df$result <- df$result^(1/n)
+

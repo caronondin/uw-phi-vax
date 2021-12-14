@@ -4,9 +4,9 @@
 
 # Load useful packages
 library(mice)
-library(VIM)
-library(car)
-library(psych)
+# library(VIM)
+# library(car)
+# library(psych)
 library(moments)
 
 # impute data once more or read in previously imputed data
@@ -43,6 +43,10 @@ if (impute_new==TRUE){
   untransformed <- copy(completeDT)
   untransformed <- as.data.table(untransformed)
 }
+
+# Add constant to some variables before transformations
+completeDT$mig_rate <- completeDT$mig_rate + 71.787
+completeDT$perc_urban <- completeDT$perc_urban + 1
 
 # Test transformation 1: natural log transformation -----
 dt1 <- as.data.table(completeDT)
@@ -218,72 +222,3 @@ for(i in seq(length(histograms_untr))) {
   print(histograms4[[i]])
 }
 dev.off()
-
-# Drop columns that won't be used
-
-# Use DT2 to drop columsn we don't need:
-# dt2 <- unlist(dt2[,-c(6,11)])
-
-# Calcualte geometric mean
-# dt2$result <- dt2[, 6:7]
-# 
-# dt2$Result <- apply(dt2, 1, function(x) (prod(x[x!=0]))^(1/sum(x!=0)))
-# dt2[, v1 := Reduce(`+`, lapply(.SD, function(x) x!=0)), .SDcols = 6:18]
-# dt2[, result2 := round((Reduce(`*`, lapply(.SD, function(x) 
-#   replace(x, x==0, 1))))^(1/v1), 2), .SDcols = 6:18][, v1 := NULL][]
-# 
-# # calculate skewness in r
-# # install.packages("moments")
-# 
-# # Variables requiring inverse transformation
-# dt1[,c(8, 10, 11, 18)] <- 1/dt1[, c(8, 10, 11, 18)] 
-
-
-# refers to variables that are proportions
-# complVars = c('perc_skil_attend', 
-              # 'imm_pop_perc', 'perc_urban', 'prim_school_complt')
-
-# transform completeness variables using approximation of logit that allows 1's and 0's
-# (Smithson et al 2006 Psychological methods "A better lemon squeezer")
-# smithsonTransform = function(x) { 
-#   N=length( x[!is.na(x)] )
-#   logit(((x*(N-1))+0.5)/N)
-# }
-# 
-# for(v in complVars) { 
-#   completedData[get(v)>1, (v):=1]
-#   completedData[, (v):=smithsonTransform(get(v))]
-# }
-
-# # transform inverse variables to reciprocal
-# inverseTransform = function(x) {
-#   1/x
-# }
-# 
-# for (v in invVars) {
-#   dt2[, (v):=inverseTransform(get(v))]
-# }
-# 
-# numVars <- c('haqi')
-# 
-# logTransform = function(x) {
-#   log(x)
-# }
-# 
-# for (v in numVars) {
-#   dt2[get(v), (v):=1000*v]
-#   dt2[, (v):=logTransform(get(v))]
-# }
-# investigate missingness
-# mice_plot <- aggr(dt1, col=c('navyblue', 'yellow'),
-#                   numbers=TRUE, sortVars=TRUE)
-
-
-
-
-
-# extrapolate where necessary using GLM
-
-# Data transformations
-
-## including: logit transformation, log-tranformation
