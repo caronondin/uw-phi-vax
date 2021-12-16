@@ -4,6 +4,7 @@
 
 # library packages
 library(mice)
+library(GGally)
 
 # Load the imputed data set
 imputed_Data <- readRDS(file=paste0(prepped_data_dir, "aim_2/imputed_data_list.RDS"))
@@ -52,6 +53,12 @@ for (v in cubeVars) {
 # for (v in negVars) {
 #   data[, (v):=log(1000*get(v))]
 # }
+
+# check multicolinearity in the data
+X<-data[,6:21]
+
+ggpairs(X)
+
 
 # calculate the geometric mean
 # df <- data[,6:21]
