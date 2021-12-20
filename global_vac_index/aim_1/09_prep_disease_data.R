@@ -8,7 +8,7 @@
 file_list <- data.table(read_excel(paste0(g_drive, "data/list_of_data_used.xlsx")))
 
 # subset files to latest disease trends data
-file_list <- file_list[data_type=="disease_trends" & year=="2019"]
+file_list <- file_list[data_type=="disease_trends"]
 
 print("Now prepping:")
 
@@ -48,7 +48,7 @@ dx_dt <- prepped_dx_data
 dx_dt <- dx_dt %>% 
   select(measure_name, location_id, location_name, 
          cause_id, cause_name, metric_name,
-         year, val, upper, lower, file_name)
+         year, val, upper, lower)
 
 # rename columns for consistency
 setnames(dx_dt, old = c("year"), new = c("year_id"))
@@ -86,7 +86,7 @@ dx_perc <- dx_perc %>%
   )
 
 # bind datasets back together
-mergeCols <- c("location_id", "location_name", "cause_id", "cause_name", "year_id", "file_name")
+mergeCols <- c("location_id", "location_name", "cause_id", "cause_name", "year_id")
 
 tidy_data <- dx_numb %>% 
   full_join(dx_rate, by = mergeCols) %>%
