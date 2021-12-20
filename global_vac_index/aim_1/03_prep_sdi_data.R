@@ -101,7 +101,7 @@ setnames(sdi_dat_prepped,
 
 # clean numerical values of SDIs
 cols = names(sdi_dat_prepped)[3:32]   # define which columns to work with
-sdi_dat_prepped[ , (cols) := lapply(.SD, function(x) { as.numeric(gsub("Â·", ".", x)) }), .SDcols = cols] # replace symbol
+sdi_dat_prepped[ , (cols) := lapply(.SD, function(x) { as.numeric(gsub("·", ".", x)) }), .SDcols = cols] # replace symbol
 
 # remove unnecessary columns
 sdi_dat_prepped[,c("orig_location", "location"):=NULL]
