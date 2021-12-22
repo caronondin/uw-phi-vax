@@ -87,5 +87,27 @@ prepped_urban_dataset <- prepped_urban_dataset %>%
 prepped_urban_dataset <- prepped_urban_dataset %>% 
   select(location, year, gbd_location_id, iso_code, iso_num_code, perc_urban)
 
+# Extrapolate the missing values in between the years
+# extrapolate where necessary using GLM (better would be to use multiple imputation)
+# numVars =c('perc_urban')
+# i=1
+# for(v in numVars) {
+#   for(h in unique(prepped_urban_dataset$location)) { 
+#     i=i+1
+#     if (!any(is.na(prepped_urban_dataset[location==h][[v]]))) next
+#     if (!any(!is.na(prepped_urban_dataset[location==h][[v]]))) next
+#     form = as.formula(paste0(v,'~year'))
+#     lmFit = glm(form, prepped_urban_dataset[location==h], family='poisson')
+#     prepped_urban_dataset[location==h, tmp:=exp(predict(lmFit, newdata=prepped_urban_dataset[location==h]))]
+#     lim = max(prepped_urban_dataset[location==h][[v]], na.rm=T)+sd(prepped_urban_dataset[location==h][[v]], na.rm=T)
+#     prepped_urban_dataset[location==h & tmp>lim, tmp:=lim]
+#     ggplot(prepped_urban_dataset[location==h], aes_string(y=v, x='year')) + geom_point() + geom_point(aes(y=tmp),color='red')
+#     prepped_urban_dataset[location==h & is.na(get(v)), (v):=tmp]
+#     pct_complete = floor(i/(length(numVars)*length(unique(prepped_urban_dataset$location)))*100)
+#     cat(paste0('\r', pct_complete, '% Complete'))
+#     flush.console() 
+#   }
+# }
+
 # Save file in the prepped data folder
 saveRDS(prepped_urban_dataset, file = paste0(prepped_data_dir, "aim_2/07_prepped_un_perc_urban_data.RDS"))

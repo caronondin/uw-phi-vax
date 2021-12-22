@@ -1,13 +1,13 @@
-# Purpose: Explore data that will be used in index analysis
-# Author: Francisco Rios Casas
-# Date: Last updated Dec 13 2021
+# Name: Explore data before final analysis
+# Author: Francisco Rios
+# Date: Dec 22, 2021
 
-# Load useful packages
+# Load necessary packages
 library(mice)
-# library(VIM)
-# library(car)
-# library(psych)
+library(VIM)
 library(moments)
+library(ggcorrplot)
+library(vtable)
 
 # impute data once more or read in previously imputed data
 impute_new <- FALSE
@@ -18,7 +18,7 @@ if (impute_new==TRUE){
   dt <- read_rds(paste0(prepped_data_dir, "aim_2/12_merged_dataset.RDS"))
   
   # subset data to specific time frame
-  dt <- dt %>% filter(year < 2020 & year > 1990)
+  dt <- dt %>% filter(between(year, 2000, 2019))
   
   # ensure all variables have a complete time series
   imputed_Data <- mice(dt, m=5, maxit = 50, method = 'pmm', seed = 500)
@@ -34,6 +34,12 @@ if (impute_new==TRUE){
   untransformed <- as.data.table(untransformed)
   
 } else {
+  # Load prepped and merged data
+  dt <- read_rds(paste0(prepped_data_dir, "aim_2/12_merged_dataset.RDS"))
+  
+  # subset data to specific time frame
+  dt <- dt %>% filter(between(year, 2000, 2019))
+  
   imputed_Data <- read_rds(paste0(prepped_data_dir, "aim_2/imputed_data_list.RDS"))
   
   # get first completed dataset to observe trends
@@ -44,28 +50,41 @@ if (impute_new==TRUE){
   untransformed <- as.data.table(untransformed)
 }
 
-# Add constant to some variables before transformations
-completeDT$mig_rate <- completeDT$mig_rate + 71.787
-completeDT$perc_urban <- completeDT$perc_urban + 1
+# Find missigness pattern of original data set (dt) ----
+dt %>% summarise_all(list(name = ~sum(is.na(.))/length(.)))
 
-# Test transformation 1: natural log transformation -----
-dt1 <- as.data.table(completeDT)
-dt1[,c(6:19)] <- log(dt1[, c(6:19)])
+# Data transformations -----
+data <- as.data.table(completeDT)
 
-# Test transformation 2: multiply by 1000 then log transformation -----
-dt2 <- as.data.table(completeDT)
-dt2[,c(6:19)] <- log(1000*dt2[, c(6:19)])
+# add constant to migration rate to avoid having 0 
+data$mig_rate <- data$mig_rate+71.787
 
-# Test transformation 3: sqrt transformation -----
-dt3 <- as.data.table(completeDT)
-dt3[,c(6:19)] <- sqrt(dt3[, c(6:19)])
+# Change direction of the variables
+invVars = c('cpi', 'mig_rate', 'imm_pop_perc')
 
-# Test transformation 4: squared transformation -----
-dt4 <- as.data.table(completeDT)
-dt4[,c(6:19)] <- (dt3[,c(6:19)]^2)
+# transform inverse variables to reciprocal
+inverseTransform = function(x) {
+  1/x
+}
 
-# Fourth transformation: cumulative, log, logit and lag. ----
-# pending
+for (v in invVars) {
+  data[, (v):=inverseTransform(get(v))]
+}
+
+# Normalize to ensure all values are between 0 and 1
+allVars = names(data)[6:17]
+
+norm_cut <- read_xlsx(paste0(codebook_directory, "vaccine_index_normalizations_cutoffs.xlsx"))
+
+i <- 1
+for (i in 1:length(allVars)) {
+  min = norm_cut$min[i]
+  max = norm_cut$max[i]
+  v = norm_cut$variable[i]
+  data[, (v):=(get(v)-min)/(max-min)]
+}
+
+# Visualize the raw data, imputed data, and transformed data
 
 # Load "codeTable" for easy labeling
 codeTable <- as.data.table(read_xlsx(path=paste0(codebook_directory, "vaccine_index_variable_codebook.xlsx")))
@@ -73,152 +92,169 @@ labelTable <- unique(codeTable[,.(Variable, Label)])
 
 # Reshape each transformed data for plotting
 idVars <- unique(codeTable$Variable)[1:5]
-plotdt1 <- melt(dt1, id.vars = idVars, variable.name = 'variable')
-plotdt2 <- melt(dt2, id.vars = idVars, variable.name = 'variable')
-plotdt3 <- melt(dt3, id.vars = idVars, variable.name = 'variable')
-plotdt4 <- melt(dt4, id.vars = idVars, variable.name = 'variable')
+plotdt1 <- melt(dt, id.vars = idVars, variable.name = 'variable') # raw data
+plotdt2 <- melt(untransformed, id.vars = idVars, variable.name = 'variable') # imputed data
+plotdt3 <- melt(data, id.vars = idVars, variable.name = 'variable') # transformed data
 
 indexVars <- unique(plotdt1$variable)
 
-# Transformed data used to create index
+# Plot histograms of the raw data
 histograms1 = lapply(indexVars, function(v) {
   l = labelTable[Variable==v]$Label
-  ggplot(plotdt1[variable==v], aes(value)) + 
+  ggplot(plotdt1[variable==v], aes(value)) +
     geom_histogram() +
-    labs(title = paste('Histogram of', l), y = 'Value', x = l,
-         caption='Variables are post-transformation. Transformation: 
-			natural log.') + 
+    labs(title = paste('Histogram of Pre-transformation', l), y = 'Value', x = l,
+         caption='Variables are pre-imputation.') +
     theme_minimal()
 })
 
+# Plot histograms of the imputed data
 histograms2 = lapply(indexVars, function(v) {
   l = labelTable[Variable==v]$Label
-  ggplot(plotdt2[variable==v], aes(value)) + 
+  ggplot(plotdt2[variable==v], aes(value)) +
     geom_histogram() +
-    labs(title = paste('Histogram of', l), y = 'Value', x = l,
-         caption='Variables are post-transformation. Transformation: 
-			values multiplied by 1000, and natural log.') + 
+    labs(title = paste('Histogram of Pre-transformation', l), y = 'Value', x = l,
+         caption='Variables are post-imputation.') +
     theme_minimal()
 })
 
+# Plot histograms of the transformed data
 histograms3 = lapply(indexVars, function(v) {
   l = labelTable[Variable==v]$Label
-  ggplot(plotdt3[variable==v], aes(value)) + 
+  ggplot(plotdt3[variable==v], aes(value)) +
     geom_histogram() +
     labs(title = paste('Histogram of', l), y = 'Value', x = l,
-         caption='Variables are post-transformation. Transformation: 
-			square root.') + 
+         caption='Variables are post-transformation. Transformation: Variables are normalized between 0 and 1.') +
     theme_minimal()
 })
 
-histograms4 = lapply(indexVars, function(v) {
-  l = labelTable[Variable==v]$Label
-  ggplot(plotdt4[variable==v], aes(value)) + 
-    geom_histogram() +
-    labs(title = paste('Histogram of', l), y = 'Value', x = l,
-         caption='Variables are post-transformation. Transformation: 
-			squared.') + 
-    theme_minimal()
-})
+# Create PDF File with relevant visuals
+outputFile14 <- paste0(visDir, "/aim_2/histograms_of_data.PDF")
+print(paste('Saving:', outputFile14))
 
-# Reshape untransformed data for plotting
-plot_untr_dt <- melt(untransformed, id.vars = idVars, variable.name = 'variable')
 
-# Untransformed data
-histograms_untr = lapply(indexVars, function(v) {
-  l = labelTable[Variable==v]$Label
-  ggplot(plot_untr_dt[variable==v], aes(value)) +
-    geom_histogram() +
-    labs(title = paste('Histograms of untransformed', l), y = 'value', x =l,
-         caption='Variables are pre-transformation.')+
-    theme_minimal()
-})
+pdf(outputFile14, height=5.5, width=9)
 
-# QQ Plot each of the transformations -----
-
-# Plot the untransformed variables
-for (id in unique(plot_untr_dt$variable)){
-  sub_Data <- plot_untr_dt[which(plot_untr_dt$variable == id), ]$value
-  
-  pdf(paste0(visDir, "aim_2/qqplots_untransformed_data/untr", id, ".pdf"))
-  qqnorm(sub_Data, main=paste("Variable =", id))
-  qqline(sub_Data, col="red", lty =2, lwd = 3)
-  dev.off()
-}
-
-# Log transformations
-for (id in unique(plotdt1$variable)){
-  sub_Data <- plotdt1[which(plotdt1$variable == id), ]$value
-  
-  pdf(paste0(visDir, "aim_2/qqplots_transformed_data/1_natural_log/ln_log_", id, ".pdf"))
-  qqnorm(sub_Data, main=paste("Variable =", id))
-  qqline(sub_Data, col="red", lty =2, lwd = 3)
-  dev.off()
-}
-
-# Multiplied by 1000 then natural Log transformations
-for (id in unique(plotdt2$variable)){
-  sub_Data <- plotdt2[which(plotdt2$variable == id), ]$value
-  
-  pdf(paste0(visDir, "aim_2/qqplots_transformed_data/2_1000_natural_log/1000ln_log_", id, ".pdf"))
-  qqnorm(sub_Data, main=paste("Variable =", id))
-  qqline(sub_Data, col="red", lty =2, lwd = 3)
-  dev.off()
-}
-
-# Square root transformations
-for (id in unique(plotdt3$variable)){
-  sub_Data <- plotdt3[which(plotdt3$variable == id), ]$value
-  
-  pdf(paste0(visDir, "aim_2/qqplots_transformed_data/3_square_root/sqrt_", id, ".pdf"))
-  qqnorm(sub_Data, main=paste("Variable =", id))
-  qqline(sub_Data, col="red", lty =2, lwd = 3)
-  dev.off()
-}
-
-# Squared transformations
-for (id in unique(plotdt4$variable)){
-  sub_Data <- plotdt4[which(plotdt4$variable == id), ]$value
-  
-  pdf(paste0(visDir, "aim_2/qqplots_transformed_data/4_squared/sqrd_", id, ".pdf"))
-  qqnorm(sub_Data, main=paste("Variable =", id))
-  qqline(sub_Data, col="red", lty =2, lwd = 3)
-  dev.off()
-}
-
-# this could be rewritten into a loop perhaps that will populate a table?
-skewness_table <- data.table(
-  variable = indexVars,
-  skewness_untr = c(NA),
-  skewness_ln = c(NA),
-  skewness_1000ln = c(NA), 
-  skewness_sqrt = c(NA),
-  skewness_sqrd = c(NA)
-  )
-
-# Use a loop to calculate the skewness of each variable
-i <- 1
-for (i in i:length(indexVars)){
-  l <- indexVars[i]
-  skewness_table$skewness_untr[i] <- skewness(plot_untr_dt[variable==l]$value)
-  skewness_table$skewness_ln[i] <- skewness(plotdt1[variable==l]$value)
-  skewness_table$skewness_1000ln[i] <- skewness(plotdt2[variable==l]$value)
-  skewness_table$skewness_sqrt[i] <- skewness(plotdt3[variable==l]$value)
-  skewness_table$skewness_sqrd[i] <- skewness(plotdt4[variable==l]$value)
-}
-
-# Save the skewness table values 
-write.csv(skewness_table, file = paste0(visDir, "aim_2/skewness_table.csv"))
-
-# print(paste('Saving:', outputFile4c)C)
-outputFile15 <- paste0(visDir, "aim_2/transformed_data_exploration.pdf")
-pdf(outputFile15, height=5.5, width=9)
-
-for(i in seq(length(histograms_untr))) { 
-  print(histograms_untr[[i]])
+for(i in seq(length(histograms1))) {
   print(histograms1[[i]])
   print(histograms2[[i]])
   print(histograms3[[i]])
-  print(histograms4[[i]])
+  
 }
 dev.off()
+
+# Compute correlation matrix -----
+corr <- round(cor(data[,6:21]), 1)
+corrplot1 <- ggcorrplot(corr,
+           ggtheme = ggplot2::theme_gray,
+           outline.color = "white",
+           colors = c("#6D9EC1", "white", "#E46726"),
+           lab = TRUE,
+           title = "Correlation of variables after normalization.")
+
+corr2 <- round(cor(untransformed[,6:21]), 1)
+corrplot2 <-ggcorrplot(corr,
+           ggtheme = ggplot2::theme_gray,
+           outline.color = "white",
+           colors = c("#6D9EC1", "white", "#E46726"),
+           lab = TRUE,
+           title = "Correlation of variables before normalization.")
+
+# Save correlations on a PDF
+outputFile14b <- paste0(visDir, "aim_2/correlation_matrix.PDF")
+pdf(outputFile14b, height=11, width=8.5)
+corrplot1
+corrplot2
+dev.off()
+
+# view summary statistics for all variables
+# pdf(file = paste0(visDir, "aim_1/missed_opportunities/summary_statistics_prepped_dhs_data.pdf"))
+st(data, file=paste0(visDir, "aim_2/descriptive_stas_transformed_imputed_data.PDF"))
+st(untransformed, file=paste0(visDir, "aim_2/descriptive_stas_untransformed_imputed_data.PDF"))
+
+# Calculate index -----
+# Move this to seperate function afterwards
+
+# Drop variables that won't be used
+data <- data %>% select(-c("imm_pop_perc", "mig_rate", "perc_urban", "hc62_g_gghed",
+                           "hc62_che", "prim_school_complt", "crude_birth_rate")) # perc_urban, prim_school_complt, crude_birth_rate
+
+# Calculate the geometric mean
+new.col <- apply(data[,6:14], 1, prod)
+result <- as.data.frame(new.col)
+data$result <- result
+
+n <- ncol(data[,6:14])
+data$result <- data$result^(1/n)
+
+hist(data$result)
+# Save output -----
+# saveRDS(dt, outputFile06)
+
+# ggcorrplot(corr,
+#            hc.order = TRUE,
+#            type = "lower",
+#            outline.color = "white",
+#            ggtheme = ggplot2::theme_gray,
+#            colors = c("#6D9EC1", "white", "#E46726"))
+
+# Transformed data used to create index
+# histograms1 = lapply(indexVars, function(v) {
+#   l = labelTable[Variable==v]$Label
+#   ggplot(plotdt1[variable==v], aes(value)) + 
+#     geom_histogram() +
+#     labs(title = paste('Histogram of', l), y = 'Value', x = l,
+#          caption='Variables are post-transformation. Transformation: 
+# 			natural log.') + 
+#     theme_minimal()
+# })
+# 
+# histograms2 = lapply(indexVars, function(v) {
+#   l = labelTable[Variable==v]$Label
+#   ggplot(plotdt2[variable==v], aes(value)) + 
+#     geom_histogram() +
+#     labs(title = paste('Histogram of', l), y = 'Value', x = l,
+#          caption='Variables are post-transformation. Transformation: 
+# 			values multiplied by 1000, and natural log.') + 
+#     theme_minimal()
+# })
+# 
+# histograms3 = lapply(indexVars, function(v) {
+#   l = labelTable[Variable==v]$Label
+#   ggplot(plotdt3[variable==v], aes(value)) + 
+#     geom_histogram() +
+#     labs(title = paste('Histogram of', l), y = 'Value', x = l,
+#          caption='Variables are post-transformation. Transformation: 
+# 			square root.') + 
+#     theme_minimal()
+# })
+# print(paste('Saving:', outputFile4c)C)
+
+# outputFile15 <- paste0(visDir, "aim_2/transformed_data_exploration.pdf")
+# pdf(outputFile15, height=5.5, width=9)
+# 
+# for(i in seq(length(histograms_untr))) { 
+#   print(histograms_untr[[i]])
+#   print(histograms1[[i]])
+#   print(histograms2[[i]])
+#   print(histograms3[[i]])
+#   print(histograms4[[i]])
+# }
+# dev.off()
+
+
+
+# dt %>% 
+#   gather(-c(location, year, gbd_location_id, iso_code, iso_num_code))
+# 
+# df %>%
+#   gather(col, value, -line) %>% 
+#   group_by(col)
+# 
+# %>%
+#   group_by(col) %>%
+#   summarize(missing_share = mean(is.na(value)))
+# 
+# dt_aggr = aggr(dt, 
+#                    col=mdc(1:2),
+#                    numbers=TRUE, sortVars=TRUE, labels=names(dt), cex.axis=.7, gap=3, ylab=c("Proportion of missingness","Missingness Pattern"))
