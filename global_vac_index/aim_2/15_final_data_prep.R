@@ -4,6 +4,7 @@
 
 # library packages
 library(mice)
+library(GGally)
 
 # Load the imputed data set
 imputed_Data <- readRDS(file=paste0(prepped_data_dir, "aim_2/imputed_data_list.RDS"))
@@ -47,6 +48,12 @@ for (i in 1:length(allVars)) {
   v = norm_cut$variable[i]
   data[, (v):=(get(v)-min)/(max-min)]
 }
+
+# check multicolinearity in the data
+X<-data[,6:21]
+
+ggpairs(X)
+
 
 # calculate the geometric mean
 new.col <- apply(data[,6:18], 1, prod)
