@@ -1,5 +1,5 @@
 # Author: Francisco Rios Casas
-# Purpose: Load and prep IHME DAH data files
+# Purpose: Load and prep IHME DAH data files and health spending files
 # Date: October 29, 2021
 
 # Section 1: Load and organize the data -----
@@ -109,6 +109,31 @@ dah_dataset$nch_cnv_dah_20_cat <- as.numeric(dah_dataset$nch_cnv_dah_20_cat)
 
 # select only one value variable to keep
 dah_dataset <- dah_dataset %>% select(-c(nch_cnv_dah_20))
+
+# Part V: Read in the IHME health spending data
+# Set file path that will indicate which file to prep
+file_path <- paste0(raw_data_dir, "/", file_list$data_type[3], "/", file_list$data_source[3], "/", file_list$containing_folder[3], "/", file_list$file_name[3])
+
+# Load data file
+dt2 <- read_csv(file_path, show_col_types = FALSE)
+
+# Subset rows
+dt2 <- dt2 %>% filter(level=="Country")
+
+# Subset columns
+dt2 <- dt2 %>% select(location_id, location_name, iso3, year, the_total_mean, ghes_total_mean)
+
+# rename variables for merging
+dt2 <- rename(dt2,
+              gbd_location_id=`location_id`,
+              country=`location_name`,
+              iso_code=`iso3`)
+
+# merge onto dah_dataset
+prepped_dah_dataset <- dah_dataset %>% full_join(dt2, by=c("year", "gbd_location_id", "iso_code"))
+
+# Re-order columns
+prepped_dah_dataset <- prepped_dah_dataset %>% select(location, year, gbd_location_id, iso_code, iso_num_code, nch_cnv_dah_20_cat, the_total_mean, ghes_total_mean)
 
 # Save data
 saveRDS(dah_dataset, file=paste0(prepped_data_dir, "aim_2/01_prepped_ihme_dah_data.RDS"))
