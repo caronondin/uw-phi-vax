@@ -47,5 +47,47 @@ birth_attendant_data <- birth_attendant_data %>% select(location, year, gbd_loca
 # Reformat columns
 birth_attendant_data$year <- as.numeric(birth_attendant_data$year)
 
+# # Create expanded data frame to save 
+# 
+# years_of_data <- (2000:2020)
+# years <- matrix(nrow = 204, ncol = 21)
+# colnames(years) <- years_of_data
+# years <- data.table(years)
+# 
+# frame <- cbind(location_map, years)
+# frame <- as.data.table(frame)
+# 
+# frame_long <- melt(frame, id.vars=c('gbd_location_id', 'location', 'iso_code', 'iso_num_code'), variable.factor = FALSE)
+# frame_long$year <- as.numeric(frame_long$variable)
+# 
+# # Remove blank value from frame
+# frame_long <- frame_long[,-c(5,6)]
+# 
+# # Use the frame to map existing data
+# expanded_birth_attendant_dataset <- frame_long %>% left_join(birth_attendant_data, by = c("location", "iso_code", "iso_num_code", "gbd_location_id", "year"))
+# 
+# 
+# # extrapolate where necessary using GLM (better would be to use multiple imputation)
+# numVars <- "perc_skil_attend"
+# i=1
+# for(v in numVars) {
+#   for(h in unique(expanded_birth_attendant_dataset$location)) { 
+#     i=i+1
+#     if (!any(is.na(expanded_birth_attendant_dataset[location==h][[v]]))) next
+#     if (!any(!is.na(expanded_birth_attendant_dataset[location==h][[v]]))) next
+#     form = as.formula(paste0(v,'~year'))
+#     lmFit = glm(form, expanded_birth_attendant_dataset[location==h], family='poisson')
+#     expanded_birth_attendant_dataset[location==h, tmp:=exp(predict(lmFit, newdata=expanded_birth_attendant_dataset[location==h]))]
+#     lim = max(expanded_birth_attendant_dataset[location==h][[v]], na.rm=T)+sd(expanded_birth_attendant_dataset[location==h][[v]], na.rm=T)
+#     expanded_birth_attendant_dataset[location==h & tmp>lim, tmp:=lim]
+#     ggplot(expanded_birth_attendant_dataset[location==h], aes_string(y=v, x='year')) + geom_point() + geom_point(aes(y=tmp),color='red')
+#     expanded_birth_attendant_dataset[location==h & is.na(get(v)), (v):=tmp]
+#     pct_complete = floor(i/(length(numVars)*length(unique(expanded_birth_attendant_dataset$location)))*100)
+#     cat(paste0('\r', pct_complete, '% Complete'))
+#     flush.console() 
+#   }
+# }
+# expanded_imm_pop_dataset$tmp = NULL
+
 # save the file on the prepped data folder
 saveRDS(birth_attendant_data, file = paste0(prepped_data_dir, "aim_2/04_prepped_un_birth_attendant_data.RDS"))

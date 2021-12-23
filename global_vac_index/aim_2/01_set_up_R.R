@@ -9,6 +9,7 @@ library(readxl)
 library(tidyverse)
 
 # Define important variables -----
+set.seed(500)
 
 # set shared team Google drive and code repo dynamically
 if (Sys.info()[2]=='10 x64'){
