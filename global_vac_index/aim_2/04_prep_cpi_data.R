@@ -60,45 +60,5 @@ full_cpi_dataset <- cpi_dataset %>%
 # Select columns of interest
 full_cpi_dataset <- full_cpi_dataset %>% select(location, year, gbd_location_id, iso_code, iso_num_code, cpi)
 
-# # expand dataset with all years to complete the series
-# years_of_data <- (2000:2020)
-# years <- matrix(nrow = 204, ncol = 21)
-# colnames(years) <- years_of_data
-# years <- data.table(years)
-# 
-# frame <- cbind(location_map, years)
-# frame <- as.data.table(frame)
-# 
-# frame_long <- melt(frame, id.vars=c('gbd_location_id', 'location', 'iso_code', 'iso_num_code'), variable.factor = FALSE)
-# frame_long$year <- as.numeric(frame_long$variable)
-# 
-# # Remove blank value from frame
-# frame_long <- frame_long[,-c(5,6)]
-# 
-# # Use the frame to map existing data
-# expanded_cpi_dataset <- frame_long %>% left_join(full_cpi_dataset, by = c("location", "iso_code", "iso_num_code", "gbd_location_id", "year"))
-# 
-# # extrapolate where necessary using GLM (better would be to use multiple imputation)
-# numVars <- "cpi"
-# i=1
-# for(v in numVars) {
-#   for(h in unique(expanded_cpi_dataset$location)) { 
-#     i=i+1
-#     if (!any(is.na(expanded_cpi_dataset[location==h][[v]]))) next
-#     if (!any(!is.na(expanded_cpi_dataset[location==h][[v]]))) next
-#     form = as.formula(paste0(v,'~year'))
-#     lmFit = glm(form, expanded_cpi_dataset[location==h], family='poisson')
-#     expanded_cpi_dataset[location==h, tmp:=exp(predict(lmFit, newdata=expanded_cpi_dataset[location==h]))]
-#     lim = max(expanded_cpi_dataset[location==h][[v]], na.rm=T)+sd(expanded_cpi_dataset[location==h][[v]], na.rm=T)
-#     expanded_cpi_dataset[location==h & tmp>lim, tmp:=lim]
-#     # ggplot(expanded_cpi_dataset[location==h], aes_string(y=v, x='year')) + geom_point() + geom_point(aes(y=tmp),color='red')
-#     expanded_cpi_dataset[location==h & is.na(get(v)), (v):=tmp]
-#     pct_complete = floor(i/(length(numVars)*length(unique(expanded_cpi_dataset$location)))*100)
-#     cat(paste0('\r', pct_complete, '% Complete'))
-#     flush.console() 
-#   }
-# }
-# expanded_cpi_dataset$tmp = NULL
-
 # save the file on the prepped data folder
 saveRDS(full_cpi_dataset, file = paste0(prepped_data_dir, "aim_2/03_prepped_cpi_data.RDS"))

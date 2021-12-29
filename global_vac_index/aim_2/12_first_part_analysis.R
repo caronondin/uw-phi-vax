@@ -1,0 +1,33 @@
+# Purpose: Final transformations of data before calculating index
+# Author: 
+# Date: Dec 13, 2021
+
+# Load final data for analysis
+final_data <- readRDS(paste0(prepped_data_dir, "aim_2/09_prepped_data_for_analysis.RDS"))
+
+# Normalize to ensure all values are between 0 and 1
+allVars = names(final_data)[c(7:17)]
+
+norm_cut <- read_xlsx(paste0(codebook_directory, "vaccine_index_normalizations_cutoffs.xlsx"))
+
+i <- 1
+for (i in 1:length(allVars)) {
+  min = norm_cut$min[i]
+  max = norm_cut$max[i]
+  v = norm_cut$variable[i]
+  final_data[, (v):=(get(v)-min)/(max-min)]
+}
+
+# calculate geometric mean of all index variables
+# Calculate the geometric mean
+new.col <- apply(final_data[,6:16], 1, prod)
+result <- as.data.frame(new.col)
+final_data$result <- result
+
+n <- ncol(final_data[,6:16])
+final_data$result <- final_data$result^(1/n)
+
+hist(final_data$result)
+
+# Save final results
+saveRDS(final_data, file=paste0(prepped_data_dir, "aim_2/10_index_results.RDS"))
