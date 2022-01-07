@@ -18,6 +18,7 @@ library(leaflet)
 library(plotly)
 library(readxl)
 library(rintrojs)
+library(shinycssloaders)
 
 
 #setwd("~/Desktop/PHI - Research Assitant/Winter/vax/aim1")
@@ -29,16 +30,21 @@ disease_trends <- readRDS("05_disease_trends.RDS")
 merged_data_for_visuals <- readRDS("06_merged_data_for_visuals.RDS")
 vaccine_preventable_diseases <- read_excel("vaccine_preventable_diseases.xlsx")
 
-#low_sdi_lctns <- merged_data_for_visuals[sdi_group_present=="low"][,c("location_name","sdi")]
-#medium_sdi_lctns <- merged_data_for_visuals[sdi_group_present=="medium"][,c("location_name","sdi")]
-#high_sdi_lctns <- merged_data_for_visuals[sdi_group_present=="high"][,c("location_name","sdi")]
-
 ############################################### ui.R ##################################################
 body <-navbarPage(theme = shinytheme("flatly"), collapsible = TRUE,
                   title = "Global Vaccination Improvement Dashboard",
                   sidebarPanel(
                       h3(strong("Global SDI Ranking Table")),
-                      selectInput("year", "Year:",choices=sort(unique(merged_data_for_visuals$year))),
+                      #selectInput("year", "Year:",choices=sort(unique(merged_data_for_visuals$year))),
+                      tags$head(tags$style(HTML('.js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar {
+                                                  background: #20c997;
+                                                  border-top: 1px solid #18bc9c ;
+                                                  border-bottom: 1px solid #18bc9c ;}
+
+                            /* changes the colour of the number tags */
+                           .irs-from, .irs-to, .irs-single { background: #20c997}'
+                      ))),
+                      sliderInput("year", "Year", value =2019, min = 1990, max=2019,step=1,animate=TRUE),
                       radioButtons("sdi_group_present","SDI Group Present", choices = c("All"="all","Low" ="low","Medium" = "medium","High" = "high"),inline = TRUE),
                       tags$style(HTML('table.dataTable tr.selected td, table.dataTable td.selected {background-color: #92c9e8 !important;}')),
                       DT::dataTableOutput("table")),
@@ -51,6 +57,7 @@ body <-navbarPage(theme = shinytheme("flatly"), collapsible = TRUE,
                                            h3(strong(htmlOutput("content_vac"))),
                                            fluidRow(column(width = 12, "Select location by clicking location_name in left Global SDI Ranking table or click location on map.",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
+                                           radioButtons("vaccine_plot",NULL, choices = c("Time Series of Vaccine Coverage" ="line_trend","Single Year Vaccine Coverage Bar Plot"="bar_plot"),inline = TRUE),
                                            plotlyOutput("all_vaccine_plot"),
                                            fluidRow(
                                                column(3,
@@ -80,14 +87,21 @@ body <-navbarPage(theme = shinytheme("flatly"), collapsible = TRUE,
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
                                            radioButtons("disease_estimate",NULL, choices = c("Number Value"="number_val","Percent Value" ="percent_val","Rate Value" = "rate_val"),inline = TRUE),
                                            plotlyOutput("all_disease_plot"),
-                                           plotlyOutput("all_disability_plot"))
+                                           plotlyOutput("all_disability_plot")),
+                                  tabPanel("Data Explorer",fluidRow(column(6, radioButtons("dataset","Choose Dataset", choices = c("All"="all","SDI" ="sdi","Vaccine Trends" = "vaccine trends","Disease Trends" = "disease trends"),inline = TRUE)),
+                                                           column(6, style = "margin-top: 10px;",div(downloadButton("download","Download the data"), style = "float: right"))),
+                                           DT::dataTableOutput("alldatatable") %>% withSpinner(color="#0dc5c1"))  
                       )
                   )
 )
 
 server <- function(input, output,session) {
+    #year <- reactive({
+     #   req(input$year)
+      #  merged_data_for_visuals[merged_data_for_visuals$year == input$year,]
+    #})
+    
     year <- reactive({
-        req(input$year)
         merged_data_for_visuals[merged_data_for_visuals$year == input$year,]
     })
     
@@ -140,13 +154,30 @@ server <- function(input, output,session) {
     
     output$all_vaccine_plot <- renderPlotly({
         vac_plotdata <- filter(vaccine_trends,gsub(" ", "", location_name) == gsub(" ", "", "Switzerland"))
-        fig_a <- plot_ly(vac_plotdata, x = ~year_id,y=~prop_val, color = ~vaccine_name)%>%
-            add_lines()
-        fig_a <- fig_a %>% 
-            layout(title ="Time Series of Vaccination Coverage",  showlegend = T,
-                   xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
-                   yaxis = list(title = "Modeled estimate of vaccination coverage (%)",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
-        fig_a
+        if (input$vaccine_plot == "line_trend"){
+            fig_a <- plot_ly(vac_plotdata, x = ~year_id,y=~prop_val, color = ~vaccine_name)%>%
+                add_lines()
+            fig_a <- fig_a %>% 
+                layout(title ="Time Series of Vaccination Coverage",  showlegend = T,
+                       xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
+                       yaxis = list(title = "Modeled estimate of vaccination coverage (%)",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
+            fig_a
+        }
+        else{
+            single_year_vac_plotdata <- filter(vac_plotdata,year_id == input$year)
+            fig1 <- plot_ly(x = ~single_year_vac_plotdata$prop_val, y = ~reorder(single_year_vac_plotdata$vaccine_name, single_year_vac_plotdata$prop_val), name = paste0('Vaccniation Coverage in',input$year),
+                            type = 'bar', orientation = 'h',
+                            marker = list(color = 'rgba(50, 171, 96, 0.6)',
+                                          line = list(color = 'rgba(50, 171, 96, 1.0)', width = 1))) 
+            fig1 <- fig1 %>% layout(title = paste0("Vaccination Coverage in ", input$year),
+                                    yaxis = list(title = paste0("Vaccination coverage (%)"),showgrid = FALSE, showline = FALSE, showticklabels = TRUE, domain= c(0, 0.85)),
+                                    xaxis = list(title = "Vaccine", zeroline = FALSE, showline = FALSE, showticklabels = TRUE, showgrid = TRUE)) 
+            fig1 <- fig1 %>% add_annotations(xref = 'x1', yref = 'y',
+                                             x = single_year_vac_plotdata$prop_val * 1 + 0.1,  y = single_year_vac_plotdata$vaccine_name,
+                                             text = paste(round(single_year_vac_plotdata$prop_val*100, 2), '%'),
+                                             font = list(family = 'Arial', size = 12, color = 'rgb(50, 171, 96)'),
+                                             showarrow = FALSE)
+        }
     })
     
     output$all_disease_plot <- renderPlotly({
@@ -156,19 +187,19 @@ server <- function(input, output,session) {
         if (input$disease_estimate == "number_val"){
             fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_number_val, color = ~cause_name)%>%
                 add_lines()
-            title = "Time Series of Deaths, Disease or Disability Cause Number"
+            title = "Time Series of Deaths, Disease or Disability Number"
             y_title = "Number of Deaths in Population"
         }
         else if (input$disease_estimate == "percent_val"){
             fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_percent_val, color = ~cause_name)%>%
                 add_lines()
-            title = "Time Series of Deaths, Disease or Disability Cause Percent"
+            title = "Time Series of Deaths, Disease or Disability Percent"
             y_title="Proportion of deaths for a particular cuase relative to deaths from all causes"
         }
         else{
             fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_rate_val, color = ~cause_name)%>%
                 add_lines()
-            title = "Time Series of Deaths, Disease or Disability Cause Rate"
+            title = "Time Series of Deaths, Disease or Disability Rate"
             y_title="Deaths per 100,000 population"
         }
         fig_dis <- fig_dis %>% 
@@ -234,19 +265,19 @@ server <- function(input, output,session) {
             if (input$disease_estimate == "number_val"){
                 fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_number_val, color = ~cause_name)%>%
                     add_lines()
-                title = "Time Series of Deaths, Disease or Disability Cause Number"
+                title = "Time Series of Deaths, Disease or Disability Number"
                 y_title = "Number of Deaths in Population"
             }
             else if (input$disease_estimate == "percent_val"){
                 fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_percent_val, color = ~cause_name)%>%
                     add_lines()
-                title = "Time Series of Deaths, Disease or Disability Cause Percent"
+                title = "Time Series of Deaths, Disease or Disability Percent"
                 y_title="Proportion of deaths for a particular cuase relative to deaths from all causes"
             }
             else{
                 fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_rate_val, color = ~cause_name)%>%
                     add_lines()
-                title = "Time Series of Deaths, Disease or Disability Cause Rate"
+                title = "Time Series of Deaths, Disease or Disability Rate"
                 y_title="Deaths per 100,000 population"
             }
             fig_dis <- fig_dis %>% 
@@ -296,7 +327,8 @@ server <- function(input, output,session) {
     
     output$mymap <- renderLeaflet({
         leaflet() %>%
-            addProviderTiles(provider = "CartoDB.Positron")
+            addProviderTiles(provider = "CartoDB.Positron")%>%
+            setView(lng = -10.61, lat = 40, zoom = 2)
     })
     
     output$BCGtable = DT::renderDataTable({
@@ -351,6 +383,59 @@ server <- function(input, output,session) {
                                         dom = 't',
                                         ordering = FALSE))
     })
+    
+    dataexplorer <- reactive({
+        req(input$dataset)
+        if (input$dataset == "all"){
+            dataexplorer <- merged_data_for_visuals
+        }
+        else if(input$dataset == "sdi"){
+            dataexplorer <- sdi
+        }
+        else if(input$dataset == "vaccine trends"){
+            dataexplorer <- vaccine_trends
+        }
+        else{
+            dataexplorer <- disease_trends
+        }
+    })
+    
+    output$alldatatable = DT::renderDataTable({
+            data<-dataexplorer()
+            if (input$dataset == "all"){
+                x<-data %>%
+                    dplyr::select(-c("location_id","level"))
+            }
+            else if(input$dataset == "sdi"){
+                x<- data %>%
+                    dplyr::select(-c("location_id","level"))
+            }
+            else if(input$dataset == "vaccine trends"){
+                x<-data %>%
+                    dplyr::select(-c("location_id"))
+            }
+            else{
+                x<-data %>%
+                    dplyr::select(-c("location_id","cause_id"))
+            }
+            formattable(
+               x
+            ) %>%
+                as.datatable(rownames = FALSE,
+                             filter = 'top',
+                             options = list(paging = TRUE,
+                                            seaching = FALSE,
+                                            scrollX=TRUE, 
+                                            ordering = TRUE,
+                                            dom = '<lf<t>p>',
+                                            pageLength=12))
+        })
+    output$download <- downloadHandler(
+        filename =  paste0(input$dataset,".csv",sep=""),
+        content = function(fname){
+            write.csv(dataexplorer(), fname)
+        }
+    )
 }
 
 shinyApp(body, server)
