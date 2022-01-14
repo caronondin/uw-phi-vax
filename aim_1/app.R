@@ -403,6 +403,43 @@ server <- function(input, output,session) {
                      yaxis = list(title = y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
           fig_disa
       })
+      
+      observeEvent(selected_dis_vac_data(),{
+        output$selected_vac_dis_plot <- renderPlotly({
+          selected_vac_plotdata <- filter(selected_dis_vac_data()$selected_vac_data,gsub(" ", "", location_name) == gsub(" ", "", info$value))
+          selected_dis_plotdata <- filter(selected_dis_vac_data()$dis_data_for_selected_vac,gsub(" ", "", location_name) == gsub(" ", "", info$value))
+          merged_selected_plotdata <- dplyr::left_join(selected_vac_plotdata,selected_dis_plotdata, "year_id", "year_id")
+          print(selected_dis_plotdata)
+          fig <- plot_ly()
+          # Add traces
+          fig <- plot_ly(merged_selected_plotdata)
+          fig <- fig %>% add_trace(x= ~year_id, y = ~deaths_rate_val, type = 'scatter', mode = 'lines+makers', color = ~cause_name) 
+          ay <- list(
+            overlaying = "y",
+            side = "right",
+            title = "<b> Deaths</b> per 100,000 population")
+          
+          fig <- fig %>% add_trace(x =  ~year_id, y = ~prop_val, type = 'scatter',name = ~vaccine_name.x,yaxis = "y2", mode = 'lines',line = list(color = 'rgba(49,130,189, 1)', width = 4)) 
+          # Set figure title, x and y-axes titles
+          fig <- fig %>% layout(
+            title = list(text="Vaccine & Corresponding Disease Trend", x=0.25), yaxis2 = ay,
+            xaxis = list(title="xaxis title "),
+            yaxis = list(title="<b> Vaccine</b> coverage (%)"),
+            legend = list(x = 3000, y = 1.4)
+          )%>%
+            layout(xaxis = list(
+              zerolinecolor = '#ffff',
+              zerolinewidth = 2,
+              gridcolor = 'ffff'),
+              yaxis = list(
+                zerolinecolor = '#ffff',
+                zerolinewidth = 2,
+                gridcolor = 'ffff')
+            )
+          
+          fig
+        })
+      })
   })
   
   output$mymap <- renderLeaflet({
