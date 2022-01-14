@@ -61,30 +61,9 @@ body <-navbarPage(theme = shinytheme("flatly"), collapsible = TRUE,
                                            h3(strong(htmlOutput("content_vac"))),
                                            fluidRow(column(width = 12, "Select location by clicking location_name in left Global SDI Ranking table or click location on map.",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
+                                           fluidRow(column(11,h2(("   ")))),
                                            radioButtons("vaccine_plot",NULL, choices = c("Time Series of Vaccine Coverage" ="line_trend","Single Year Vaccine Coverage"="bar_plot"),inline = TRUE),
-                                           plotlyOutput("all_vaccine_plot"),
-                                           fluidRow(
-                                               column(3,
-                                                      h4("BCG"),
-                                                      helpText("Bacillus Calmette–Guérin"),
-                                                      DT::dataTableOutput("BCGtable")),
-                                               column(3,
-                                                      h4("DTP1 & DTP3"),
-                                                      helpText("Diphtheria, tetanus, pertussis"),
-                                                      DT::dataTableOutput("DTPtable")),
-                                               column(2,
-                                                      h4("HepB3"),
-                                                      helpText("Hepatitis B"),
-                                                      DT::dataTableOutput("HepB3table")), 
-                                               column(2,
-                                                      h4("MCV1 & MCV2"),
-                                                      helpText("Measles"),
-                                                      DT::dataTableOutput("MCVtable")), 
-                                               column(2,
-                                                      h4("RotaC"),
-                                                      helpText("Rotavirus"),
-                                                      DT::dataTableOutput("RotaCtable")), 
-                                           )),
+                                           plotlyOutput("all_vaccine_plot")),
                                   tabPanel("Mortality and Disability Trends",value = "d_vac",
                                            h3(strong(htmlOutput("content_dis"))),
                                            fluidRow(column(width = 12, "Select location by clicking location_name in left Global SDI Ranking table or click location on map.",
@@ -97,7 +76,27 @@ body <-navbarPage(theme = shinytheme("flatly"), collapsible = TRUE,
                                   tabPanel("Vaccination and Disease Trends",value="vac_dis_tab",
                                            h3(strong(htmlOutput("content_vac_dis"))),
                                            selectInput("vaccinations", "Vaccination:",choices=NULL),
-                                           plotlyOutput("selected_vac_dis_plot"),),
+                                           plotlyOutput("selected_vac_dis_plot"),
+                                           fluidRow(column(11,h4(strong(" ")))),
+                                           fluidRow(column(11,h4(strong(" ")))),
+                                           fluidRow(column(11,h4(strong("Vaccine Description")))),
+                                           fluidRow(
+                                             column(3,
+                                                    h4("BCG"),
+                                                    helpText("Bacillus Calmette–Guérin")),
+                                             column(3,
+                                                    h4("DTP1 & DTP3"),
+                                                    helpText("Diphtheria, tetanus, pertussis")),
+                                             column(2,
+                                                    h4("HepB3"),
+                                                    helpText("Hepatitis B")),
+                                             column(2,
+                                                    h4("MCV1 & MCV2"),
+                                                    helpText("Measles")),
+                                             column(2,
+                                                    h4("RotaC"),
+                                                    helpText("Rotavirus"))
+                                           )),
                                   tabPanel("Data Explorer",fluidRow(column(6, radioButtons("dataset","Choose Dataset", choices = c("All"="all","SDI" ="sdi","Vaccine Trends" = "vaccine trends","Disease Trends" = "disease trends"),inline = TRUE)),
                                                            column(6, style = "margin-top: 10px;",div(downloadButton("download","Download the data"), style = "float: right"))),
                                            DT::dataTableOutput("alldatatable") %>% withSpinner(color="#0dc5c1"))
@@ -290,7 +289,7 @@ server <- function(input, output,session) {
       # Set figure title, x and y-axes titles
       fig <- fig %>% layout(
         title = list(text="Vaccine & Corresponding Disease Trend", x=0.25), yaxis2 = ay,
-        xaxis = list(title="xaxis title "),
+        xaxis = list(title="Year"),
         yaxis = list(title="<b> Vaccine</b> coverage (%)"),
         legend = list(x = 3000, y = 1.4)
       )%>%
@@ -423,7 +422,7 @@ server <- function(input, output,session) {
           # Set figure title, x and y-axes titles
           fig <- fig %>% layout(
             title = list(text="Vaccine & Corresponding Disease Trend", x=0.25), yaxis2 = ay,
-            xaxis = list(title="xaxis title "),
+            xaxis = list(title="Year"),
             yaxis = list(title="<b> Vaccine</b> coverage (%)"),
             legend = list(x = 3000, y = 1.4)
           )%>%
@@ -446,59 +445,6 @@ server <- function(input, output,session) {
       leaflet() %>%
           addProviderTiles(provider = "CartoDB.Positron")%>%
           setView(lng = -10.61, lat = 40, zoom = 2)
-  })
-  
-  output$BCGtable = DT::renderDataTable({
-      bcg_table <- vaccine_preventable_diseases[vaccine_preventable_diseases$vaccine_name == "BCG",][,c("cause_name")]
-      formattable(
-          bcg_table
-      ) %>%
-          as.datatable(rownames = FALSE,  colnames = NULL,
-                       options = list(paging = FALSE,
-                                      dom = 't',
-                                      ordering = FALSE)
-          )
-  })
-  
-  output$DTPtable = DT::renderDataTable({
-      table <- vaccine_preventable_diseases[vaccine_preventable_diseases$vaccine_name == "DTP1",][,c("cause_name")]
-      formattable(
-          table
-      ) %>%
-          as.datatable(rownames = FALSE, colnames = NULL,
-                       options = list(paging = FALSE,
-                                      dom = 't',
-                                      ordering = FALSE))
-  })
-  output$HepB3table = DT::renderDataTable({
-      table <- vaccine_preventable_diseases[vaccine_preventable_diseases$vaccine_name == "HepB3",][,c("cause_name")]
-      formattable(
-          table
-      ) %>%
-          as.datatable(rownames = FALSE,  colnames = NULL,
-                       options = list(paging = FALSE,
-                                      dom = 't',
-                                      ordering = FALSE))
-  })
-  output$MCVtable = DT::renderDataTable({
-      table <- unique(vaccine_preventable_diseases[vaccine_preventable_diseases$vaccine_name == "MCV1" | vaccine_preventable_diseases$vaccine_name == "MCV2",][,c("cause_name")])
-      formattable(
-          table
-      ) %>%
-          as.datatable(rownames = FALSE,  colnames = NULL,
-                       options = list(paging = FALSE,
-                                      dom = 't',
-                                      ordering = FALSE))
-  })
-  output$RotaCtable = DT::renderDataTable({
-      table <- vaccine_preventable_diseases[vaccine_preventable_diseases$vaccine_name == "RotaC",][,c("cause_name")]
-      formattable(
-          table
-      ) %>%
-          as.datatable(rownames = FALSE,  colnames = NULL,
-                       options = list(paging = FALSE,
-                                      dom = 't',
-                                      ordering = FALSE))
   })
   
   dataexplorer <- reactive({
