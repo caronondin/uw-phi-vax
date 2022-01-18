@@ -52,5 +52,10 @@ frame_long <- frame_long[,-c(5,6)]
 # Use the frame to map existing data
 expanded_final_merged_data <- frame_long %>% left_join(final_merged_data, by = mergeVars)
 
+# re arrange variables and save final
+expanded_final_merged_data <- expanded_final_merged_data %>% select(location, year, gbd_location_id, iso_code, iso_num_code, sdi, dah_per_the_mean, the_per_cap_mean, 
+                                        ghes_per_the_mean, haqi, cpi, perc_skil_attend, imm_pop_perc, perc_urban,
+                                        mean_agree_vac_safe, mean_agree_vac_important, mean_agree_vac_effective)
+
 # Save Final Prepped Data
 saveRDS(expanded_final_merged_data, file = paste0(prepped_data_dir, "aim_2/08_merged_dataset.RDS"))

@@ -6,12 +6,12 @@
 final_data <- readRDS(paste0(prepped_data_dir, "aim_2/09_prepped_data_for_analysis.RDS"))
 
 # Normalize to ensure all values are between 0 and 1
-allVars = names(final_data)[c(7:17)]
+normVars = c('the_per_cap_mean', 'dah_per_the_mean_cat')
 
 norm_cut <- read_xlsx(paste0(codebook_directory, "vaccine_index_normalizations_cutoffs.xlsx"))
 
 i <- 1
-for (i in 1:length(allVars)) {
+for (i in 1:length(normVars)) {
   min = norm_cut$min[i]
   max = norm_cut$max[i]
   v = norm_cut$variable[i]
@@ -20,11 +20,11 @@ for (i in 1:length(allVars)) {
 
 # calculate geometric mean of all index variables
 # Calculate the geometric mean
-new.col <- apply(final_data[,6:16], 1, prod)
+new.col <- apply(final_data[,6:17], 1, prod)
 result <- as.data.frame(new.col)
 final_data$result <- result
 
-n <- ncol(final_data[,6:16])
+n <- ncol(final_data[,6:17])
 final_data$result <- final_data$result^(1/n)
 
 hist(final_data$result)

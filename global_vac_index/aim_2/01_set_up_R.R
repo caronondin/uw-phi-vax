@@ -26,6 +26,6 @@ if (Sys.info()[2]=='10 x64'){
 setwd(code_dir) # set the working directory to wherever code is stored
 raw_data_dir <- paste0(g_drive,"Data/raw_data/") # location of raw data
 prepped_data_dir <- paste0(g_drive,"Data/prepped_data/") # location of prepped data
-codebook_directory <- paste0(g_drive,"Data/documentation/codebooks/") # location of codebooks for interpreting data
+codebook_directory <- paste0(g_drive,"Data/documentation/codebooks/aim_2/") # location of codebooks for interpreting data
 resDir <- paste0(g_drive, "Results/") # location of  any result outputs
 visDir <- paste0(g_drive,"Visualizations/") # location where visualizations are saved

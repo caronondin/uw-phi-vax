@@ -23,21 +23,28 @@ full_data <- index_data %>% left_join(vax_data, by=c("gbd_location_id"="location
 # subset columns
 full_data <- full_data %>% select(location, year, gbd_location_id, iso_code, iso_num_code, result, prop_val_MCV1, prop_val_DTP1, prop_val_DTP3)
 
+# create duplicated columns that will be imputed
+full_data$prop_val_MCV1_estimated <- full_data$prop_val_MCV1
+full_data$prop_val_DTP1_estimated <- full_data$prop_val_DTP1
+full_data$prop_val_DTP3_estimated <- full_data$prop_val_DTP3
+
 # drop the values from 2019
-data <- full_data
+data <- full_data %>% filter(between(year, 1995, 2019))
 data[year==2019, prop_val_MCV1:=NA]
+data[year==2019, prop_val_DTP1:=NA]
+data[year==2019, prop_val_DTP3:=NA]
 
-# Use values to extrapolate per country
-v <- "prop_val_MCV1"
-h <- "Afghanistan"
-form = as.formula(paste0(v,'~result'))
-lmFit = glm(form, data[location==h], family='poisson')
-data[location==h,tmp:=exp(predict(lmFit, newdata=data[location==h]))]
-lim = max(data[location==h][[v]], na.rm=T)+sd(data[location==h][[v]], na.rm=T)
-data[location==h & tmp>lim, tmp:=lim]
-ggplot(data[location==h], aes_string(y=v, x='result')) + geom_point() + geom_point(aes(y=tmp),color='red') + labs(title=paste0(h))
+# # Use values to extrapolate per country
+# v <- "prop_val_MCV1"
+# h <- "Afghanistan"
+# form = as.formula(paste0(v,'~result'))
+# lmFit = glm(form, data[location==h], family='poisson')
+# data[location==h,tmp:=exp(predict(lmFit, newdata=data[location==h]))]
+# lim = max(data[location==h][[v]], na.rm=T)+sd(data[location==h][[v]], na.rm=T)
+# data[location==h & tmp>lim, tmp:=lim]
+# ggplot(data[location==h], aes_string(y=v, x='result')) + geom_point() + geom_point(aes(y=tmp),color='red') + labs(title=paste0(h))
 
-numVars <- names("prop_val_MCV1")
+numVars <- names(data)[7:9]
 i=1
 pltlist <- list()
 for(v in numVars) {
@@ -45,12 +52,12 @@ for(v in numVars) {
     
     if (!any(is.na(data[location==h][[v]]))) next
     if (!any(!is.na(data[location==h][[v]]))) next
-    form = as.formula(paste0(v,'~year'))
-    lmFit = glm(form, data[location==h], family='binomial')
+    form = as.formula(paste0(v,'~result'))
+    lmFit = glm(form, data[location==h], family='poisson')
     data[location==h, tmp:=exp(predict(lmFit, newdata=data[location==h]))]
     lim = max(data[location==h][[v]], na.rm=T)+sd(data[location==h][[v]], na.rm=T)
     data[location==h & tmp>lim, tmp:=lim]
-    pltlist[[i]] <- ggplot(data[location==h], aes_string(y=v, x='year')) + geom_point() + geom_point(aes(y=tmp),color='red') + labs(title = paste0(h))
+    pltlist[[i]] <- ggplot(data[location==h], aes_string(y=v, x='result')) + geom_point() + geom_point(aes(y=tmp),color='red') + labs(title = paste0(h))
     data[location==h & is.na(get(v)), (v):=tmp]
     i=i+1
     pct_complete = floor(i/(length(numVars)*length(unique(data$location)))*100)
@@ -61,7 +68,23 @@ for(v in numVars) {
 
 data$tmp = NULL
 
+outputFile13 <- paste0(visDir, "aim_2/index_vacc_coverage.pdf")
+pdf(outputFile13, height=5.5, width=9)
+
+for(i in seq(length(pltlist))) {
+  print(pltlist[[i]])
+}
+dev.off()
+
 # plot relationship between index result and values of vaccine coverage
-ggplot(data[], aes_string(y='prop_val_MCV1', x='result')) + geom_point()
+ggplot(data, aes_string(y='prop_val_MCV1', x='result')) + geom_point()
 ggplot(data, aes_string(y='prop_val_DTP1', x='result')) + geom_point()
+ggplot(data, aes_string(y='prop_val_DTP3', x='result')) + geom_point()
 ggplot(data[location=="Afghanistan"], aes_string(y='prop_val_DTP3', x='result')) + geom_point()
+
+# Plot relationship between predicted and observed values of vaccine coverage
+ggplot(data[year=="2019"], aes_string(y='prop_val_MCV1', x='prop_val_MCV1_estimated')) + geom_point()
+ggplot(data[year=="2019"], aes_string(y='prop_val_DTP1', x='prop_val_DTP1_estimated')) + geom_point()
+ggplot(data[year=="2019"], aes_string(y='prop_val_DTP3', x='prop_val_DTP3_estimated')) + geom_point()
+
+# Quantify how much agreement there is between predicted and estimated value

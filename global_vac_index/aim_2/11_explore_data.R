@@ -1,4 +1,4 @@
-# Purpose: Create viuals to inspect data
+# Purpose: Create visuals to inspect data
 # Author: Francisco Rios 
 # Date: Dec 13, 2021
 
@@ -73,5 +73,43 @@ st(dt1, file=paste0(visDir, "aim_2/descriptive_stats_merged_data.PDF"))
 st(dt2, file=paste0(visDir, "aim_2/descriptive_stats_imputed_data.PDF"))
 
 # Find missigness pattern of original data set (dt) ----
-missingness <- dt1 %>% summarise_all(list(name = ~sum(is.na(.))/length(.)))
-write.csv(missingness, file=paste0(visDir, "aim_2/missingness_in_merged_data.csv"))
+missingness1 <- dt1 %>% filter(between(year, 1995, 2020)) %>% summarise_all(list(name = ~sum(is.na(.))/length(.))) 
+missingness2 <- dt1 %>% filter(between(year, 2000, 2020)) %>% summarise_all(list(name = ~sum(is.na(.))/length(.)))
+missingness3 <- dt1 %>% filter(between(year, 2010, 2020)) %>% summarise_all(list(name = ~sum(is.na(.))/length(.)))
+missingness4 <- dt1 %>% filter(between(year, 2015, 2020)) %>% summarise_all(list(name = ~sum(is.na(.))/length(.)))
+missingness5 <- dt1 %>% filter(between(year, 2015, 2019)) %>% summarise_all(list(name = ~sum(is.na(.))/length(.)))
+
+# add new column indicating year range
+missingness1$range <- "1995-2020"
+missingness2$range <- "2000-2020"
+missingness3$range <- "2010-2020"
+missingness4$range <- "2015-2020"
+missingness5$range <- "2015-2019"
+
+# bind into one table
+miss_table <- rbind(missingness1, missingness2, missingness3, missingness4, missingness5)
+
+miss_table <- miss_table %>% pivot_longer(cols = !range, names_to = "variable", values_to = "missingness")
+
+# reshape miss_table to be long
+miss_table_reformat <- miss_table %>% pivot_wider(names_from = range, values_from=missingness)
+write.csv(miss_table_reformat, file=paste0(visDir, "aim_2/missingness_in_merged_data.csv"))
+
+# Compare which locations have been dropped
+all_locs <- unique(dt1$location)
+sub_locs <- unique(dt2$location)
+dropped_locs <- setdiff(all_locs, sub_locs)
+
+# Save vector of locations that were dropped due to missing data
+write.csv(dropped_locs, file = paste0(visDir, "aim_2/dropped_locations.csv"))
+
+# find locations that are missing info on skilled birth attendants
+skill_att_miss <- dt1 %>% select(location, year, gbd_location_id, iso_code, iso_num_code, perc_skil_attend)
+skill_att_miss <- pivot_wider(skill_att_miss, id_cols = c(location, year, gbd_location_id, iso_code, iso_num_code), values_from = perc_skil_attend, names_from = year)
+skill_att_miss$total_missing <- rowSums(is.na(skill_att_miss))
+skill_att_miss <- skill_att_miss %>% filter(total_missing>=31)
+
+# save csv of locations that do not have any data on skilled birth attendants
+write.csv(skill_att_miss, file = paste0(visDir, "aim_2/locations_missing_skill_birth_attendants.csv"))
+# %>% filter(is.na(perc_skil_attend))
+# unique(skill_att_miss$location)
