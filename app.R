@@ -56,15 +56,14 @@ body <-navbarPage(theme = shinytheme("flatly"), collapsible = TRUE,
                                   tabPanel("Vaccination Improvement Index Mapper",value="t_sdi",
                                            #leaflet::leafletOutput("mymap", height = "80vh")),
                                            fluidRow(column(6, " ", style='padding:20px;')),
-                                           plotlyOutput("index_map",height = "100vh"),
+                                           plotlyOutput("index_map",height = "57vh"),
+                                           plotlyOutput("index_trend_plot",height = "28vh"),
                                            div(class="outer",
                                                tags$head(includeCSS("aim_2/style.css")),
                                                absolutePanel(id = "controls", class = "panel panel-default",
                                                              top = 180, left = 650, width = 250, fixed=TRUE,
                                                              draggable = TRUE, height = "auto",
-                                                             sliderInput("index_year", "Select Mapping Year", value =2020, min = 1995, max=2020,step=1,sep = "",animate=TRUE)))
-                                                             
-                                               ),
+                                                             sliderInput("index_year", "Select Mapping Year", value =2020, min = 1995, max=2020,step=1,sep = "",animate=TRUE)))),
                                   tabPanel("Vaccination Trends", value = "t_vac",
                                            h3(strong(htmlOutput("content_vac"))),
                                            fluidRow(column(width = 12, "Select location by clicking location_name in left Global SDI Ranking table or click location on map.",
@@ -140,7 +139,7 @@ server <- function(input, output,session) {
     req(input$index_year)
     index_results[index_results$year == input$index_year,]
   })
-  
+
   observeEvent(merged_data_for_vac_dis,{
     choices = sort(unique(merged_data_for_vac_dis$vaccine_name))
     updateSelectInput(session,'vaccinations', choices = choices)
@@ -344,6 +343,48 @@ server <- function(input, output,session) {
       fig_disa
   })
   
+  output$index_trend_plot <- renderPlotly({
+    index_trend_data <- filter(index_results,location == "Switzerland")
+    
+    vii_left <- list(
+      xref = 'paper',
+      yref = 'y',
+      x = 0.01,
+      y = index_trend_data$result[1]+0.01,
+      xanchor = 'middle',
+      yanchor = 'center',
+      text = ~round(index_trend_data$result[1],3),
+      font = list(family = 'Arial',
+                  size = 16,
+                  color = 'rgba(67,67,67,1)'),
+      showarrow = FALSE)
+    
+    vii_right <- list(
+      xref = 'paper',
+      yref = 'y',
+      x = 0.97,
+      y = index_trend_data$result[26]+0.02,
+      xanchor = 'middle',
+      yanchor = 'center',
+      text = ~round(index_trend_data$result[26],3),
+      font = list(family = 'Arial',
+                  size = 16,
+                  color = 'rgba(67,67,67,1)'),
+      showarrow = FALSE)
+    
+    fig_a <- plot_ly(index_trend_data, x = ~year)
+    fig_a <- fig_a  %>% add_trace(y=~result,type='scatter', name = "vaccination improvement index", mode = 'lines', line = list(color = 'rgba(49,130,189, 1)',width=2))
+    fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(result[1], result[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgba(49,130,189, 1)', size = 10))
+    fig_a <- fig_a %>% 
+      layout(title = paste0("Time Series of Vaccination Improvement Index in Switzerland"), 
+             showlegend = FALSE,
+             xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
+             yaxis = list(title = "Vaccination Improvement Index",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
+    fig_a <- fig_a %>% layout(annotations = vii_left) 
+    fig_a <- fig_a %>% layout(annotations = vii_right) 
+    fig_a
+  })
+  
   observeEvent(selected_dis_vac_data(),{
     output$selected_vac_dis_plot <- renderPlotly({
       selected_vac_plotdata <- filter(selected_dis_vac_data()$selected_vac_data,gsub(" ", "", location_name) == gsub(" ", "", "Switzerland"))
@@ -394,6 +435,49 @@ server <- function(input, output,session) {
       output$content_vac <- renderText(info$value)
       output$content_dis <- renderText(info$value)
       output$content_vac_dis <- renderText(info$value)
+      
+      output$index_trend_plot <- renderPlotly({
+        index_trend_data <- filter(index_results,location == gsub(" ", "", info$value))
+        
+        vii_left <- list(
+          xref = 'paper',
+          yref = 'y',
+          x = 0.01,
+          y = index_trend_data$result[1]+0.01,
+          xanchor = 'middle',
+          yanchor = 'center',
+          text = ~round(index_trend_data$result[1],3),
+          font = list(family = 'Arial',
+                      size = 16,
+                      color = 'rgba(67,67,67,1)'),
+          showarrow = FALSE)
+        
+        vii_right <- list(
+          xref = 'paper',
+          yref = 'y',
+          x = 0.97,
+          y = index_trend_data$result[26]+0.02,
+          xanchor = 'middle',
+          yanchor = 'center',
+          text = ~round(index_trend_data$result[26],3),
+          font = list(family = 'Arial',
+                      size = 16,
+                      color = 'rgba(67,67,67,1)'),
+          showarrow = FALSE)
+        
+        fig_a <- plot_ly(index_trend_data, x = ~year)
+        fig_a <- fig_a  %>% add_trace(y=~result,type='scatter', name = "vaccination improvement index", mode = 'lines', line = list(color = 'rgba(49,130,189, 1)',width=2))
+        fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(result[1], result[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgba(49,130,189, 1)', size = 10))
+        fig_a <- fig_a %>% 
+          layout(title = paste0("Time Series of Vaccination Improvement Index in ",info$value), 
+                 showlegend = FALSE,
+                 xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
+                 yaxis = list(title = "Vaccination Improvement Index",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
+        fig_a <- fig_a %>% layout(annotations = vii_left) 
+        fig_a <- fig_a %>% layout(annotations = vii_right) 
+        fig_a
+      })
+      
       output$all_vaccine_plot <- renderPlotly({
           vac_plotdata <- filter(vaccine_trends,gsub(" ", "", location_name) == gsub(" ", "", info$value))
           if (input$vaccine_plot == "line_trend"){
