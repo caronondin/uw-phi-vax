@@ -912,7 +912,7 @@ label(NISPUF10$P_NUM1M) <- "NUMBER OF MONOVALENT 2009 H1N1 INFLUENZA SPRAY VACCI
 label(NISPUF10$P_NUM1N) <- "NUMBER OF INJECTED MONOVALENT 2009 H1N1 INFLUENZA VACCINATIONS BY 36 MONTHS OF AGE DETERMINED FROM PROVIDER INFO, EXCLUDING ANY VACCINATIONS AFTER THE HH INTERVIEW DATE."
 label(NISPUF10$P_NUMHEA) <- "NUMBER OF HEPATITIS A-CONTAINING SHOTS BY 36 MONTHS OF AGE DETERMINED FROM PROVIDER INFO, EXCLUDING ANY VACCINATIONS AFTER THE HH INTERVIEW DATE."
 label(NISPUF10$P_NUMHEN) <- "NUMBER OF HEPATITIS B-CONTAINING SHOTS OF UNKNOWN TYPE BY 36 MONTHS OF AGE DETERMINED FROM PROVIDER INFO, EXCLUDING ANY VACCINATIONS AFTER THE HH INTERVIEW DATE."
-label(NISPUF10$P_NUMHEP) <- "NUMBER OF HEPATITIS B-CONTAINING SHOTS BY 36 MONTHS OF AGE DETERMINED FROM PROVIDER INFO, EXCLUDING ANY VACCINATIONS AFTER THE HH INTERVIEW DATE."
+label(NISPUF10$P_NUMHEP) <- "NUMBER OF HEPATITIS B-CONTAINING SHOTS DETERMINED FROM PROVIDER INFO, EXCLUDING ANY VACCINATIONS AFTER THE HH INTERVIEW DATE."
 label(NISPUF10$P_NUMHIB) <- "NUMBER OF HIB-CONTAINING SHOTS BY 36 MONTHS OF AGE DETERMINED FROM PROVIDER INFO, EXCLUDING ANY VACCINATIONS AFTER THE HH INTERVIEW DATE."
 
 label(NISPUF10$P_NUMHIN) <- "NUMBER OF HIB-CONTAINING SHOTS OF UNKNOWN TYPE BY 36 MONTHS OF AGE DETERMINED FROM PROVIDER INFO, EXCLUDING ANY VACCINATIONS AFTER THE HH INTERVIEW DATE."
@@ -1429,350 +1429,350 @@ label(NISPUF10$VFC_I) <- "DERIVED: IS CHILD VFC ELIGIBLE?"
 
 save(NISPUF10, file=paste(PUF, "/NISPUF10.RData", sep=""))
 
-############################################################################
-# Step 6:   ASSIGN FORMATS                                                 #
-#	  FORMATS ARE APPLICABLE ONLY TO CATEGORICAL VARIABLES	IN R           #
-############################################################################
-
-NISPUF10$AGEGRP <- factor(NISPUF10$AGEGRP, levels=AGEGRPlevels, labels=AGEGRPlabels)
-NISPUF10$LANGUAGE <- factor(NISPUF10$LANGUAGE, levels=LANGUAGElevels, labels=LANGUAGElabels)
-NISPUF10$HAD_CPOX <- factor(NISPUF10$HAD_CPOX, levels=YNDKRFlevels, labels=YNDKRFlabels)
-NISPUF10$CBF_01 <- factor(NISPUF10$CBF_01, levels=YNDKRFlevels, labels=YNDKRFlabels)
-NISPUF10$CWIC_02 <- factor(NISPUF10$CWIC_02, levels=YNDKRFlevels, labels=YNDKRFlabels)
-
-NISPUF10$INTRP <- factor(NISPUF10$INTRP, levels=YNDKRFlevels, labels=YNDKRFlabels)
-NISPUF10$INS_1 <- factor(NISPUF10$INS_1, levels=YNDKRFlevels, labels=YNDKRFlabels)
-NISPUF10$INS_2 <- factor(NISPUF10$INS_2, levels=YNDKRFlevels, labels=YNDKRFlabels)
-NISPUF10$INS_3 <- factor(NISPUF10$INS_3, levels=YNDKRFlevels, labels=YNDKRFlabels)
-NISPUF10$INS_3A <- factor(NISPUF10$INS_3A, levels=YNDKRFlevels, labels=YNDKRFlabels)
-
-NISPUF10$INS_4_5 <- factor(NISPUF10$INS_4_5, levels=YNDKRFlevels, labels=YNDKRFlabels)
-NISPUF10$INS_6 <- factor(NISPUF10$INS_6, levels=YNDKRFlevels, labels=YNDKRFlabels)
-NISPUF10$INS_11 <- factor(NISPUF10$INS_11, levels=YNDKRFlevels, labels=YNDKRFlabels)
-NISPUF10$P_NUHEPX <- factor(NISPUF10$P_NUHEPX, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUHIBX <- factor(NISPUF10$P_NUHIBX, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-
-NISPUF10$P_NUHPHB <- factor(NISPUF10$P_NUHPHB, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMDAH <- factor(NISPUF10$P_NUMDAH, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMDHI <- factor(NISPUF10$P_NUMDHI, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMDIH <- factor(NISPUF10$P_NUMDIH, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMDTA <- factor(NISPUF10$P_NUMDTA, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-
-NISPUF10$P_NUMDTP <- factor(NISPUF10$P_NUMDTP, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMFLU <- factor(NISPUF10$P_NUMFLU, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMFLUL <- factor(NISPUF10$P_NUMFLUL, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMFLUM <- factor(NISPUF10$P_NUMFLUM, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMFLUN <- factor(NISPUF10$P_NUMFLUN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-
-NISPUF10$P_NUMH1N <- factor(NISPUF10$P_NUMH1N, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUM1L <- factor(NISPUF10$P_NUM1L, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUM1M <- factor(NISPUF10$P_NUM1M, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUM1N <- factor(NISPUF10$P_NUM1N, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMHEA <- factor(NISPUF10$P_NUMHEA, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-
-NISPUF10$P_NUMHEN <- factor(NISPUF10$P_NUMHEN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMHEP <- factor(NISPUF10$P_NUMHEP, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMHIB <- factor(NISPUF10$P_NUMHIB, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMHIN <- factor(NISPUF10$P_NUMHIN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMHION <- factor(NISPUF10$P_NUMHION, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-
-NISPUF10$P_NUMHM <- factor(NISPUF10$P_NUMHM, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMHG <- factor(NISPUF10$P_NUMHG, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMHS <- factor(NISPUF10$P_NUMHS, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMIPV <- factor(NISPUF10$P_NUMIPV, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMMCN <- factor(NISPUF10$P_NUMMCN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-
-NISPUF10$P_NUMMMR <- factor(NISPUF10$P_NUMMMR, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMMMRX <- factor(NISPUF10$P_NUMMMRX, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMMMX <- factor(NISPUF10$P_NUMMMX, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMMP <- factor(NISPUF10$P_NUMMP, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMMPR <- factor(NISPUF10$P_NUMMPR, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-
-NISPUF10$P_NUMMRV <- factor(NISPUF10$P_NUMMRV, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMMS <- factor(NISPUF10$P_NUMMS, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMMSM <- factor(NISPUF10$P_NUMMSM, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMMSR <- factor(NISPUF10$P_NUMMSR, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMOLN <- factor(NISPUF10$P_NUMOLN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-
-NISPUF10$P_NUMOPV <- factor(NISPUF10$P_NUMOPV, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMPCV <- factor(NISPUF10$P_NUMPCV, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMPCP <- factor(NISPUF10$P_NUMPCP, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMPCC <- factor(NISPUF10$P_NUMPCC, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMPCC7 <- factor(NISPUF10$P_NUMPCC7, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-
-NISPUF10$P_NUMPCC13 <- factor(NISPUF10$P_NUMPCC13, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMPCCN <- factor(NISPUF10$P_NUMPCCN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMPCN <- factor(NISPUF10$P_NUMPCN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMPOL <- factor(NISPUF10$P_NUMPOL, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMRB <- factor(NISPUF10$P_NUMRB, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-
-NISPUF10$P_NUMRG <- factor(NISPUF10$P_NUMRG, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMRM <- factor(NISPUF10$P_NUMRM, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMRO <- factor(NISPUF10$P_NUMRO, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMROT <- factor(NISPUF10$P_NUMROT, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMTPN <- factor(NISPUF10$P_NUMTPN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-
-NISPUF10$P_NUMVRC <- factor(NISPUF10$P_NUMVRC, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMVRN <- factor(NISPUF10$P_NUMVRN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$P_NUMVRX <- factor(NISPUF10$P_NUMVRX, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
-NISPUF10$SC_431 <- factor(NISPUF10$SC_431, levels=SCUTDlevels, labels=SCUTDlabels)
-NISPUF10$SC_4313 <- factor(NISPUF10$SC_4313, levels=SCUTDlevels, labels=SCUTDlabels)
-
-NISPUF10$SC_43133 <- factor(NISPUF10$SC_43133, levels=SCUTDlevels, labels=SCUTDlabels)
-NISPUF10$SC_DTP <- factor(NISPUF10$SC_DTP, levels=SCUTDlevels, labels=SCUTDlabels)
-NISPUF10$SC_HEPB <- factor(NISPUF10$SC_HEPB, levels=SCUTDlevels, labels=SCUTDlabels)
-NISPUF10$SC_HIB <- factor(NISPUF10$SC_HIB, levels=SCUTDlevels, labels=SCUTDlabels)
-NISPUF10$SC_MCV <- factor(NISPUF10$SC_MCV, levels=SCUTDlevels, labels=SCUTDlabels)
-
-NISPUF10$SC_POL <- factor(NISPUF10$SC_POL, levels=SCUTDlevels, labels=SCUTDlabels)
-NISPUF10$SC_VRC <- factor(NISPUF10$SC_VRC, levels=SCUTDlevels, labels=SCUTDlabels)
-NISPUF10$HH_DTP <- factor(NISPUF10$HH_DTP, levels=HHNUMlevels, labels=HHNUMlabels)
-NISPUF10$HH_HEPB <- factor(NISPUF10$HH_HEPB, levels=HHNUMlevels, labels=HHNUMlabels)
-NISPUF10$HH_HIB <- factor(NISPUF10$HH_HIB, levels=HHNUMlevels, labels=HHNUMlabels)
-
-NISPUF10$HH_MCV <- factor(NISPUF10$HH_MCV, levels=HHNUMlevels, labels=HHNUMlabels)
-NISPUF10$HH_POL <- factor(NISPUF10$HH_POL, levels=HHNUMlevels, labels=HHNUMlabels)
-NISPUF10$HH_VRC <- factor(NISPUF10$HH_VRC, levels=HHNUMlevels, labels=HHNUMlabels)
-NISPUF10$HH_FLU <- factor(NISPUF10$HH_FLU, levels=HHNUMlevels, labels=HHNUMlabels)
-NISPUF10$HH_H1N <- factor(NISPUF10$HH_H1N, levels=HHNUMlevels, labels=HHNUMlabels)
-
-NISPUF10$D7 <- factor(NISPUF10$D7, levels=YNlevels, labels=YNlabels)
-NISPUF10$SHOTCARD <- factor(NISPUF10$SHOTCARD, levels=SHOTCARDlevels, labels=SHOTCARDlabels)
-NISPUF10$BFENDFL06 <- factor(NISPUF10$BFENDFL06, levels=Ylevels, labels=Ylabels)
-NISPUF10$BFFORMFL06 <- factor(NISPUF10$BFFORMFL06, levels=Ylevels, labels=Ylabels)
-NISPUF10$CHILDNM <- factor(NISPUF10$CHILDNM, levels=CHILDNMlevels, labels=CHILDNMlabels)
-
-NISPUF10$CWIC_01 <- factor(NISPUF10$CWIC_01, levels=CWIClevels, labels=CWIClabels)
-NISPUF10$EDUC1 <- factor(NISPUF10$EDUC1, levels=EDUC1_levels, labels=EDUC1_labels)
-NISPUF10$I_HISP_K <- factor(NISPUF10$I_HISP_K, levels=HISPlevels, labels=HISPlabels)
-NISPUF10$M_AGEGRP <- factor(NISPUF10$M_AGEGRP, levels=MAGEGRPlevels, labels=MAGEGRPlabels)
-NISPUF10$MOBIL_I <- factor(NISPUF10$MOBIL_I, levels=MOBILlevels, labels=MOBILlabels)
-
-NISPUF10$SEX <- factor(NISPUF10$SEX, levels=SEXlevels, labels=SEXlabels)
-NISPUF10$INCPOV1 <- factor(NISPUF10$INCPOV1, levels=INCPOVlevels, labels=INCPOVlabels)
-NISPUF10$DISPCODE <- factor(NISPUF10$DISPCODE, levels=DISPlevels, labels=DISPlabels)
-NISPUF10$PDAT <- factor(NISPUF10$PDAT, levels=HASPDA2Flevels, labels=HASPDA2Flabels)
-NISPUF10$PROV_FAC <- factor(NISPUF10$PROV_FAC, levels=PROVIDlevels, labels=PROVIDlabels)
-
-NISPUF10$REGISTRY <- factor(NISPUF10$REGISTRY, levels=REGISTRYlevels, labels=REGISTRYlabels)
-NISPUF10$VFC_ORDER <- factor(NISPUF10$VFC_ORDER, levels=REGISTRYlevels, labels=REGISTRYlabels)
-NISPUF10$XDTPTY1 <- factor(NISPUF10$XDTPTY1, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XDTPTY2 <- factor(NISPUF10$XDTPTY2, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XDTPTY3 <- factor(NISPUF10$XDTPTY3, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XDTPTY4 <- factor(NISPUF10$XDTPTY4, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XDTPTY5 <- factor(NISPUF10$XDTPTY5, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XDTPTY6 <- factor(NISPUF10$XDTPTY6, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XDTPTY7 <- factor(NISPUF10$XDTPTY7, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XDTPTY8 <- factor(NISPUF10$XDTPTY8, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XDTPTY9 <- factor(NISPUF10$XDTPTY9, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XFLUTY1 <- factor(NISPUF10$XFLUTY1, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XFLUTY2 <- factor(NISPUF10$XFLUTY2, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XFLUTY3 <- factor(NISPUF10$XFLUTY3, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XFLUTY4 <- factor(NISPUF10$XFLUTY4, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XFLUTY5 <- factor(NISPUF10$XFLUTY5, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XFLUTY6 <- factor(NISPUF10$XFLUTY6, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XFLUTY7 <- factor(NISPUF10$XFLUTY7, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XFLUTY8 <- factor(NISPUF10$XFLUTY8, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XFLUTY9 <- factor(NISPUF10$XFLUTY9, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XH1NTY1 <- factor(NISPUF10$XH1NTY1, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XH1NTY2 <- factor(NISPUF10$XH1NTY2, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XH1NTY3 <- factor(NISPUF10$XH1NTY3, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XH1NTY4 <- factor(NISPUF10$XH1NTY4, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XH1NTY5 <- factor(NISPUF10$XH1NTY5, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XH1NTY6 <- factor(NISPUF10$XH1NTY6, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XH1NTY7 <- factor(NISPUF10$XH1NTY7, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XH1NTY8 <- factor(NISPUF10$XH1NTY8, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XH1NTY9 <- factor(NISPUF10$XH1NTY9, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XHEPTY1 <- factor(NISPUF10$XHEPTY1, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XHEPTY2 <- factor(NISPUF10$XHEPTY2, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XHEPTY3 <- factor(NISPUF10$XHEPTY3, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XHEPTY4 <- factor(NISPUF10$XHEPTY4, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XHEPTY5 <- factor(NISPUF10$XHEPTY5, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XHEPTY6 <- factor(NISPUF10$XHEPTY6, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XHEPTY7 <- factor(NISPUF10$XHEPTY7, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XHEPTY8 <- factor(NISPUF10$XHEPTY8, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XHEPTY9 <- factor(NISPUF10$XHEPTY9, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XHIBTY1 <- factor(NISPUF10$XHIBTY1, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XHIBTY2 <- factor(NISPUF10$XHIBTY2, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XHIBTY3 <- factor(NISPUF10$XHIBTY3, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XHIBTY4 <- factor(NISPUF10$XHIBTY4, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XHIBTY5 <- factor(NISPUF10$XHIBTY5, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XHIBTY6 <- factor(NISPUF10$XHIBTY6, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XHIBTY7 <- factor(NISPUF10$XHIBTY7, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XHIBTY8 <- factor(NISPUF10$XHIBTY8, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XHIBTY9 <- factor(NISPUF10$XHIBTY9, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XMMRTY1 <- factor(NISPUF10$XMMRTY1, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XMMRTY2 <- factor(NISPUF10$XMMRTY2, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XMMRTY3 <- factor(NISPUF10$XMMRTY3, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XMMRTY4 <- factor(NISPUF10$XMMRTY4, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XMMRTY5 <- factor(NISPUF10$XMMRTY5, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XMMRTY6 <- factor(NISPUF10$XMMRTY6, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XMMRTY7 <- factor(NISPUF10$XMMRTY7, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XMMRTY8 <- factor(NISPUF10$XMMRTY8, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XMMRTY9 <- factor(NISPUF10$XMMRTY9, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPCVTY1 <- factor(NISPUF10$XPCVTY1, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPCVTY2 <- factor(NISPUF10$XPCVTY2, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPCVTY3 <- factor(NISPUF10$XPCVTY3, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPCVTY4 <- factor(NISPUF10$XPCVTY4, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XPCVTY5 <- factor(NISPUF10$XPCVTY5, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPCVTY6 <- factor(NISPUF10$XPCVTY6, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPCVTY7 <- factor(NISPUF10$XPCVTY7, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPCVTY8 <- factor(NISPUF10$XPCVTY8, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPCVTY9 <- factor(NISPUF10$XPCVTY9, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XPOLTY1 <- factor(NISPUF10$XPOLTY1, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPOLTY2 <- factor(NISPUF10$XPOLTY2, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPOLTY3 <- factor(NISPUF10$XPOLTY3, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPOLTY4 <- factor(NISPUF10$XPOLTY4, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPOLTY5 <- factor(NISPUF10$XPOLTY5, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XPOLTY6 <- factor(NISPUF10$XPOLTY6, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPOLTY7 <- factor(NISPUF10$XPOLTY7, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPOLTY8 <- factor(NISPUF10$XPOLTY8, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XPOLTY9 <- factor(NISPUF10$XPOLTY9, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XROTTY1 <- factor(NISPUF10$XROTTY1, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XROTTY2 <- factor(NISPUF10$XROTTY2, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XROTTY3 <- factor(NISPUF10$XROTTY3, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XROTTY4 <- factor(NISPUF10$XROTTY4, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XROTTY5 <- factor(NISPUF10$XROTTY5, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XROTTY6 <- factor(NISPUF10$XROTTY6, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XROTTY7 <- factor(NISPUF10$XROTTY7, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XROTTY8 <- factor(NISPUF10$XROTTY8, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XROTTY9 <- factor(NISPUF10$XROTTY9, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XVRCTY1 <- factor(NISPUF10$XVRCTY1, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XVRCTY2 <- factor(NISPUF10$XVRCTY2, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XVRCTY3 <- factor(NISPUF10$XVRCTY3, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XVRCTY4 <- factor(NISPUF10$XVRCTY4, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XVRCTY5 <- factor(NISPUF10$XVRCTY5, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XVRCTY6 <- factor(NISPUF10$XVRCTY6, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XVRCTY7 <- factor(NISPUF10$XVRCTY7, levels=TYPElevels, labels=TYPElabels)
-
-NISPUF10$XVRCTY8 <- factor(NISPUF10$XVRCTY8, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$XVRCTY9 <- factor(NISPUF10$XVRCTY9, levels=TYPElevels, labels=TYPElabels)
-NISPUF10$HEP_BRTH <- factor(NISPUF10$HEP_BRTH, levels=HEPBRTlevels, labels=HEPBRTlabels)
-NISPUF10$HEP_FLAG <- factor(NISPUF10$HEP_FLAG, levels=HEPFLGlevels, labels=HEPFLGlabels)
-NISPUF10$P_U12VRC <- factor(NISPUF10$P_U12VRC, levels=UTDlevels, labels=UTDlabels)
-
-NISPUF10$P_UTD331 <- factor(NISPUF10$P_UTD331, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTD431 <- factor(NISPUF10$P_UTD431, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTDH1N_1 <- factor(NISPUF10$P_UTDH1N_1, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTDH1N_2 <- factor(NISPUF10$P_UTDH1N_2, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTDHEP <- factor(NISPUF10$P_UTDHEP, levels=UTDlevels, labels=UTDlabels)
-
-NISPUF10$P_UTDHEPA2 <- factor(NISPUF10$P_UTDHEPA2, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTDHIB <- factor(NISPUF10$P_UTDHIB, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTDHIB_ROUT_S <- factor(NISPUF10$P_UTDHIB_ROUT_S, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTDHIB_SHORT_S <- factor(NISPUF10$P_UTDHIB_SHORT_S, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTDMCV <- factor(NISPUF10$P_UTDMCV, levels=UTDlevels, labels=UTDlabels)
-
-NISPUF10$P_UTDMMX <- factor(NISPUF10$P_UTDMMX, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTDPC3 <- factor(NISPUF10$P_UTDPC3, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTDPCV <- factor(NISPUF10$P_UTDPCV, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTDPOL <- factor(NISPUF10$P_UTDPOL, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTDROT_S <- factor(NISPUF10$P_UTDROT_S, levels=UTDlevels, labels=UTDlabels)
-
-NISPUF10$P_UTDTP3 <- factor(NISPUF10$P_UTDTP3, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTDTP4 <- factor(NISPUF10$P_UTDTP4, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$PU431331 <- factor(NISPUF10$PU431331, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTD431H31_ROUT_S <- factor(NISPUF10$P_UTD431H31_ROUT_S, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$PU431_31 <- factor(NISPUF10$PU431_31, levels=UTDlevels, labels=UTDlabels)
-
-NISPUF10$PU4313313 <- factor(NISPUF10$PU4313313, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTD431H313_ROUT_S <- factor(NISPUF10$P_UTD431H313_ROUT_S, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$PU4313314 <- factor(NISPUF10$PU4313314, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTD431H314_ROUT_S <- factor(NISPUF10$P_UTD431H314_ROUT_S, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$PU431_314 <- factor(NISPUF10$PU431_314, levels=UTDlevels, labels=UTDlabels)
-
-NISPUF10$PUT43133 <- factor(NISPUF10$PUT43133, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTD431H3_ROUT_S <- factor(NISPUF10$P_UTD431H3_ROUT_S, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$PUTD4313 <- factor(NISPUF10$PUTD4313, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$P_UTD431H_ROUT_S <- factor(NISPUF10$P_UTD431H_ROUT_S, levels=UTDlevels, labels=UTDlabels)
-NISPUF10$CEN_REG <- factor(NISPUF10$CEN_REG, levels=CENREGlevels, labels=CENREGlabels)
-
-NISPUF10$STATE <- factor(NISPUF10$STATE, levels=STATElevels, labels=STATElabels)
-NISPUF10$P_UTDFL1 <- factor(NISPUF10$P_UTDFL1, levels=FLUUTDlevels, labels=FLUUTDlabels)
-NISPUF10$P_UTDFL2 <- factor(NISPUF10$P_UTDFL2, levels=FLUUTDlevels, labels=FLUUTDlabels)
-NISPUF10$P_UTDFL3 <- factor(NISPUF10$P_UTDFL3, levels=FLUUTDlevels, labels=FLUUTDlabels)
-NISPUF10$RACE_K <- factor(NISPUF10$RACE_K, levels=RACE_PUFlevels, labels=RACE_PUFlabels)
-
-NISPUF10$AGECPOXR <- factor(NISPUF10$AGECPOXR, levels=AGECPOXRlevels, labels=AGECPOXRlabels)
-NISPUF10$C1R <- factor(NISPUF10$C1R, levels=C1Rlevels, labels=C1Rlabels)
-NISPUF10$C5R <- factor(NISPUF10$C5R, levels=C5Rlevels, labels=C5Rlabels)
-NISPUF10$INCQ298A <- factor(NISPUF10$INCQ298A, levels=INCQ298Alevels, labels=INCQ298Alabels)
-NISPUF10$RACEETHK <- factor(NISPUF10$RACEETHK, levels=RACEETHKlevels, labels=RACEETHKlabels)
-
-NISPUF10$D6R <- factor(NISPUF10$D6R, levels=D6Rlevels, labels=D6Rlabels)
-NISPUF10$N_PRVR <- factor(NISPUF10$N_PRVR, levels=D6Rlevels, labels=D6Rlabels)
-NISPUF10$FRSTBRN <- factor(NISPUF10$FRSTBRN, levels=FRSTBRNlevels, labels=FRSTBRNlabels)
-NISPUF10$SEQNUMC <- factor(NISPUF10$SEQNUMC, levels=CHARIDlevels, labels=CHARIDlabels)
-NISPUF10$SEQNUMHH <- factor(NISPUF10$SEQNUMHH, levels=CHARIDlevels, labels=CHARIDlabels)
-
-NISPUF10$BF_FORMR08 <- factor(NISPUF10$BF_FORMR08, levels=BFFORM08Flevels, labels=BFFORM08Flabels)
-NISPUF10$RENT_OWN <- factor(NISPUF10$RENT_OWN, levels=RENTOWNlevels, labels=RENTOWNlabels)
-NISPUF10$NUM_PHONE <- factor(NISPUF10$NUM_PHONE, levels=NUM_PHONlevels, labels=NUM_PHONlabels)
-NISPUF10$NUM_CELLS_HH <- factor(NISPUF10$NUM_CELLS_HH, levels=NUM_PHONlevels, labels=NUM_PHONlabels)
-NISPUF10$NUM_CELLS_PARENTS <- factor(NISPUF10$NUM_CELLS_PARENTS, levels=NUM_PHONlevels, labels=NUM_PHONlabels)
-
-NISPUF10$VFC_I <- factor(NISPUF10$VFC_I, levels=INS_STATlevels, labels=INS_STATlabels)
-NISPUF10$MARITAL2 <- factor(NISPUF10$MARITAL2, levels=MAR_PUF2_levels, labels=MAR_PUF2_labels)
-NISPUF10$ESTIAP10 <- factor(NISPUF10$ESTIAP10, levels=ESTIAP10Flevels, labels=ESTIAP10Flabels)
-NISPUF10$P_UTDPCVB13 <- factor(NISPUF10$P_UTDPCVB13, levels=UTDPCVBlevels, labels=UTDPCVBlabels)
-
-##########################################################################
-# STEP 7:   CONTENTS AND STATISTICAL ESTIMATES(FREQUENCY) EXAMPLE        #
-##########################################################################
-
-#---CONTENTS---#
-NISPUF10.CONTENTS <- contents(NISPUF10)$contents
-
-print(NISPUF10.CONTENTS)
-
-#IN CASE THAT THE R CONSOLE CANNOT DISPLAY WHOLE CONTENTS,
-#YOU CAN SAVE CONTENTS INTO A FILE
-#write.table(NISPUF10.CONTENTS, file=paste(PUF,"/file-name",sep=""))
-
-#---UNWEIGHTED FREQUENCY---#
-unwt_freq <- function(UNWT.VAR){#FUNCTION TO PRINT UNWEIGHTED FREQUENCIES
-
-unwt.tab <- wtd.table(UNWT.VAR, weights= NULL, type='table')
-unwtd.freq <- data.frame(cbind(
-unwt.tab, round(unwt.tab/sum(unwt.tab)*100,2),
-cumsum(unwt.tab), cumsum(round(unwt.tab/sum(unwt.tab)*100,2))))
-names(unwtd.freq) <- c("Frequency", "Percent", "Cumulative Frequency", "Cumulative Percent")
-unwtd.title <- paste('2010 NIS', 'UNWEIGHTED FREQUENCIES', label(UNWT.VAR), sep="\n")
-label(unwtd.freq) <- unwtd.title
-
-print(unwtd.freq)
-}
-
-UNWT.VAR <- NISPUF10$AGEGRP	#INPUT A VARIABLE OF INTEREST
-unwt_freq(UNWT.VAR)
-
-#---WEIGHTED FREQUENCY---#
-WT <- NISPUF10$RDDWT		#INPUT A WEIGHT VARIABLE
-WT.VAR <- NISPUF10$AGEGRP 	#INPUT A VARIABLE OF INTEREST
-
-wt.tab <- wtd.table(WT.VAR, weights= WT, type='table')
-wtd.freq <- data.frame(cbind(
-wt.tab, round(wt.tab/sum(wt.tab)*100,2),
-cumsum(wt.tab), cumsum(round(wt.tab/sum(wt.tab)*100,2))))
-names(wtd.freq) <- c("Frequency", "Percent", "Cumulative Frequency", "Cumulative Percent")
-wtd.title <- paste('2010 NIS PUBLIC USE FILE', 'WEIGHTED FREQUENCIES (EXCLUDING U.S. VIRGIN ISLANDS)', label(WT.VAR), sep="\n")
-label(wtd.freq) <- wtd.title
-
-print(wtd.freq)
+# ############################################################################
+# # Step 6:   ASSIGN FORMATS                                                 #
+# #	  FORMATS ARE APPLICABLE ONLY TO CATEGORICAL VARIABLES	IN R           #
+# ############################################################################
+# 
+# NISPUF10$AGEGRP <- factor(NISPUF10$AGEGRP, levels=AGEGRPlevels, labels=AGEGRPlabels)
+# NISPUF10$LANGUAGE <- factor(NISPUF10$LANGUAGE, levels=LANGUAGElevels, labels=LANGUAGElabels)
+# NISPUF10$HAD_CPOX <- factor(NISPUF10$HAD_CPOX, levels=YNDKRFlevels, labels=YNDKRFlabels)
+# NISPUF10$CBF_01 <- factor(NISPUF10$CBF_01, levels=YNDKRFlevels, labels=YNDKRFlabels)
+# NISPUF10$CWIC_02 <- factor(NISPUF10$CWIC_02, levels=YNDKRFlevels, labels=YNDKRFlabels)
+# 
+# NISPUF10$INTRP <- factor(NISPUF10$INTRP, levels=YNDKRFlevels, labels=YNDKRFlabels)
+# NISPUF10$INS_1 <- factor(NISPUF10$INS_1, levels=YNDKRFlevels, labels=YNDKRFlabels)
+# NISPUF10$INS_2 <- factor(NISPUF10$INS_2, levels=YNDKRFlevels, labels=YNDKRFlabels)
+# NISPUF10$INS_3 <- factor(NISPUF10$INS_3, levels=YNDKRFlevels, labels=YNDKRFlabels)
+# NISPUF10$INS_3A <- factor(NISPUF10$INS_3A, levels=YNDKRFlevels, labels=YNDKRFlabels)
+# 
+# NISPUF10$INS_4_5 <- factor(NISPUF10$INS_4_5, levels=YNDKRFlevels, labels=YNDKRFlabels)
+# NISPUF10$INS_6 <- factor(NISPUF10$INS_6, levels=YNDKRFlevels, labels=YNDKRFlabels)
+# NISPUF10$INS_11 <- factor(NISPUF10$INS_11, levels=YNDKRFlevels, labels=YNDKRFlabels)
+# NISPUF10$P_NUHEPX <- factor(NISPUF10$P_NUHEPX, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUHIBX <- factor(NISPUF10$P_NUHIBX, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# 
+# NISPUF10$P_NUHPHB <- factor(NISPUF10$P_NUHPHB, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMDAH <- factor(NISPUF10$P_NUMDAH, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMDHI <- factor(NISPUF10$P_NUMDHI, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMDIH <- factor(NISPUF10$P_NUMDIH, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMDTA <- factor(NISPUF10$P_NUMDTA, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# 
+# NISPUF10$P_NUMDTP <- factor(NISPUF10$P_NUMDTP, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMFLU <- factor(NISPUF10$P_NUMFLU, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMFLUL <- factor(NISPUF10$P_NUMFLUL, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMFLUM <- factor(NISPUF10$P_NUMFLUM, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMFLUN <- factor(NISPUF10$P_NUMFLUN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# 
+# NISPUF10$P_NUMH1N <- factor(NISPUF10$P_NUMH1N, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUM1L <- factor(NISPUF10$P_NUM1L, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUM1M <- factor(NISPUF10$P_NUM1M, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUM1N <- factor(NISPUF10$P_NUM1N, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMHEA <- factor(NISPUF10$P_NUMHEA, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# 
+# NISPUF10$P_NUMHEN <- factor(NISPUF10$P_NUMHEN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMHEP <- factor(NISPUF10$P_NUMHEP, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMHIB <- factor(NISPUF10$P_NUMHIB, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMHIN <- factor(NISPUF10$P_NUMHIN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMHION <- factor(NISPUF10$P_NUMHION, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# 
+# NISPUF10$P_NUMHM <- factor(NISPUF10$P_NUMHM, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMHG <- factor(NISPUF10$P_NUMHG, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMHS <- factor(NISPUF10$P_NUMHS, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMIPV <- factor(NISPUF10$P_NUMIPV, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMMCN <- factor(NISPUF10$P_NUMMCN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# 
+# NISPUF10$P_NUMMMR <- factor(NISPUF10$P_NUMMMR, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMMMRX <- factor(NISPUF10$P_NUMMMRX, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMMMX <- factor(NISPUF10$P_NUMMMX, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMMP <- factor(NISPUF10$P_NUMMP, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMMPR <- factor(NISPUF10$P_NUMMPR, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# 
+# NISPUF10$P_NUMMRV <- factor(NISPUF10$P_NUMMRV, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMMS <- factor(NISPUF10$P_NUMMS, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMMSM <- factor(NISPUF10$P_NUMMSM, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMMSR <- factor(NISPUF10$P_NUMMSR, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMOLN <- factor(NISPUF10$P_NUMOLN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# 
+# NISPUF10$P_NUMOPV <- factor(NISPUF10$P_NUMOPV, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMPCV <- factor(NISPUF10$P_NUMPCV, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMPCP <- factor(NISPUF10$P_NUMPCP, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMPCC <- factor(NISPUF10$P_NUMPCC, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMPCC7 <- factor(NISPUF10$P_NUMPCC7, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# 
+# NISPUF10$P_NUMPCC13 <- factor(NISPUF10$P_NUMPCC13, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMPCCN <- factor(NISPUF10$P_NUMPCCN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMPCN <- factor(NISPUF10$P_NUMPCN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMPOL <- factor(NISPUF10$P_NUMPOL, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMRB <- factor(NISPUF10$P_NUMRB, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# 
+# NISPUF10$P_NUMRG <- factor(NISPUF10$P_NUMRG, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMRM <- factor(NISPUF10$P_NUMRM, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMRO <- factor(NISPUF10$P_NUMRO, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMROT <- factor(NISPUF10$P_NUMROT, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMTPN <- factor(NISPUF10$P_NUMTPN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# 
+# NISPUF10$P_NUMVRC <- factor(NISPUF10$P_NUMVRC, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMVRN <- factor(NISPUF10$P_NUMVRN, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$P_NUMVRX <- factor(NISPUF10$P_NUMVRX, levels=SHOTCOUNlevels, labels=SHOTCOUNlabels)
+# NISPUF10$SC_431 <- factor(NISPUF10$SC_431, levels=SCUTDlevels, labels=SCUTDlabels)
+# NISPUF10$SC_4313 <- factor(NISPUF10$SC_4313, levels=SCUTDlevels, labels=SCUTDlabels)
+# 
+# NISPUF10$SC_43133 <- factor(NISPUF10$SC_43133, levels=SCUTDlevels, labels=SCUTDlabels)
+# NISPUF10$SC_DTP <- factor(NISPUF10$SC_DTP, levels=SCUTDlevels, labels=SCUTDlabels)
+# NISPUF10$SC_HEPB <- factor(NISPUF10$SC_HEPB, levels=SCUTDlevels, labels=SCUTDlabels)
+# NISPUF10$SC_HIB <- factor(NISPUF10$SC_HIB, levels=SCUTDlevels, labels=SCUTDlabels)
+# NISPUF10$SC_MCV <- factor(NISPUF10$SC_MCV, levels=SCUTDlevels, labels=SCUTDlabels)
+# 
+# NISPUF10$SC_POL <- factor(NISPUF10$SC_POL, levels=SCUTDlevels, labels=SCUTDlabels)
+# NISPUF10$SC_VRC <- factor(NISPUF10$SC_VRC, levels=SCUTDlevels, labels=SCUTDlabels)
+# NISPUF10$HH_DTP <- factor(NISPUF10$HH_DTP, levels=HHNUMlevels, labels=HHNUMlabels)
+# NISPUF10$HH_HEPB <- factor(NISPUF10$HH_HEPB, levels=HHNUMlevels, labels=HHNUMlabels)
+# NISPUF10$HH_HIB <- factor(NISPUF10$HH_HIB, levels=HHNUMlevels, labels=HHNUMlabels)
+# 
+# NISPUF10$HH_MCV <- factor(NISPUF10$HH_MCV, levels=HHNUMlevels, labels=HHNUMlabels)
+# NISPUF10$HH_POL <- factor(NISPUF10$HH_POL, levels=HHNUMlevels, labels=HHNUMlabels)
+# NISPUF10$HH_VRC <- factor(NISPUF10$HH_VRC, levels=HHNUMlevels, labels=HHNUMlabels)
+# NISPUF10$HH_FLU <- factor(NISPUF10$HH_FLU, levels=HHNUMlevels, labels=HHNUMlabels)
+# NISPUF10$HH_H1N <- factor(NISPUF10$HH_H1N, levels=HHNUMlevels, labels=HHNUMlabels)
+# 
+# NISPUF10$D7 <- factor(NISPUF10$D7, levels=YNlevels, labels=YNlabels)
+# NISPUF10$SHOTCARD <- factor(NISPUF10$SHOTCARD, levels=SHOTCARDlevels, labels=SHOTCARDlabels)
+# NISPUF10$BFENDFL06 <- factor(NISPUF10$BFENDFL06, levels=Ylevels, labels=Ylabels)
+# NISPUF10$BFFORMFL06 <- factor(NISPUF10$BFFORMFL06, levels=Ylevels, labels=Ylabels)
+# NISPUF10$CHILDNM <- factor(NISPUF10$CHILDNM, levels=CHILDNMlevels, labels=CHILDNMlabels)
+# 
+# NISPUF10$CWIC_01 <- factor(NISPUF10$CWIC_01, levels=CWIClevels, labels=CWIClabels)
+# NISPUF10$EDUC1 <- factor(NISPUF10$EDUC1, levels=EDUC1_levels, labels=EDUC1_labels)
+# NISPUF10$I_HISP_K <- factor(NISPUF10$I_HISP_K, levels=HISPlevels, labels=HISPlabels)
+# NISPUF10$M_AGEGRP <- factor(NISPUF10$M_AGEGRP, levels=MAGEGRPlevels, labels=MAGEGRPlabels)
+# NISPUF10$MOBIL_I <- factor(NISPUF10$MOBIL_I, levels=MOBILlevels, labels=MOBILlabels)
+# 
+# NISPUF10$SEX <- factor(NISPUF10$SEX, levels=SEXlevels, labels=SEXlabels)
+# NISPUF10$INCPOV1 <- factor(NISPUF10$INCPOV1, levels=INCPOVlevels, labels=INCPOVlabels)
+# NISPUF10$DISPCODE <- factor(NISPUF10$DISPCODE, levels=DISPlevels, labels=DISPlabels)
+# NISPUF10$PDAT <- factor(NISPUF10$PDAT, levels=HASPDA2Flevels, labels=HASPDA2Flabels)
+# NISPUF10$PROV_FAC <- factor(NISPUF10$PROV_FAC, levels=PROVIDlevels, labels=PROVIDlabels)
+# 
+# NISPUF10$REGISTRY <- factor(NISPUF10$REGISTRY, levels=REGISTRYlevels, labels=REGISTRYlabels)
+# NISPUF10$VFC_ORDER <- factor(NISPUF10$VFC_ORDER, levels=REGISTRYlevels, labels=REGISTRYlabels)
+# NISPUF10$XDTPTY1 <- factor(NISPUF10$XDTPTY1, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XDTPTY2 <- factor(NISPUF10$XDTPTY2, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XDTPTY3 <- factor(NISPUF10$XDTPTY3, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XDTPTY4 <- factor(NISPUF10$XDTPTY4, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XDTPTY5 <- factor(NISPUF10$XDTPTY5, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XDTPTY6 <- factor(NISPUF10$XDTPTY6, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XDTPTY7 <- factor(NISPUF10$XDTPTY7, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XDTPTY8 <- factor(NISPUF10$XDTPTY8, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XDTPTY9 <- factor(NISPUF10$XDTPTY9, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XFLUTY1 <- factor(NISPUF10$XFLUTY1, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XFLUTY2 <- factor(NISPUF10$XFLUTY2, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XFLUTY3 <- factor(NISPUF10$XFLUTY3, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XFLUTY4 <- factor(NISPUF10$XFLUTY4, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XFLUTY5 <- factor(NISPUF10$XFLUTY5, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XFLUTY6 <- factor(NISPUF10$XFLUTY6, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XFLUTY7 <- factor(NISPUF10$XFLUTY7, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XFLUTY8 <- factor(NISPUF10$XFLUTY8, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XFLUTY9 <- factor(NISPUF10$XFLUTY9, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XH1NTY1 <- factor(NISPUF10$XH1NTY1, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XH1NTY2 <- factor(NISPUF10$XH1NTY2, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XH1NTY3 <- factor(NISPUF10$XH1NTY3, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XH1NTY4 <- factor(NISPUF10$XH1NTY4, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XH1NTY5 <- factor(NISPUF10$XH1NTY5, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XH1NTY6 <- factor(NISPUF10$XH1NTY6, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XH1NTY7 <- factor(NISPUF10$XH1NTY7, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XH1NTY8 <- factor(NISPUF10$XH1NTY8, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XH1NTY9 <- factor(NISPUF10$XH1NTY9, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XHEPTY1 <- factor(NISPUF10$XHEPTY1, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XHEPTY2 <- factor(NISPUF10$XHEPTY2, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XHEPTY3 <- factor(NISPUF10$XHEPTY3, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XHEPTY4 <- factor(NISPUF10$XHEPTY4, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XHEPTY5 <- factor(NISPUF10$XHEPTY5, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XHEPTY6 <- factor(NISPUF10$XHEPTY6, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XHEPTY7 <- factor(NISPUF10$XHEPTY7, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XHEPTY8 <- factor(NISPUF10$XHEPTY8, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XHEPTY9 <- factor(NISPUF10$XHEPTY9, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XHIBTY1 <- factor(NISPUF10$XHIBTY1, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XHIBTY2 <- factor(NISPUF10$XHIBTY2, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XHIBTY3 <- factor(NISPUF10$XHIBTY3, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XHIBTY4 <- factor(NISPUF10$XHIBTY4, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XHIBTY5 <- factor(NISPUF10$XHIBTY5, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XHIBTY6 <- factor(NISPUF10$XHIBTY6, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XHIBTY7 <- factor(NISPUF10$XHIBTY7, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XHIBTY8 <- factor(NISPUF10$XHIBTY8, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XHIBTY9 <- factor(NISPUF10$XHIBTY9, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XMMRTY1 <- factor(NISPUF10$XMMRTY1, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XMMRTY2 <- factor(NISPUF10$XMMRTY2, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XMMRTY3 <- factor(NISPUF10$XMMRTY3, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XMMRTY4 <- factor(NISPUF10$XMMRTY4, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XMMRTY5 <- factor(NISPUF10$XMMRTY5, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XMMRTY6 <- factor(NISPUF10$XMMRTY6, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XMMRTY7 <- factor(NISPUF10$XMMRTY7, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XMMRTY8 <- factor(NISPUF10$XMMRTY8, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XMMRTY9 <- factor(NISPUF10$XMMRTY9, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPCVTY1 <- factor(NISPUF10$XPCVTY1, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPCVTY2 <- factor(NISPUF10$XPCVTY2, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPCVTY3 <- factor(NISPUF10$XPCVTY3, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPCVTY4 <- factor(NISPUF10$XPCVTY4, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XPCVTY5 <- factor(NISPUF10$XPCVTY5, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPCVTY6 <- factor(NISPUF10$XPCVTY6, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPCVTY7 <- factor(NISPUF10$XPCVTY7, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPCVTY8 <- factor(NISPUF10$XPCVTY8, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPCVTY9 <- factor(NISPUF10$XPCVTY9, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XPOLTY1 <- factor(NISPUF10$XPOLTY1, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPOLTY2 <- factor(NISPUF10$XPOLTY2, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPOLTY3 <- factor(NISPUF10$XPOLTY3, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPOLTY4 <- factor(NISPUF10$XPOLTY4, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPOLTY5 <- factor(NISPUF10$XPOLTY5, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XPOLTY6 <- factor(NISPUF10$XPOLTY6, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPOLTY7 <- factor(NISPUF10$XPOLTY7, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPOLTY8 <- factor(NISPUF10$XPOLTY8, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XPOLTY9 <- factor(NISPUF10$XPOLTY9, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XROTTY1 <- factor(NISPUF10$XROTTY1, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XROTTY2 <- factor(NISPUF10$XROTTY2, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XROTTY3 <- factor(NISPUF10$XROTTY3, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XROTTY4 <- factor(NISPUF10$XROTTY4, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XROTTY5 <- factor(NISPUF10$XROTTY5, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XROTTY6 <- factor(NISPUF10$XROTTY6, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XROTTY7 <- factor(NISPUF10$XROTTY7, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XROTTY8 <- factor(NISPUF10$XROTTY8, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XROTTY9 <- factor(NISPUF10$XROTTY9, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XVRCTY1 <- factor(NISPUF10$XVRCTY1, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XVRCTY2 <- factor(NISPUF10$XVRCTY2, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XVRCTY3 <- factor(NISPUF10$XVRCTY3, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XVRCTY4 <- factor(NISPUF10$XVRCTY4, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XVRCTY5 <- factor(NISPUF10$XVRCTY5, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XVRCTY6 <- factor(NISPUF10$XVRCTY6, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XVRCTY7 <- factor(NISPUF10$XVRCTY7, levels=TYPElevels, labels=TYPElabels)
+# 
+# NISPUF10$XVRCTY8 <- factor(NISPUF10$XVRCTY8, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$XVRCTY9 <- factor(NISPUF10$XVRCTY9, levels=TYPElevels, labels=TYPElabels)
+# NISPUF10$HEP_BRTH <- factor(NISPUF10$HEP_BRTH, levels=HEPBRTlevels, labels=HEPBRTlabels)
+# NISPUF10$HEP_FLAG <- factor(NISPUF10$HEP_FLAG, levels=HEPFLGlevels, labels=HEPFLGlabels)
+# NISPUF10$P_U12VRC <- factor(NISPUF10$P_U12VRC, levels=UTDlevels, labels=UTDlabels)
+# 
+# NISPUF10$P_UTD331 <- factor(NISPUF10$P_UTD331, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTD431 <- factor(NISPUF10$P_UTD431, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTDH1N_1 <- factor(NISPUF10$P_UTDH1N_1, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTDH1N_2 <- factor(NISPUF10$P_UTDH1N_2, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTDHEP <- factor(NISPUF10$P_UTDHEP, levels=UTDlevels, labels=UTDlabels)
+# 
+# NISPUF10$P_UTDHEPA2 <- factor(NISPUF10$P_UTDHEPA2, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTDHIB <- factor(NISPUF10$P_UTDHIB, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTDHIB_ROUT_S <- factor(NISPUF10$P_UTDHIB_ROUT_S, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTDHIB_SHORT_S <- factor(NISPUF10$P_UTDHIB_SHORT_S, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTDMCV <- factor(NISPUF10$P_UTDMCV, levels=UTDlevels, labels=UTDlabels)
+# 
+# NISPUF10$P_UTDMMX <- factor(NISPUF10$P_UTDMMX, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTDPC3 <- factor(NISPUF10$P_UTDPC3, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTDPCV <- factor(NISPUF10$P_UTDPCV, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTDPOL <- factor(NISPUF10$P_UTDPOL, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTDROT_S <- factor(NISPUF10$P_UTDROT_S, levels=UTDlevels, labels=UTDlabels)
+# 
+# NISPUF10$P_UTDTP3 <- factor(NISPUF10$P_UTDTP3, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTDTP4 <- factor(NISPUF10$P_UTDTP4, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$PU431331 <- factor(NISPUF10$PU431331, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTD431H31_ROUT_S <- factor(NISPUF10$P_UTD431H31_ROUT_S, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$PU431_31 <- factor(NISPUF10$PU431_31, levels=UTDlevels, labels=UTDlabels)
+# 
+# NISPUF10$PU4313313 <- factor(NISPUF10$PU4313313, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTD431H313_ROUT_S <- factor(NISPUF10$P_UTD431H313_ROUT_S, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$PU4313314 <- factor(NISPUF10$PU4313314, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTD431H314_ROUT_S <- factor(NISPUF10$P_UTD431H314_ROUT_S, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$PU431_314 <- factor(NISPUF10$PU431_314, levels=UTDlevels, labels=UTDlabels)
+# 
+# NISPUF10$PUT43133 <- factor(NISPUF10$PUT43133, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTD431H3_ROUT_S <- factor(NISPUF10$P_UTD431H3_ROUT_S, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$PUTD4313 <- factor(NISPUF10$PUTD4313, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$P_UTD431H_ROUT_S <- factor(NISPUF10$P_UTD431H_ROUT_S, levels=UTDlevels, labels=UTDlabels)
+# NISPUF10$CEN_REG <- factor(NISPUF10$CEN_REG, levels=CENREGlevels, labels=CENREGlabels)
+# 
+# NISPUF10$STATE <- factor(NISPUF10$STATE, levels=STATElevels, labels=STATElabels)
+# NISPUF10$P_UTDFL1 <- factor(NISPUF10$P_UTDFL1, levels=FLUUTDlevels, labels=FLUUTDlabels)
+# NISPUF10$P_UTDFL2 <- factor(NISPUF10$P_UTDFL2, levels=FLUUTDlevels, labels=FLUUTDlabels)
+# NISPUF10$P_UTDFL3 <- factor(NISPUF10$P_UTDFL3, levels=FLUUTDlevels, labels=FLUUTDlabels)
+# NISPUF10$RACE_K <- factor(NISPUF10$RACE_K, levels=RACE_PUFlevels, labels=RACE_PUFlabels)
+# 
+# NISPUF10$AGECPOXR <- factor(NISPUF10$AGECPOXR, levels=AGECPOXRlevels, labels=AGECPOXRlabels)
+# NISPUF10$C1R <- factor(NISPUF10$C1R, levels=C1Rlevels, labels=C1Rlabels)
+# NISPUF10$C5R <- factor(NISPUF10$C5R, levels=C5Rlevels, labels=C5Rlabels)
+# NISPUF10$INCQ298A <- factor(NISPUF10$INCQ298A, levels=INCQ298Alevels, labels=INCQ298Alabels)
+# NISPUF10$RACEETHK <- factor(NISPUF10$RACEETHK, levels=RACEETHKlevels, labels=RACEETHKlabels)
+# 
+# NISPUF10$D6R <- factor(NISPUF10$D6R, levels=D6Rlevels, labels=D6Rlabels)
+# NISPUF10$N_PRVR <- factor(NISPUF10$N_PRVR, levels=D6Rlevels, labels=D6Rlabels)
+# NISPUF10$FRSTBRN <- factor(NISPUF10$FRSTBRN, levels=FRSTBRNlevels, labels=FRSTBRNlabels)
+# NISPUF10$SEQNUMC <- factor(NISPUF10$SEQNUMC, levels=CHARIDlevels, labels=CHARIDlabels)
+# NISPUF10$SEQNUMHH <- factor(NISPUF10$SEQNUMHH, levels=CHARIDlevels, labels=CHARIDlabels)
+# 
+# NISPUF10$BF_FORMR08 <- factor(NISPUF10$BF_FORMR08, levels=BFFORM08Flevels, labels=BFFORM08Flabels)
+# NISPUF10$RENT_OWN <- factor(NISPUF10$RENT_OWN, levels=RENTOWNlevels, labels=RENTOWNlabels)
+# NISPUF10$NUM_PHONE <- factor(NISPUF10$NUM_PHONE, levels=NUM_PHONlevels, labels=NUM_PHONlabels)
+# NISPUF10$NUM_CELLS_HH <- factor(NISPUF10$NUM_CELLS_HH, levels=NUM_PHONlevels, labels=NUM_PHONlabels)
+# NISPUF10$NUM_CELLS_PARENTS <- factor(NISPUF10$NUM_CELLS_PARENTS, levels=NUM_PHONlevels, labels=NUM_PHONlabels)
+# 
+# NISPUF10$VFC_I <- factor(NISPUF10$VFC_I, levels=INS_STATlevels, labels=INS_STATlabels)
+# NISPUF10$MARITAL2 <- factor(NISPUF10$MARITAL2, levels=MAR_PUF2_levels, labels=MAR_PUF2_labels)
+# NISPUF10$ESTIAP10 <- factor(NISPUF10$ESTIAP10, levels=ESTIAP10Flevels, labels=ESTIAP10Flabels)
+# NISPUF10$P_UTDPCVB13 <- factor(NISPUF10$P_UTDPCVB13, levels=UTDPCVBlevels, labels=UTDPCVBlabels)
+# 
+# ##########################################################################
+# # STEP 7:   CONTENTS AND STATISTICAL ESTIMATES(FREQUENCY) EXAMPLE        #
+# ##########################################################################
+# 
+# #---CONTENTS---#
+# NISPUF10.CONTENTS <- contents(NISPUF10)$contents
+# 
+# print(NISPUF10.CONTENTS)
+# 
+# #IN CASE THAT THE R CONSOLE CANNOT DISPLAY WHOLE CONTENTS,
+# #YOU CAN SAVE CONTENTS INTO A FILE
+# #write.table(NISPUF10.CONTENTS, file=paste(PUF,"/file-name",sep=""))
+# 
+# #---UNWEIGHTED FREQUENCY---#
+# unwt_freq <- function(UNWT.VAR){#FUNCTION TO PRINT UNWEIGHTED FREQUENCIES
+# 
+# unwt.tab <- wtd.table(UNWT.VAR, weights= NULL, type='table')
+# unwtd.freq <- data.frame(cbind(
+# unwt.tab, round(unwt.tab/sum(unwt.tab)*100,2),
+# cumsum(unwt.tab), cumsum(round(unwt.tab/sum(unwt.tab)*100,2))))
+# names(unwtd.freq) <- c("Frequency", "Percent", "Cumulative Frequency", "Cumulative Percent")
+# unwtd.title <- paste('2010 NIS', 'UNWEIGHTED FREQUENCIES', label(UNWT.VAR), sep="\n")
+# label(unwtd.freq) <- unwtd.title
+# 
+# print(unwtd.freq)
+# }
+# 
+# UNWT.VAR <- NISPUF10$AGEGRP	#INPUT A VARIABLE OF INTEREST
+# unwt_freq(UNWT.VAR)
+# 
+# #---WEIGHTED FREQUENCY---#
+# WT <- NISPUF10$RDDWT		#INPUT A WEIGHT VARIABLE
+# WT.VAR <- NISPUF10$AGEGRP 	#INPUT A VARIABLE OF INTEREST
+# 
+# wt.tab <- wtd.table(WT.VAR, weights= WT, type='table')
+# wtd.freq <- data.frame(cbind(
+# wt.tab, round(wt.tab/sum(wt.tab)*100,2),
+# cumsum(wt.tab), cumsum(round(wt.tab/sum(wt.tab)*100,2))))
+# names(wtd.freq) <- c("Frequency", "Percent", "Cumulative Frequency", "Cumulative Percent")
+# wtd.title <- paste('2010 NIS PUBLIC USE FILE', 'WEIGHTED FREQUENCIES (EXCLUDING U.S. VIRGIN ISLANDS)', label(WT.VAR), sep="\n")
+# label(wtd.freq) <- wtd.title
+# 
+# print(wtd.freq)

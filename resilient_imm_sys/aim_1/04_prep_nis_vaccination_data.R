@@ -3,23 +3,104 @@
 # Purpose: Load NIS data and necessary variables
 # Date: Last modified January 07, 2022
 
+
 ## This script will create two data sets
 # Data set 1: Change in vaccination rates for all regions in the NIS
 # Data set 2: Change in vaccination rates for all racial/ethnic groups for all regions in the NIS
 
-## Load prepped data for 2019 and 2007 ----
-load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/prepped_data/NISPUF19.RData")
-load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/prepped_data/NISPUF07.RData")
+# source set up script
+source(paste0("C:/Users/frc2/Documents/uw-phi-vax/resilient_imm_sys/aim_1/01_set_up_R.R"))
+
+## Load prepped data between 2007 and 2020----
+load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/raw_data/cdc/r_files/NISPUF07.RData")
+load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/raw_data/cdc/r_files/NISPUF08.RData")
+load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/raw_data/cdc/r_files/NISPUF09.RData")
+load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/raw_data/cdc/r_files/NISPUF10.RData")
+load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/raw_data/cdc/r_files/NISPUF11.RData")
+load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/raw_data/cdc/r_files/NISPUF12.RData")
+load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/raw_data/cdc/r_files/NISPUF13.RData")
+load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/raw_data/cdc/r_files/NISPUF14.RData")
+load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/raw_data/cdc/r_files/NISPUF15.RData")
+load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/raw_data/cdc/r_files/NISPUF16.RData")
+load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/raw_data/cdc/r_files/NISPUF17.RData")
+load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/raw_data/cdc/r_files/NISPUF18.RData")
+load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/raw_data/cdc/r_files/NISPUF19.RData")
+load("C:/Users/frc2/UW/og_merck_resilient_immunization_programs_project - Aim 1/Data/raw_data/cdc/r_files/NISPUF20.RData")
 
 ## General data prep -----
 
 # subset columns in each dataset
-nis19 <- NISPUF19 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACE_K, RACEETHK, I_HISP_K, STATE, EST_GRANT, ESTIAP19, EDUC1, INCQ298A, P_NUMHEP, P_NUMMMR, P_NUMDTP)
-nis07 <- NISPUF07 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACE_K, RACEETHK, I_HISP_K, STATE,            ESTIAP07, EDUC1, INCQ298A, P_NUMHEP, P_NUMMMR, P_NUMDTP)
+nis07 <- NISPUF07 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, ESTIAP07, EDUC1, INCQ298A, INCPOV1, LANGUAGE, MOBIL_I, # demographics
+                             INS_1, INS_2, INS_3, INS_3A, INS_4, INS_5, INS_6, INS_11,  # insurance information
+                             P_NUMHEP, P_NUMMMR, P_NUMDTP) # vaccination doses
+
+nis08 <- NISPUF08 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, ESTIAP08, EDUC1, INCQ298A, INCPOV1, LANGUAGE, MOBIL_I, 
+                             INS_1, INS_2, INS_3, INS_3A, INS_4, INS_5, INS_6, INS_11, 
+                             P_NUMHEP, P_NUMMMR, P_NUMDTP)
+
+nis09 <- NISPUF09 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, ESTIAP09, EDUC1, INCQ298A, INCPOV1, LANGUAGE, MOBIL_I, 
+                             INS_1, INS_2, INS_3, INS_3A, INS_4_5, INS_6, INS_11, 
+                             P_NUMHEP, P_NUMMMR, P_NUMDTP)
+
+nis10 <- NISPUF10 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, ESTIAP10, EDUC1, INCQ298A, INCPOV1, LANGUAGE, MOBIL_I, 
+                             INS_1, INS_2, INS_3, INS_3A, INS_4_5, INS_6, INS_11, 
+                             P_NUMHEP, P_NUMMMR, P_NUMDTP)
+
+nis11 <- NISPUF11 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, ESTIAP11, EDUC1, INCQ298A, INCPOV1, LANGUAGE, MOBIL_I, 
+                             INS_1, INS_2, INS_3, INS_3A, INS_4_5, INS_6, INS_11, 
+                             P_NUMHEP, P_NUMMMR, P_NUMDTP)
+
+nis12 <- NISPUF12 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, ESTIAP12, EDUC1, INCQ298A, INCPOV1, LANGUAGE, MOBIL_I, 
+                             INS_1, INS_2, INS_3, INS_3A, INS_4_5, INS_6, INS_11, 
+                             P_NUMHEP, P_NUMMMR, P_NUMDTP)
+
+nis13 <- NISPUF13 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, ESTIAP13, EDUC1, INCQ298A, INCPOV1, LANGUAGE, MOBIL_I, 
+                             INS_1, INS_2, INS_3, INS_3A, INS_4_5, INS_6, INS_11, 
+                             P_NUMHEP, P_NUMMMR, P_NUMDTP)
+
+nis14 <- NISPUF14 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, ESTIAP14, EDUC1, INCQ298A, INCPOV1, LANGUAGE, MOBIL_I, 
+                             INS_1, INS_2, INS_3, INS_3A, INS_4_5, INS_6, INS_11, 
+                             P_NUMHEP, P_NUMMMR, P_NUMDTP)
+
+nis15 <- NISPUF15 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, ESTIAP15, EDUC1, INCQ298A, INCPOV1, LANGUAGE, MOBIL_I, 
+                             INS_1, INS_2, INS_3, INS_3A, INS_4_5, INS_6, INS_11, 
+                             P_NUMHEP, P_NUMMMR, P_NUMDTP)
+
+nis16 <- NISPUF16 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, ESTIAP16, EDUC1, INCQ298A, INCPOV1, LANGUAGE, MOBIL_I, 
+                             INS_STAT_I, INS_BREAK_I, 
+                             P_NUMHEP, P_NUMMMR, P_NUMDTP)
+
+nis17 <- NISPUF17 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, ESTIAP17, EDUC1, INCQ298A, INCPOV1, LANGUAGE, MOBIL_I, 
+                             INS_STAT2_I, INS_BREAK_I, 
+                             P_NUMHEP, P_NUMMMR, P_NUMDTP)
+
+nis18 <- NISPUF18 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, ESTIAP18, EDUC1, INCQ298A, INCPOV1, LANGUAGE, MOBIL_I, 
+                             INS_STAT2_I, INS_BREAK_I, 
+                             P_NUMHEP, P_NUMMMR, P_NUMDTP)
+
+nis19 <- NISPUF19 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, ESTIAP19, EDUC1, INCQ298A, INCPOV1, LANGUAGE, MOBIL_I, 
+                             INS_STAT2_I, INS_BREAK_I, 
+                             P_NUMHEP, P_NUMMMR, P_NUMDTP)
+
+nis20 <- NISPUF20 %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, ESTIAP20, EDUC1, INCQ298A, INCPOV1, LANGUAGE, MOBIL_I, 
+                             INS_STAT2_I, INS_BREAK_I, 
+                             P_NUMHEP, P_NUMMMR, P_NUMDTP)
+
+# merge datasets together into four groups
+nis07 <- as_tibble(nis07)
+nis08 <- as_tibble(nis08)
+data <- bind_rows(nis07, nis08)
+
+# filter out children without adequate data
+
+# create new variables out of old: (location, insurance coverage)
+
+
 
 # filter children with adequate provider data
-nis19 <- nis19 %>% filter(PDAT==1)
 nis07 <- nis07 %>% filter(PDAT==1)
+nis19 <- nis19 %>% filter(PDAT==1)
+
 
 # drop Puerto Rico from 2019 survey data  (which only exists in 2019 survey)
 nis19 <- nis19 %>% filter(ESTIAP19!=106)

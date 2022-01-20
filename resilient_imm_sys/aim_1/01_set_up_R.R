@@ -33,3 +33,4 @@ prepped_data_dir <- paste0(team_drive,"Data/prepped_data/") # location of preppe
 codebook_directory <- paste0(team_drive,"Data/documentation/codebooks/aim_2/") # location of codebooks for interpreting data
 resDir <- paste0(team_drive, "Results/") # location of  any result outputs
 visDir <- paste0(team_drive,"Visualizations/") # location where visualizations are saved
+
