@@ -97,5 +97,10 @@ test <- prepped_vacc_confid_dataset[,.(mean_agree_vac_safe=mean(mean_agree_vac_s
 # Save over dataset
 prepped_vacc_confid_dataset <- as_tibble(test)
 
+# Divide value by 100
+prepped_vacc_confid_dataset$mean_agree_vac_safe <- prepped_vacc_confid_dataset$mean_agree_vac_safe/100
+prepped_vacc_confid_dataset$mean_agree_vac_important <- prepped_vacc_confid_dataset$mean_agree_vac_important/100
+prepped_vacc_confid_dataset$mean_agree_vac_effective <- prepped_vacc_confid_dataset$mean_agree_vac_effective/100
+
 # Save prepped data source
 saveRDS(prepped_vacc_confid_dataset, paste0(prepped_data_dir, "aim_2/07_prepped_vaccine_confidence_data.RDS"))

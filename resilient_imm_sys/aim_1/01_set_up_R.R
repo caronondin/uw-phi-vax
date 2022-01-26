@@ -9,6 +9,7 @@ library(readxl)
 library(tidyverse)
 library(utilities)
 library(Hmisc) 
+library(ggrepel)
 
 # Define important variables -----
 set.seed(500)
@@ -32,5 +33,5 @@ raw_data_dir <- paste0(team_drive,"Data/raw_data/") # location of raw data
 prepped_data_dir <- paste0(team_drive,"Data/prepped_data/") # location of prepped data
 codebook_directory <- paste0(team_drive,"Data/documentation/codebooks/aim_2/") # location of codebooks for interpreting data
 resDir <- paste0(team_drive, "Results/") # location of  any result outputs
-visDir <- paste0(team_drive,"Visualizations/") # location where visualizations are saved
+visDir <- paste0(resDir, "graphics/") # location where visualizations are saved
 

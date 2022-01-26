@@ -2,8 +2,15 @@
 # Author: 
 # Date: Dec 13, 2021
 
+rm(list=ls())
+
+source(paste0("C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_2/01_set_up_R.R"))
+
 # Load final data for analysis
 final_data <- readRDS(paste0(prepped_data_dir, "aim_2/09_prepped_data_for_analysis.RDS"))
+
+# subset from 1995 to 2020
+# final_data <- final_data %>% filter(year>1995)
 
 # Normalize to ensure all values are between 0 and 1
 normVars = c('the_per_cap_mean', 'dah_per_the_mean_cat')

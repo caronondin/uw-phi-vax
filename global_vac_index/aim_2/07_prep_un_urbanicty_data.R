@@ -88,5 +88,8 @@ prepped_urban_dataset <- prepped_urban_dataset %>%
   select(location, year, gbd_location_id, iso_code, iso_num_code, perc_urban) %>%
   filter(year >=1990 & year <=2020)
 
+# Divide urban dataset by 100
+prepped_urban_dataset$perc_urban <- prepped_urban_dataset$perc_urban/100
+
 # Save file in the prepped data folder
 saveRDS(prepped_urban_dataset, file = paste0(prepped_data_dir, "aim_2/06_prepped_un_perc_urban_data.RDS"))

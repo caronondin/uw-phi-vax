@@ -1,10 +1,7 @@
 ## Prep NIS Vaccination Data
 # Author: Francisco Rios 
-# Purpose: Load NIS data and necessary variables
+# Purpose: This script will create complete NIS dataset for past few years
 # Date: Last modified January 07, 2022
-
-
-## This script will create complete NIS dataset for past few years
 
 # source set up script
 source(paste0("C:/Users/frc2/Documents/uw-phi-vax/resilient_imm_sys/aim_1/01_set_up_R.R"))
@@ -178,17 +175,17 @@ full_data <- full_data %>%
 # create new variable that will standardize estimation areas
 full_data <- full_data %>%
   mutate(ESTIAP = case_when(
-    ESTIAP_ORIG==15 ~ 14,
-    ESTIAP_ORIG==24 ~ 22,
-    ESTIAP_ORIG==37 ~ 36,
-    ESTIAP_ORIG==52 ~ 51,
-    ESTIAP_ORIG==53 ~ 51,
-    ESTIAP_ORIG==69 ~ 68,
-    ESTIAP_ORIG==70 ~ 68,
-    ESTIAP_ORIG==79 ~ 68,
-    ESTIAP_ORIG==80 ~ 68,
-    ESTIAP_ORIG==85 ~ 68,
-    ESTIAP_ORIG==91 ~ 22,
+    ESTIAP_ORIG==15 ~ 14, # City of Baltimore
+    ESTIAP_ORIG==24 ~ 22, #Miami-Dade County
+    ESTIAP_ORIG==37 ~ 36, # IN-Marion County
+    ESTIAP_ORIG==52 ~ 51, # TX-Dallas County
+    ESTIAP_ORIG==53 ~ 51, # TX-El Paso County
+    ESTIAP_ORIG==69 ~ 68, # CA-Los Angeles County
+    ESTIAP_ORIG==70 ~ 68, # CA-Santa Clara County
+    ESTIAP_ORIG==79 ~ 68, # CA-Alameda County
+    ESTIAP_ORIG==80 ~ 68, # CA-San Bernardino County
+    ESTIAP_ORIG==85 ~ 68, # CA- Northern Ca
+    ESTIAP_ORIG==91 ~ 22, # FL-Orange County
     ESTIAP_ORIG==92 ~ 34,
     ESTIAP_ORIG==93 ~ 40,
     ESTIAP_ORIG==96 ~ 36,
@@ -235,4 +232,4 @@ full_data <- full_data %>% select(SEQNUMC, PDAT, YEAR, AGEGRP, RACEETHK, RACEETH
                               P_NUMHEP, P_NUMMMR, P_NUMDTP, dtp_vac, mmr_vac, hep_vac)
 
 # Save final dataset
-saveRDS(full_data, file = paste0(prepped_data_dir, "complete_nis_data.RDS"))
+saveRDS(full_data, file = paste0(prepped_data_dir, "01_complete_nis_data.RDS"))

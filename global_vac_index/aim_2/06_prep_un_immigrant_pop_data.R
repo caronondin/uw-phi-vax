@@ -92,5 +92,8 @@ imm_pop_dataset <- as_tibble(imm_pop_dataset)
 # Select columns of interest
 imm_pop_dataset <- imm_pop_dataset %>% select(location, year, gbd_location_id, iso_code, iso_num_code, imm_pop_perc)
 
+# divide value by 100
+imm_pop_dataset$imm_pop_perc <- imm_pop_dataset$imm_pop_perc/100
+
 # Save file in the prepped data folder
 saveRDS(imm_pop_dataset, file = paste0(prepped_data_dir, "aim_2/05_prepped_un_immigrant_data.RDS"))
