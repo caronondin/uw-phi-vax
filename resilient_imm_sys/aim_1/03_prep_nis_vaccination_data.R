@@ -186,17 +186,17 @@ full_data <- full_data %>%
     ESTIAP_ORIG==80 ~ 68, # CA-San Bernardino County
     ESTIAP_ORIG==85 ~ 68, # CA- Northern Ca
     ESTIAP_ORIG==91 ~ 22, # FL-Orange County
-    ESTIAP_ORIG==92 ~ 34,
-    ESTIAP_ORIG==93 ~ 40,
-    ESTIAP_ORIG==96 ~ 36,
-    ESTIAP_ORIG==97 ~ 77,
-    ESTIAP_ORIG==102 ~ 77,
-    ESTIAP_ORIG==103 ~ 14,
-    ESTIAP_ORIG==107 ~ 51,
-    ESTIAP_ORIG==108 ~ 51,
-    ESTIAP_ORIG==109 ~ 51,
-    ESTIAP_ORIG==773 ~ 77,
-    ESTIAP_ORIG==774 ~ 77,
+    ESTIAP_ORIG==92 ~ 34, # IL-Madison/St.Clair Counties
+    ESTIAP_ORIG==93 ~ 40, # MN-Twin Cities
+    ESTIAP_ORIG==96 ~ 36, # IN-Lake County
+    ESTIAP_ORIG==97 ~ 77, # WA-Eastern Washington
+    ESTIAP_ORIG==102 ~ 77, # WA-Western WA
+    ESTIAP_ORIG==103 ~ 14, # MD-Prince George's County
+    ESTIAP_ORIG==107 ~ 51, # TX-Hidalgo County
+    ESTIAP_ORIG==108 ~ 51, # TX-Travis County
+    ESTIAP_ORIG==109 ~ 51, # TX-Tarrant County
+    ESTIAP_ORIG==773 ~ 77, # TX-Western Washington
+    ESTIAP_ORIG==774 ~ 77, # WA-Eastern/Western WA
     TRUE ~ as.double(ESTIAP_ORIG)
   ))
 
