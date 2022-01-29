@@ -39,9 +39,15 @@ dt2$change <- ((dt2$`2019`-dt2$`2007`)/dt2$`2007`)*100
 dt3 <- pivot_wider(dt2, id_cols = c(ESTIAP, INCPOV1, VACCINE), names_from = RACEETHK_R, values_from = c(change))
 
 # Calculate equitable immunization improvement
-dt3$eii_hispa <- ((dt3$hispa - dt3$white)/dt3$white)*100
-dt3$eii_black <- ((dt3$black - dt3$white)/dt3$white)*100
-dt3$eii_other <- ((dt3$other - dt3$white)/dt3$white)*100
+# dt3$eii_hispa <- ((dt3$hispa - dt3$white)/dt3$white)*100
+# dt3$eii_black <- ((dt3$black - dt3$white)/dt3$white)*100
+# dt3$eii_other <- ((dt3$other - dt3$white)/dt3$white)*100
+
+dt3$eii_hispa <- (dt3$hispa - dt3$white)
+dt3$eii_black <- (dt3$black - dt3$white)
+dt3$eii_other <- (dt3$other - dt3$white)
+
+# ggplot(dt3, aes(x=eii_hispa)
 
 # Reshape data for additional calculations
 # dt4 <- dt3 %>% select(ESTIAP, INCPOV1, VACCINE, eii_hispa, eii_black, eii_other)
@@ -62,7 +68,7 @@ for (v in numVars) {
 }
 
 # calculate the quantile groups for each column
-summary(dt4)
+# summary(dt4)
 quants <- c(.25, .75)
 quantiles <- as_tibble(apply( dt4[,2:37] , 2 , quantile , probs = quants , na.rm = TRUE))
 quantiles$quant <- NA
@@ -71,59 +77,200 @@ quantiles$quant[2] <- "third_q"
 
 quantiles <- pivot_longer(quantiles, cols = starts_with("eii"), names_to = c("group"))
 quantiles <- pivot_wider(quantiles, id_cols = "group", names_from = "quant", values_from = "value" )
+quantiles <- quantiles %>% separate(group, into = c("variable", "race", "income", "vaccine"))
+quantiles <- quantiles %>% select(-c(variable))
 
-# create new columns that will help group each variable
-dt4$group_hispa_high_dtp <- NA_character_
-dt4$group_hispa_med_dtp <- NA_character_
-dt4$group_hispa_low_dtp <- NA_character_
-dt4$group_hispa_miss_dtp <- NA_character_
-dt4$group_hispa_high_mmr <- NA_character_
-dt4$group_hispa_med_mmr <- NA_character_
-dt4$group_hispa_low_mmr <- NA_character_
-dt4$group_hispa_miss_mmr <- NA_character_
-dt4$group_hispa_high_hepb <- NA_character_
-dt4$group_hispa_med_hepb <- NA_character_
-dt4$group_hispa_low_hepb <- NA_character_
-dt4$group_hispa_miss_hepb <- NA_character_
+# reshape each dataset
+dt5 <- dt4 %>%
+  pivot_longer(
+    !c(ESTIAP),
+    names_to = c("group"),
+    values_to = "eii",
+    values_drop_na = FALSE) %>% 
+  separate(group, into = c("variable", "race", "income", "vaccine")) %>%
+  select(-c(variable))
 
-dt4$group_black_high_dtp <- NA_character_
-dt4$group_black_med_dtp <- NA_character_
-dt4$group_black_low_dtp <- NA_character_
-dt4$group_black_miss_dtp <- NA_character_
-dt4$group_black_high_mmr <- NA_character_
-dt4$group_black_med_mmr <- NA_character_
-dt4$group_black_low_mmr <- NA_character_
-dt4$group_black_miss_mmr <- NA_character_
-dt4$group_black_high_hepb <- NA_character_
-dt4$group_black_med_hepb <- NA_character_
-dt4$group_black_low_hepb <- NA_character_
-dt4$group_black_miss_hepb <- NA_character_
+# merge the dt_groups data to the quantiles cut off points
+dt6 <- merge(dt5, quantiles, by=c("race", "income", "vaccine"))
 
-dt4$group_other_high_dtp <- NA_character_
-dt4$group_other_med_dtp <- NA_character_
-dt4$group_other_low_dtp <- NA_character_
-dt4$group_other_miss_dtp <- NA_character_
-dt4$group_other_high_mmr <- NA_character_
-dt4$group_other_med_mmr <- NA_character_
-dt4$group_other_low_mmr <- NA_character_
-dt4$group_other_miss_mmr <- NA_character_
-dt4$group_other_high_hepb <- NA_character_
-dt4$group_other_med_hepb <- NA_character_
-dt4$group_other_low_hepb <- NA_character_
-dt4$group_other_miss_hepb <- NA_character_
+# calculate the group for each location, race, income and vaccine
+dt6 <- dt6 %>% 
+  mutate(category = case_when(eii > first_q & eii < third_q ~ "medium",
+                     eii < first_q ~ "low",
+                     eii > third_q ~ "high"))
 
-quantiles$new_variable <- quantiles$group
-quantiles$new_variable <- gsub("eii", "group", quantiles$new_variable)
-quantiles <- as.data.table(quantiles)
+# count how many states were most likely to exceed the change within racial group and ethnicity and vaccine
+dt6 <- dt6 %>% filter(!is.na(eii))
+plotdt6 <- dt6 %>% group_by(ESTIAP, category) %>%
+  tally()
+
+levels(plotdt6$ESTIAP)
+
+
+# create figures to compare states
+ggplot(plotdt6, aes(fill=category, y =n, x=ESTIAP)) + geom_bar(position="stack", stat="identity")
+ggplot(data=dt6, aes(x=category)) + geom_bar(stat="count") + facet_wrap(~ESTIAP)
+
+# reshape the dt4 to facilitate the merge
+# dt5 <- dt4 %>% 
+# # create new columns that will help group each variable
+# dt4$group_hispa_high_dtp <- NA_character_
+# dt4$group_hispa_med_dtp <- NA_character_
+# dt4$group_hispa_low_dtp <- NA_character_
+# dt4$group_hispa_miss_dtp <- NA_character_
+# dt4$group_hispa_high_mmr <- NA_character_
+# dt4$group_hispa_med_mmr <- NA_character_
+# dt4$group_hispa_low_mmr <- NA_character_
+# dt4$group_hispa_miss_mmr <- NA_character_
+# dt4$group_hispa_high_hepb <- NA_character_
+# dt4$group_hispa_med_hepb <- NA_character_
+# dt4$group_hispa_low_hepb <- NA_character_
+# dt4$group_hispa_miss_hepb <- NA_character_
+# 
+# dt4$group_black_high_dtp <- NA_character_
+# dt4$group_black_med_dtp <- NA_character_
+# dt4$group_black_low_dtp <- NA_character_
+# dt4$group_black_miss_dtp <- NA_character_
+# dt4$group_black_high_mmr <- NA_character_
+# dt4$group_black_med_mmr <- NA_character_
+# dt4$group_black_low_mmr <- NA_character_
+# dt4$group_black_miss_mmr <- NA_character_
+# dt4$group_black_high_hepb <- NA_character_
+# dt4$group_black_med_hepb <- NA_character_
+# dt4$group_black_low_hepb <- NA_character_
+# dt4$group_black_miss_hepb <- NA_character_
+# 
+# dt4$group_other_high_dtp <- NA_character_
+# dt4$group_other_med_dtp <- NA_character_
+# dt4$group_other_low_dtp <- NA_character_
+# dt4$group_other_miss_dtp <- NA_character_
+# dt4$group_other_high_mmr <- NA_character_
+# dt4$group_other_med_mmr <- NA_character_
+# dt4$group_other_low_mmr <- NA_character_
+# dt4$group_other_miss_mmr <- NA_character_
+# dt4$group_other_high_hepb <- NA_character_
+# dt4$group_other_med_hepb <- NA_character_
+# dt4$group_other_low_hepb <- NA_character_
+# dt4$group_other_miss_hepb <- NA_character_
+
+# quantiles$new_variable <- quantiles$group
+# quantiles$new_variable <- gsub("eii", "group", quantiles$new_variable)
+# quantiles <- as.data.table(quantiles)
+
+# dt4 %>% mutate(
+#   
+# )
 
 # create a loop that will group each variable
-groupVars <- names(dt4)[38:73]
-g <- groupVars[1]
-for (r in 1:nrow(dt4)){
-  for (c in 38:73){
-    dt4[r,c] <- ifelse(dt4[,get(v)][r]<quantiles[group==v]$first_q, "low", ifelse(dt4[,get(v)][r]>quantiles[group==v]$third_q, "high", "medium"))
-  }
-}
+# groupVars <- names(dt4)[38:73]
+# 
+# i <- 1
+# for (i in 1:nrow(dt4)){
+#   v <- numVars[i]
+#   g <- groupVars[i]
+#   dt4 %>% select(g, v) %>% filter(v==quantiles[group==v]) <- 
+#   dt4[i, get(g)] <- ifelse(dt4[i ,get(v)] < quantiles[group==v]$first_q, "low", ifelse(dt4[i, get(v)] > quantiles[group==v]$third_q, "high", ifelse(is.na(dt4[i ,get(v)]), NA_character_, "medium")))
+#   rm(g)
+# }
+# # g <- groupVars[1]
+# for (r in 1:nrow(dt4)){
+#   for (c in 38:73){
+#     dt4[r,c] <- ifelse(dt4[,get(v)][r] < quantiles[group==v]$first_q, "low", ifelse(dt4[,get(v)][r] > quantiles[group==v]$third_q, "high", ifelse(is.na(dt4[,get(v)][r]), NA_character_, "medium")))
+#   }
+# }
+# for (v in newVars){
+#   data[is.na(get(v)), (v):=0]
+# }
+
+# 
+# # separate the data into two separate files
+# dt_groups <- dt4 %>% select(c(ESTIAP), starts_with("group"))
+# dt_eii <- dt4 %>% select(c(ESTIAP), starts_with("eii"))
+
+# # reshape each dataset
+# dt_groups <- dt_groups %>%
+#   pivot_longer(
+#     !c(ESTIAP),
+#     names_to = c("group"),
+#     values_to = "category",
+#     values_drop_na = FALSE) %>% 
+#   separate(group, into = c("variable", "race", "income", "vaccine"))
+
+# dt_eii <- dt_eii %>%
+#   pivot_longer(
+#     !c(ESTIAP),
+#     names_to = c("group"),
+#     values_to = "eii",
+#     values_drop_na = FALSE) %>% 
+#   separate(group, into = c("variable", "race", "income", "vaccine"))
+
+# drop unnecessary columns
+# dt_groups <- dt_groups %>% select(-c(variable))
+# dt_eii <- dt_eii %>% select(-c(variable))
+
+# merge two datasets into one
+# dt5 <- dt_eii %>% inner_join(dt_groups, by=c("ESTIAP", "race", "income", "vaccine"))
+
+
+# create visuals and tables to explore the data
+
+# format the location variable
+ESTIAPFlevels=c(1,10,105,106,107,109,11,12,13,14,16,17,18,19,2,20,22,25,27,28,29,30,31,34,35,36,38,4,40,41,44,46,47,49,5,50,51,52,53,54,55,56,57,58,59,6,60,61,62,63,64,65,66,68,7,72,73,74,75,76,77,8,95)
+ESTIAPFlabels=c("CT", "NY-REST OF STATE", "GUAM", "PUERTO RICO", "TX-HIDALGO COUNTY", "TX-TARRANT COUNTY", "NY-CITY OF NEW YORK", "DC", "DE", "MD", "PA-REST OF STATE", "PA-PHILADELPHIA COUNTY", "VA", "WV", "MA", "AL", "FL", "GA", "KY", "MS", "NC", "SC",
+                "TN", "IL-REST OF STATE", "IL-CITY OF CHICAGO", "IN", "MI", "ME", "MN", "OH", "WI", "AR", "LA", "NM", "NH", "OK", "TX-REST OF STATE", "TX-DALLAS COUNTY", "TX-EL PASO COUNTY", "TX-CITY OF HOUSTON", "TX-BEXAR COUNTY", "IA", "KS", "MO", "NE", "RI", "CO",
+                "MT", "ND", "SD", "UT", "WY", "AZ", "CA", "VT", "HI", "NV", "AK", "ID", "OR", "WA", "NJ", "U.S. VIRGIN ISLANDS")
+dt5$ESTIAP <- factor(dt5$ESTIAP, levels=ESTIAPFlevels, labels=ESTIAPFlabels)
+dt5[category=="high", .N, by = .(ESTIAP, vaccine)]
+dt5[category=="medium", .N, by = .(ESTIAP, vaccine)]
+dt5[category=="low", .N, by = .(ESTIAP, vaccine)]
+
+# subset data to high-performing locations
+# plot.data <- dt5 %>%
+#   group_by(ESTIAP, VACCINE) %>%
+#   dplyr::summarize(.N))
+
+
+ggplot(data = dt5, aes(x = outlier, y = N)) +
+  geom_bar(stat = "identity", width = 0.5, fill = "steelblue") +
+  coord_flip() +
+  geom_text(aes(label=N), hjust=1.6, color="white") +
+  theme_minimal(base_size = 12) + 
+  labs(title = paste('Countries that exceeded median improvement in vaccine coverage'), 
+       y = 'Number of vaccines that saw greater-than-expected improvement', 
+       x = 'Location', 
+       subtitle = paste0('between 2014 and 2019, among low-SDI countries'))
+
+dt5 <- as.data.table(dt5)
+
+high.per.data <- dt5 %>% filter(category=="high")
+
+ggplot(dt5, aes(x=category, y=vaccine, size=eii, color=ESTIAP)) +
+  geom_point(alpha=0.5) 
+  
+  geom_tile(aes(fill = eii)) +
+  geom_text(aes(label = round(eii, 2))) +
+  scale_fill_gradient(low="white", high= "steelblue") +
+  facet_grid(vars(income), vars(race))
+  
+
+# create raster plot of locations
+j <- ggplot(dt3, aes(vaccine_name, location_name)) +
+  geom_tile(aes(fill = percent_change)) + 
+  geom_text(aes(label = round(percent_change, 2))) +
+  scale_fill_gradient(low = "white", high = "steelblue") +
+  geom_tile(data=median, size=1, fill=NA, colour="black") +
+  labs(title=paste('Percent change in countries that saw above-average improvement'), y = 'Location', x = 'Vaccine', 
+       subtitle=paste0('between 2014 and 2019, among low-SDI countries'))
+# create tables described in DAP
+
+# dobyearData <- dobyearData %>%
+#   pivot_longer(
+#     !c(caseid, v009, v010, v011, v000, v005, v007, v006, v016, sstate),
+#     names_to = c("variable", "child"),
+#     names_sep = "_",
+#     values_to = "birth_year",
+#     values_drop_na = FALSE
+#   )
 
 # reshape the data
 
