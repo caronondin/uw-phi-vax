@@ -1,0 +1,31 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 5px;
+    font-family: 'Open Sans';
+  }
+  
+  .nav {
+    height: 0px;
+    width: 100%;
+    position: relative;
+  }
+  
+  .nav > .nav-header {
+    display: inline;
+  }
+  
+  .nav > .nav-header > .nav-title {
+    display: inline-block;
+    font-size: 24px;
+    color: rgb(196, 204, 190);
+    padding: 10px 10px 10px 10px;
+  }
+  
+  .nav > .nav-btn {
+    display: none;
+  }
+  
+ 
