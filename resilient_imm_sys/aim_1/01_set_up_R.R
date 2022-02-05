@@ -10,6 +10,8 @@ library(tidyverse)
 library(utilities)
 library(Hmisc) 
 library(ggrepel)
+library(scales)
+library(RColorBrewer) 
 
 # Define important variables -----
 set.seed(500)
