@@ -28,7 +28,6 @@ prepped_dhs_for_mov <- readRDS("aim_1/04_prepped_dhs_for_mov.RDS")
 disease_trends <- readRDS("aim_1/05_disease_trends.RDS")
 merged_data_for_visuals <- readRDS("aim_1/06_merged_data_for_visuals.RDS")
 vaccine_preventable_diseases <- read_excel("aim_1/vaccine_preventable_diseases.xlsx")
-merged_data_for_visuals <- readRDS("aim_1/06_merged_data_for_visuals.RDS")
 merged_data_for_vac_dis <- dplyr::left_join(vaccine_preventable_diseases,disease_trends, "cause_name", "cause_name")
 
 
@@ -46,18 +45,12 @@ print(merged_data_for_vacii_sdi)
 #shape <- read_sf(dsn = "./aim_2", layer = "gadm36_0")
 
 ############################################### ui.R ##################################################
-body <-navbarPage(theme = shinytheme("flatly"), collapsible = TRUE,
-                  tags$head(includeCSS("aim_2/navbarpage_style.css")),
-                  title = "Global Vaccination Improvement Dashboard",
+body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
+                  theme = shinytheme("flatly"), collapsible = TRUE,
+                  title = div(img(src="https://uw-s3-cdn.s3.us-west-2.amazonaws.com/wp-content/uploads/sites/98/2014/09/07214416/W-Logo_White.png",width= "73px", height="45px"),  strong(toupper("Global Vaccination Improvement Dashboard"))),
+                  #title = strong("Global Vaccination Improvement Dashboard"),
                   sidebarPanel(
                       h3(strong("Improvement Index Ranking Table")),
-                      tags$head(tags$style(HTML('.js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar {
-                                                  background: #20c997;
-                                                  border-top: 1px solid #18bc9c ;
-                                                  border-bottom: 1px solid #18bc9c ;}
-                            /* changes the colour of the number tags */
-                           .irs-from, .irs-to, .irs-single { background: #20c997}'
-                      ))),
                       sliderInput("year", "Year", value =2019, min = 1990, max=2019,step=1,sep = "",animate=TRUE),
                       radioButtons("sdi_group_present","SDI Group Present", choices = c("All"="all","Low" ="low","Medium" = "medium","High" = "high"),inline = TRUE),
                       tags$style(HTML('table.dataTable tr.selected td, table.dataTable td.selected {background-color: #92c9e8 !important;}')),
@@ -73,10 +66,10 @@ body <-navbarPage(theme = shinytheme("flatly"), collapsible = TRUE,
                                   tabPanel("Vaccination Improvement Index Mapper",value="t_sdi",
                                            #leaflet::leafletOutput("mymap", height = "80vh")),
                                            fluidRow(column(6, " ", style='padding:5px;')),
-                                           fluidRow(column(width = 12, "Select location by clicking location_name in left Global SDI Ranking table.",
+                                           fluidRow(column(width = 12, "Select location by clicking location_name in left Improvement Index Ranking table.",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:center')),
                                            fluidRow(column(6, " ", style='padding:5px;')),
-                                           fluidRow(column(12,plotlyOutput("index_map",height = "45vh"))),
+                                           fluidRow(column(12,plotlyOutput("index_map",height = "60vh"))),
                                           # tags$head(tags$style(HTML('.info-box {min-height: 40px;} .info-box-icon {height: 40px; line-height: 40px;} .info-box-content {padding-top: 0px; padding-bottom: 0px;}'))),
                                            #fluidRow(infoBoxOutput("dah_per_the_mean_cat"),tags$style("#dah_per_the_mean_cat {width:630px;"),infoBoxOutput("the_per_cap_mean"),tags$style("#the_per_cap_mean {width:400px")),
                                            #fluidRow(infoBoxOutput("ghes_per_the_mean"),tags$style("#ghes_per_the_mean {width:570px;"),
@@ -84,24 +77,19 @@ body <-navbarPage(theme = shinytheme("flatly"), collapsible = TRUE,
                                            #         infoBoxOutput("cpi"),tags$style("#cpi {width:370px")),
                                           fluidRow(column(6, " ", style='padding:2px;')),
                                           fluidRow(column(12, plotlyOutput("index_trend_plot",height = "30vh")))),
-                                           #div(class="outer",
-                                               #tags$head(includeCSS("aim_2/style.css")),
-                                               #absolutePanel(id = "controls", class = "panel panel-default",
-                                                            # top = 420, left = 700, width = 250, fixed=TRUE,
-                                                            # draggable = TRUE, height = "auto"))),
                                   tabPanel("Vaccination Improvement Index Ranking Table",
                                            DT::dataTableOutput("indextable")
                                            ),
                                   tabPanel("Vaccination Trends", value = "t_vac",
                                            fluidRow(column(width = 11,h3(strong(htmlOutput("content_vac"))))),
-                                           fluidRow(column(width = 11, "Select location by clicking location_name in left Global SDI Ranking table.",
+                                           fluidRow(column(width = 11, "Select location by clicking location_name in left Improvement Index Ranking table.",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
                                            fluidRow(column(11,h2(("   ")))),
                                            radioButtons("vaccine_plot","Plot type:", choices = c("Time Series of Vaccine Coverage" ="line_trend","Single Year Vaccine Coverage"="bar_plot"),inline = TRUE),
                                            fluidRow(column(12,plotlyOutput("all_vaccine_plot",height = "50vh")))),
                                   tabPanel("Mortality and Disability Trends",value = "d_vac",
                                            fluidRow(column(width = 11,h3(strong(htmlOutput("content_dis"))))),
-                                           fluidRow(column(width = 11, "Select location by clicking location_name in left Global SDI Ranking table.",
+                                           fluidRow(column(width = 11, "Select location by clicking location_name in left Improvement Index Ranking table.",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
                                            #fluidRow(column(6, radioButtons("disease_estimate","Choose y-axis:", choices = c("Number Value"="number_val","Percent Value" ="percent_val","Rate Value" = "rate_val"),inline = TRUE)),
                                                     #column(6,radioButtons("disease_plot","Choose plot type:", choices = c("Time Series of Disease Trend" ="line_trend","Single Year Disease trend"="bar_plot"),inline = TRUE))),
@@ -136,9 +124,9 @@ body <-navbarPage(theme = shinytheme("flatly"), collapsible = TRUE,
                                            )),
                                   tabPanel("Data Explorer",
                                            fluidRow(column(6, " ", style='padding:5px;')),
-                                           fluidRow(column(6, radioButtons("dataset","Choose Dataset", choices = c("All"="all","SDI" ="sdi","Vaccine Trends" = "vaccine trends","Disease Trends" = "disease trends","Improvement Index"= "improvement index"),inline = TRUE)),
+                                           fluidRow(column(6, radioButtons("dataset","Choose Dataset", choices = c("Improvement Index"= "improvement index","Vaccine Trends" = "vaccine trends","Disease Trends" = "disease trends"),inline = TRUE)),
                                                            column(5, style = "margin-top: 10px;",div(downloadButton("download","Download the data"), style = "float: right"))),
-                                           fluidRow(column(11,DT::dataTableOutput("alldatatable") %>% withSpinner(color="#0dc5c1"))))
+                                           fluidRow(column(11,DT::dataTableOutput("alldatatable") %>% withSpinner(color="#4b2e83"))))
                       )
                   )))
 )
@@ -207,7 +195,8 @@ server <- function(input, output,session) {
       sdi_rank_table$rank <- NA
       sdi_rank_table$rank = dense_rank(desc(sdi_rank_table$result))
       sdi_rank_table <- sdi_rank_table[,c("rank","location","result","sdi","sdi_group_present")]
-      sdi_rank_table<-sdi_rank_table[order(sdi_rank_table$rank),]
+      colnames(sdi_rank_table) <- c('Rank','Location','Improvement Index', "SDI","SDI Group Present")
+      sdi_rank_table<-sdi_rank_table[order(sdi_rank_table$Rank),]
       true_false_formatter <-
           formatter("span",
                     style = x ~ formattable::style(
@@ -219,9 +208,10 @@ server <- function(input, output,session) {
           sdi_rank_table,
           list(
               ## a coloured bar with length proportional to value
-              'result' = color_tile("white", "pink"),
+              'Improvement Index' = color_tile("white", "#569eca"),
+              'SDI' = color_tile("white", "pink"),
               ## use custom formatter for TRUE/FALSE values
-              sdi_group_present = true_false_formatter
+              'SDI Group Present' = true_false_formatter
           )
       ) %>%
           as.datatable(rownames = FALSE, 
@@ -346,15 +336,13 @@ server <- function(input, output,session) {
       
       customGreen0 = "#DeF7E9"
       customGreen = "#71CA97"
-      customPurple = "#8787e0"
-      customPurple0 = #dcdcf2
         
         print(index_rank_table)
       formattable(
         index_rank_table,
         list(
           ## a coloured bar with length proportional to value
-          'Improvement Index' = color_tile("white", customPurple),
+          'Improvement Index' = color_tile("white", "#569eca"),
           "SDI" = color_tile("white", "pink"),
           "Development Assistance Per Total Health Spending Categorical" = color_tile(customGreen, customGreen0),
           "Total Health Spending per Person"= color_tile(customGreen, customGreen0),
@@ -371,7 +359,7 @@ server <- function(input, output,session) {
       ) %>%
         as.datatable(rownames = FALSE, 
                      options = list(paging = FALSE,
-                                    scrollY = '600px', 
+                                    scrollY = '620px', 
                                     scrollY=TRUE, 
                                     scrollX=TRUE, 
                                     #searching = FALSE,
@@ -398,15 +386,12 @@ server <- function(input, output,session) {
     
     customGreen0 = "#DeF7E9"
     customGreen = "#71CA97"
-    customPurple = "#8787e0"
-    customPurple0 = #dcdcf2
-      
-      print(index_rank_table)
+    
     formattable(
       index_rank_table,
       list(
         ## a coloured bar with length proportional to value
-        'Improvement Index' = color_tile("white", customPurple),
+        'Improvement Index' = color_tile("white", "#569eca"),
         "SDI" = color_tile("white", "pink"),
         "Development Assistance Per Total Health Spending Categorical" = color_tile(customGreen, customGreen0),
         "Total Health Spending per Person"= color_tile(customGreen, customGreen0),
@@ -503,9 +488,9 @@ server <- function(input, output,session) {
                                   yaxis = list(title = "Vaccine",showgrid = FALSE, showline = FALSE, showticklabels = TRUE, domain= c(0, 0.85)),
                                   xaxis = list(title = "Vaccination coverage (%)", zeroline = FALSE, showline = FALSE, showticklabels = TRUE, showgrid = TRUE)) 
           fig1 <- fig1 %>% add_annotations(xref = 'x1', yref = 'y',
-                                           x = single_year_vac_plotdata$prop_val * 1 + 0.1,  y = single_year_vac_plotdata$vaccine_name,
+                                           x = single_year_vac_plotdata$prop_val * 1 - 0.05,  y = single_year_vac_plotdata$vaccine_name,
                                            text = paste(round(single_year_vac_plotdata$prop_val*100, 2), '%'),
-                                           font = list(family = 'Arial', size = 12, color = 'rgb(50, 171, 96)'),
+                                           font = list(family = 'Arial', size = 12, color = 'rgba(0, 0, 0, 1)'),
                                            showarrow = FALSE)
       }
   })
@@ -518,25 +503,25 @@ server <- function(input, output,session) {
           fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_number_val, color = ~cause_name)%>%
               add_lines()
           title = "Time Series of Deaths, Disease or Disability Number"
-          y_title = "Number of Deaths in Population"
+          y_title = "Number of Deaths in Population (Log scale)"
       }
       else if (input$disease_estimate == "percent_val"){
           fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_percent_val, color = ~cause_name)%>%
               add_lines()
           title = "Time Series of Deaths, Disease or Disability Percent"
-          y_title="Deaths for a particular cuase/Deaths from all causes"
+          y_title="Deaths for a particular cuase/Deaths from all causes (Log scale)"
       }
       else{
           fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_rate_val, color = ~cause_name)%>%
               add_lines()
           title = "Time Series of Deaths, Disease or Disability Rate"
-          y_title="Deaths per 100,000 population"
+          y_title="Deaths per 100,000 population (Log scale)"
       }
       fig_dis <- fig_dis %>% 
           layout( autosize = T,
                   title =title,  showlegend = T,
                  xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
-                 yaxis = list(title =y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
+                 yaxis = list(title =y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE,type= "log"))
       fig_dis
   })
   
@@ -546,19 +531,19 @@ server <- function(input, output,session) {
           fig_dis <- plot_ly(disability_plotdata, x = ~year_id,y= ~ylds_number_val, color = ~cause_name)%>%
               add_lines()
           title = "Time Series of Years Lived in Less Than Ideal health"
-          y_title = "Years lived with disability in population "
+          y_title = "Years lived with disability in population (Log scale) "
       }
       else if (input$disease_estimate == "percent_val"){
           fig_dis <- plot_ly(disability_plotdata, x = ~year_id,y= ~ylds_percent_val, color = ~cause_name)%>%
               add_lines()
           title = "Time Series of Proportion of Years Lived in Less Than Ideal health"
-          y_title="YLDs for particular cause/YLDs for all causes"
+          y_title="YLDs for particular cause/YLDs for all causes (Log scale)"
       }
       else{
           fig_dis <- plot_ly(disability_plotdata, x = ~year_id,y= ~ylds_rate_val, color = ~cause_name)%>%
               add_lines()
           title = "Time Series of Years Lived in Less Than Ideal health per 100,000 population"
-          y_title="YLDs per 100,000 population"
+          y_title="YLDs per 100,000 population (Log scale)"
       }
       fig_disa <- plot_ly(disability_plotdata, x = ~year_id,y=~ylds_number_val, color = ~cause_name)%>%
           add_lines()
@@ -566,7 +551,7 @@ server <- function(input, output,session) {
           layout( autosize = T,
                   title =title,  showlegend = T,
                  xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
-                 yaxis = list(title = y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
+                 yaxis = list(title = y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE,type= "log"))
       fig_disa
   })
   
@@ -684,18 +669,18 @@ server <- function(input, output,session) {
           }
           else{
               single_year_vac_plotdata <- filter(vac_plotdata,year_id == input$year)
-              fig1 <- plot_ly(x = ~single_year_vac_plotdata$prop_val, y = ~reorder(single_year_vac_plotdata$vaccine_name, single_year_vac_plotdata$prop_val), name = paste0('Vaccniation Coverage in',input$year),
-                              type = 'bar', orientation = 'h',
-                              marker = list(color = 'rgba(50, 171, 96, 0.6)',
-                                            line = list(color = 'rgba(50, 171, 96, 1.0)', width = 1))) 
+              fig1 <- plot_ly(x = ~single_year_vac_plotdata$prop_val, y = ~reorder(single_year_vac_plotdata$vaccine_name, single_year_vac_plotdata$prop_val), name = single_year_vac_plotdata$vaccine_name,
+                              type = 'bar', orientation = 'h',color = single_year_vac_plotdata$vaccine_name)
+                              #marker = list(color = 'rgba(50, 171, 96, 0.6)',
+                                            #line = list(color = 'rgba(50, 171, 96, 1.0)', width = 1))) 
               fig1 <- fig1 %>% layout( autosize = T,
                                        title = paste0("Vaccination Coverage in ", input$year),
                                       yaxis = list(title = "Vaccine",showgrid = FALSE, showline = FALSE, showticklabels = TRUE, domain= c(0, 0.85)),
                                       xaxis = list(title = "Vaccination coverage (%)", zeroline = FALSE, showline = FALSE, showticklabels = TRUE, showgrid = TRUE)) 
               fig1 <- fig1 %>% add_annotations(xref = 'x1', yref = 'y',
-                                               x = single_year_vac_plotdata$prop_val * 1 + 0.1,  y = single_year_vac_plotdata$vaccine_name,
+                                               x = single_year_vac_plotdata$prop_val * 1- 0.05,  y = single_year_vac_plotdata$vaccine_name,
                                                text = paste(round(single_year_vac_plotdata$prop_val*100, 2), '%'),
-                                               font = list(family = 'Arial', size = 12, color = 'rgb(50, 171, 96)'),
+                                               font = list(family = 'Arial', size = 12, color = 'rgb(0,0,0,1)'),
                                                showarrow = FALSE)
           }
       })
@@ -705,25 +690,25 @@ server <- function(input, output,session) {
               fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_number_val, color = ~cause_name)%>%
                   add_lines()
               title = "Time Series of Deaths, Disease or Disability Number"
-              y_title = "Number of Deaths in Population"
+              y_title = "Number of Deaths in Population (Log scale)"
           }
           else if (input$disease_estimate == "percent_val"){
               fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_percent_val, color = ~cause_name)%>%
                   add_lines()
               title = "Time Series of Deaths, Disease or Disability Percent"
-              y_title="Deaths for a particular cuase/Deaths from all causes"
+              y_title="Deaths for a particular cuase/Deaths from all causes (Log scale)"
           }
           else{
               fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_rate_val, color = ~cause_name)%>%
                   add_lines()
               title = "Time Series of Deaths, Disease or Disability Rate"
-              y_title="Deaths per 100,000 population"
+              y_title="Deaths per 100,000 population (Log scale)"
           }
           fig_dis <- fig_dis %>% 
               layout( autosize = T,
                       title =title,  showlegend = T,
                      xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
-                     yaxis = list(title = y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
+                     yaxis = list(title = y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE,type= "log"))
           fig_dis
       })
       
@@ -733,19 +718,19 @@ server <- function(input, output,session) {
               fig_dis <- plot_ly(disability_plotdata, x = ~year_id,y= ~ylds_number_val, color = ~cause_name)%>%
                   add_lines()
               title = "Time Series of Years Lived in Less Than Ideal health"
-              y_title = "Years lived with disability in population "
+              y_title = "Years lived with disability in population(Log scale)"
           }
           else if (input$disease_estimate == "percent_val"){
               fig_dis <- plot_ly(disability_plotdata, x = ~year_id,y= ~ylds_percent_val, color = ~cause_name)%>%
                   add_lines()
-              title = "Time Series of Proportion of Years Lived in Less Than Ideal health"
-              y_title="YLDs for particular cause/YLDs for all causes"
+              title = "Time Series of Proportion of Years Lived in Less Than Ideal health" 
+              y_title="YLDs for particular cause/YLDs for all causes (Log scale)" 
           }
           else{
               fig_dis <- plot_ly(disability_plotdata, x = ~year_id,y= ~ylds_rate_val, color = ~cause_name)%>%
                   add_lines()
               title = "Time Series of Years Lived in Less Than Ideal health per 100,000 population"
-              y_title="YLDs per 100,000 population"
+              y_title="YLDs per 100,000 population(Log scale)"
           }
           fig_disa <- plot_ly(disability_plotdata, x = ~year_id,y=~ylds_number_val, color = ~cause_name)%>%
               add_lines()
@@ -753,7 +738,7 @@ server <- function(input, output,session) {
               layout( autosize = T,
                       title =title,  showlegend = T,
                      xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
-                     yaxis = list(title = y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
+                     yaxis = list(title = y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE,type= "log"))
           fig_disa
       })
       
@@ -770,15 +755,16 @@ server <- function(input, output,session) {
           ay <- list(
             overlaying = "y",
             side = "right",
-            title = "<b> Deaths</b> per 100,000 population")
+            title = "<b> Vaccine</b> coverage (%)")
           
           fig <- fig %>% add_trace(x =  ~year_id, y = ~prop_val, type = 'scatter',name = ~vaccine_name.x,yaxis = "y2", mode = 'lines',line = list(color = 'rgba(49,130,189, 1)', width = 4)) 
           # Set figure title, x and y-axes titles
           fig <- fig %>% layout(
             autosize = T,
-            title = list(text="Vaccine & Corresponding Disease Trend", x=0.25), yaxis2 = ay,
+            title = list(text="Vaccine & Corresponding Disease Trend", x=0.25), 
             xaxis = list(title="Year"),
-            yaxis = list(title="<b> Vaccine</b> coverage (%)"),
+            yaxis = list(title="<b> Deaths</b> per 100,000 population"),
+            yaxis2 = ay,
             legend = list(x = 3000, y = 1.2)
           )%>%
             layout(xaxis = list(
@@ -866,13 +852,7 @@ server <- function(input, output,session) {
   
   dataexplorer <- reactive({
       req(input$dataset)
-      if (input$dataset == "all"){
-          dataexplorer <- merged_data_for_visuals
-      }
-      else if(input$dataset == "sdi"){
-          dataexplorer <- sdi
-      }
-      else if(input$dataset == "vaccine trends"){
+      if(input$dataset == "vaccine trends"){
           dataexplorer <- vaccine_trends
       }
       else if (input$dataset == "disease trends"){
@@ -885,37 +865,26 @@ server <- function(input, output,session) {
   
   output$alldatatable = DT::renderDataTable({
           data<-dataexplorer()
-          pl=10
-          if (input$dataset == "all"){
-              x<-data %>%
-                  dplyr::select(-c("location_id","level"))
-          }
-          else if(input$dataset == "sdi"){
-              x<- data %>%
-                  dplyr::select(-c("location_id","level"))
-              pl=14
-          }
-          else if(input$dataset == "vaccine trends"){
+          if(input$dataset == "vaccine trends"){
               x<-data %>%
                   dplyr::select(-c("location_id"))
-              pl=14
+              pl=17
           }
           else if (input$dataset == "disease trends"){
             x<-data %>%
               dplyr::select(-c("location_id","cause_id"))
-            pl=9
+            pl=11
           }
           else{
               x<-data 
-              pl=14
+              pl=17
           }
           formattable(
              x
           ) %>%
               as.datatable(rownames = FALSE,
-                           filter = 'top',
                            options = list(paging = TRUE,
-                                          searching = FALSE,
+                                          searching = TRUE,
                                           scrollX=TRUE, 
                                           ordering = TRUE,
                                           dom = '<lf<t>p>',
