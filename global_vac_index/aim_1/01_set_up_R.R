@@ -16,6 +16,7 @@ library(lubridate)
 library(survival)
 library(vtable)
 library(stringr)
+library(kableExtra)
 
 # library(GGally)
 # library(plyr)

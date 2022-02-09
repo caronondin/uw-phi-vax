@@ -17,7 +17,7 @@ vax_dt$vaccine_name <- tolower(vax_dt$vaccine_name)
 # Reshape the vaccine data to be wider
 vax_dt_rsh <- vax_dt %>% pivot_wider(id_cols = c(location_id, location_name, year_id),
                           names_from = vaccine_name,
-                          values_from = c(prop_val, prop_upper, prop_lower),
+                          values_from = c(prop_val, prop_upper, prop_lower, minyear),
                           values_fill = NA)
 
 # Reshape the disease data to be wider
@@ -104,7 +104,7 @@ saveRDS(full_data, file=outputFile09)
 #   stop("You have location names in the vaccine data that aren't in the SDI data!")
 # }
 
-saveRDS(dt, outputFile09)
+# saveRDS(dt, outputFile09)
 
 # Print final statement
 print("Step 06: Merging complete; data set saved in prepped data folder")

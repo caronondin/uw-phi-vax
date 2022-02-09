@@ -1,6 +1,7 @@
 # Author: Francisco Rios 
-# Purpose: Prep Vaccination coverage data for analyses
-# Date: Last modified July 13, 2021
+# Purpose: Prep Vaccination coverage data for analyses and prep UN data on when 
+# vaccines were first introduced
+# Date: Last modified February 7, 2021
 
 # Read in vaccine trend data
 
@@ -29,9 +30,9 @@ for(i in 1:nrow(file_list)){
   
   #Bind data together 
   if(i==1){
-    prepped_vax_data = tmpData
+    extracted_vax_data = tmpData
   } else {
-    prepped_vax_data = rbind(prepped_vax_data, tmpData, use.names=TRUE, fill = TRUE)
+    extracted_vax_data = rbind(extracted_vax_data, tmpData, use.names=TRUE, fill = TRUE)
   }
   
   print(paste0(i, " ", file_list$data_type[i], " ", file_list$disease[i], " ", file_list$file_name[i])) ## if the code breaks, you know which file it broke on
@@ -40,7 +41,7 @@ for(i in 1:nrow(file_list)){
 # formatting of data -----
 
 # load newly prepped data
-dt <- prepped_vax_data
+dt <- extracted_vax_data
 
 # subset columns
 dt <- dt %>% select(location_id, location_name, vaccine_name, year_id, measure_name, val, upper, lower)
@@ -50,7 +51,7 @@ dt <- dt %>%
   mutate(measure_name=recode(measure_name, Proportion="prop"))
 
 # pivot data wider
-tidy_data <- dt %>%
+dt <- dt %>%
   pivot_wider(
     names_from = c(measure_name),
     names_glue = "{measure_name}_{.value}",
@@ -58,7 +59,7 @@ tidy_data <- dt %>%
   )
 
 # convert from tibble to datatable
-tidy_data <- as.data.table(tidy_data)
+dt <- as.data.table(dt)
 
 # Prep data on vaccine introductions -----
 # Read in list of files to prep
@@ -90,34 +91,25 @@ dt2 <- dt2 %>% select(gbd_location_id, location, iso_num_code, ISO_3_CODE, YEAR,
   filter(!is.na(vaccine_name)) %>% filter(!is.na(INTRO))
 
 # find the earliest value a vaccine was introduced for each location
-intro_year <- dt2 %>%
+dt2 <- dt2 %>%
   group_by(gbd_location_id, location, vaccine_name) %>%
   mutate(minyear = min(YEAR, na.rm = T)) %>% 
   arrange(location)
 
 # reshape data
-prepped_intro_year <- unique(intro_year %>% select(gbd_location_id, location, vaccine_name, minyear))
+dt2 <- unique(dt2 %>% select(gbd_location_id, location, vaccine_name, minyear))
 
-# rename variables in the prepped_intro_year file
-prepped_intro_year <- rename(prepped_intro_year, location_id=gbd_location_id, location_name=location)
+# rename variables in the prepped_dt2 file
+dt2 <- rename(dt2, location_id=gbd_location_id, location_name=location)
 
 # merge onto original data
-prepped_data <- tidy_data %>% full_join(prepped_intro_year, by=c("location_id", "location_name", "vaccine_name"))
+prepped_data <- dt %>% full_join(dt2, by=c("location_id", "location_name", "vaccine_name"))
 
-# set any value that is zero to missing if it occurred before the vaccine was officially introduced in each country
-final_prepped_data <- prepped_data %>% mutate(prop_val= case_when(prop_val==0 & year_id<minyear ~ as.numeric(NA),
-                                          TRUE~prop_val),
-                        prop_upper=case_when(prop_upper==0 & year_id<minyear ~ as.numeric(NA),
-                                             TRUE~prop_upper),
-                        prop_lower=case_when(prop_lower==0 & year_id<minyear ~ as.numeric(NA)))
-                        
-check_na <- prepped_data %>% filter(year_id<minyear)
-na_proportion = check_na[, sum(prop_val, na.rm = TRUE)]
-# recode 0s that occurred before the vaccine was introduced
-
+# drop any value that occurs before the official date of introduction per UNICEF
+final_data <- prepped_data %>% filter(year_id>=minyear)
 
 # save prepped data 
-saveRDS(tidy_data, outputFile02)
+saveRDS(final_data, outputFile02)
 
 # print final statement
 print("Step 02: Reading and prepping vaccination trend data completed.")

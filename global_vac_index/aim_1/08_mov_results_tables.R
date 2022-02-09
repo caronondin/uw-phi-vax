@@ -3,7 +3,7 @@
 # Date: Last modified October 13 2021
 
 # Source set up file with required packages and file paths
-source("./aim_1/01_set_up_R.R")
+source("C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_1/01_set_up_R.R")
 
 # Load data
 data <- readRDS(outputFile06)
