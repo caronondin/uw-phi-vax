@@ -71,6 +71,7 @@ file_path <- paste0(raw_data_dir, file_list$data_type, "/", file_list$containing
 
 # Read data sheet
 dt2 <- read_xlsx(file_path, sheet = 1)
+
 dt2 <- dt2 %>% mutate(
   vaccine_name = case_when(
     # DESCRIPTION=="aP (acellular pertussis) vaccine" ~ "DTP3",
@@ -88,7 +89,9 @@ dt2 <- dt2 %>% full_join(location_map, by=c('ISO_3_CODE'='iso_code'))
 
 # subset columns of interest
 dt2 <- dt2 %>% select(gbd_location_id, location, iso_num_code, ISO_3_CODE, YEAR, vaccine_name, DESCRIPTION, INTRO) %>%
-  filter(!is.na(vaccine_name)) %>% filter(!is.na(INTRO))
+  filter(!is.na(vaccine_name)) %>% 
+  filter(!is.na(INTRO)) %>% 
+  filter(INTRO%in%c("Yes", "Yes (R)", "Yes (P)", "Yes (A)"))
 
 # find the earliest value a vaccine was introduced for each location
 dt2 <- dt2 %>%
@@ -105,11 +108,28 @@ dt2 <- rename(dt2, location_id=gbd_location_id, location_name=location)
 # merge onto original data
 prepped_data <- dt %>% full_join(dt2, by=c("location_id", "location_name", "vaccine_name"))
 
-# drop any value that occurs before the official date of introduction per UNICEF
-final_data <- prepped_data %>% filter(year_id>=minyear)
+# save prepepd_data as a tibble
+prepped_data <- as_tibble(prepped_data)
 
-# save prepped data 
+# some vaccines do not have an introduction year
+
+# drop any value that occurs before the official date of introduction per UNICEF
+final_data <- prepped_data %>% mutate(too_early = 
+                                        case_when(prop_val==0 & !is.na(minyear) & year_id<=minyear ~ 1,
+                                                  !is.na(minyear) & year_id>minyear ~0,
+                                                  is.na(minyear) ~ 0),
+                                      )
+
+# keep only data that is not too early to be counted
+final_data <- final_data %>% filter(too_early==0)
+
+# drop columns not needed
+final_data <- final_data %>% select(-c(too_early, minyear))
+
+# save prepped data as datatable
+final_data <- as.data.table(final_data)
 saveRDS(final_data, outputFile02)
 
 # print final statement
 print("Step 02: Reading and prepping vaccination trend data completed.")
+

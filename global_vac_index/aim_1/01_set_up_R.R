@@ -56,8 +56,3 @@ source(paste0(code_dir, "functions/prep_vax_trend_data.R"))
 source(paste0(code_dir, "functions/prep_dx_trend_data.R"))
 source(paste0(code_dir, "functions/strip_chars.R"), encoding = "UTF-8")
 source(paste0(code_dir, "functions/extract_dhs_data.R"), encoding = "UTF-8")
-
-
-
-
-

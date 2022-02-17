@@ -56,13 +56,18 @@ mea1_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 # add vaccine indicator
 mea1_dt[,vaccine:="mea1"]
 
+mea1_dt
+
 # statistical test 
 mea1_test <- mea1_dt %>% select(strata, no_vaccine, mop)
 mea1_test[,no_mop:=no_vaccine-mop]
+mea1_test
+
 chisq.test(mea1_test %>% select(mop, no_mop), correct = FALSE)
 
 # statistical test of change in vaccine coverage
 mea1_cov_test <- mea1_dt %>% select(strata, no_vaccine, received_vaccine)
+mea1_cov_test
 chisq.test(mea1_cov_test %>% select(no_vaccine, received_vaccine), correct = FALSE)
 
 # DPT All -----
@@ -80,18 +85,21 @@ dt3 <- data2[gotit==0,. (no_vaccine=.N), by=strata]
 dt4 <- data2[gotit==0 & dpt_missed_opportunity=="Yes",. (mop=.N), by=strata]
 
 # merge dataset
-dpt_all_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt_all_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt_all_dt[,vaccine:="dpt_all"]
+dpt_all_dt
 
 # statistical test
 dpt_all_test <- dpt_all_dt %>% select(strata, no_vaccine, mop)
 dpt_all_test[,no_mop:=no_vaccine-mop]
+dpt_all_test
 chisq.test(dpt_all_test %>% select(mop, no_mop), correct = FALSE)
 
 # statistical test of change in vaccine coverage
 dpt_cov_test <- dpt_all_dt %>% select(strata, no_vaccine, received_vaccine)
+dpt_cov_test
 chisq.test(dpt_cov_test %>% select(no_vaccine, received_vaccine), correct = FALSE)
 
 # DPT 1 -----
@@ -109,10 +117,11 @@ dt3 <- data3[is.na(age_at_dpt1),. (no_vaccine=.N), by=strata]
 dt4 <- data3[is.na(age_at_dpt1) & dpt1_missed_opportunity==1,. (mop=.N), by=strata]
 
 # merge data sets together
-dpt1_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt1_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt1_dt[,vaccine:="dpt1"]
+dpt1_dt
 
 # statistical test
 dpt1_test <- dpt1_dt %>% select(strata, no_vaccine, mop)
@@ -134,14 +143,16 @@ dt3 <- data4[is.na(age_at_dpt2),. (no_vaccine=.N), by=strata]
 dt4 <- data4[is.na(age_at_dpt2) & dpt2_missed_opportunity==1,. (mop=.N), by=strata]
 
 # merge dataset
-dpt2_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt2_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt2_dt[,vaccine:="dpt2"]
+dpt2_dt
 
 # statistical test
 dpt2_test <- dpt2_dt %>% select(strata, no_vaccine, mop)
 dpt2_test[,no_mop:=no_vaccine-mop]
+dpt2_test
 chisq.test(dpt2_test %>% select(mop, no_mop), correct = FALSE)
 
 # DPT 3 -----
@@ -159,14 +170,16 @@ dt3 <- data5[is.na(age_at_dpt3),. (no_vaccine=.N), by=strata]
 dt4 <- data5[is.na(age_at_dpt3) & dpt3_missed_opportunity==1,. (mop=.N), by=strata]
 
 # merge dataset
-dpt3_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt3_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt3_dt[,vaccine:="dpt3"]
+dpt3_dt
 
 # statistical test
 dpt3_test <- dpt3_dt %>% select(strata, no_vaccine, mop)
 dpt3_test[,no_mop:=no_vaccine-mop]
+dpt3_test
 chisq.test(dpt3_test %>% select(mop, no_mop), correct = FALSE)
 
 # merge all vaccine data together
@@ -184,7 +197,6 @@ all_vax_data[,potential_coverage_with_no_mop:=round((mop+received_vaccine)/total
 setcolorder(all_vax_data, 
             c("strata", "total_with_card", "vaccine", "received_vaccine", "no_vaccine", 
               "vac_coverage", "mop", "percent_with_mop", "potential_coverage_with_no_mop"))
-
 write.csv(all_vax_data, file=paste0(resDir, "aim_1/missed_opportunities/mop_vaccine_table.csv"))
 
 
@@ -208,10 +220,13 @@ mea1_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 mea1_dt[,vaccine:="mea1"]
+mea1_dt
 
 # statistical test within each level of education
 mea1_test <- mea1_dt %>% select(strata, edu, no_vaccine, mop)
 mea1_test[,no_mop:=no_vaccine-mop]
+mea1_test
+
 chisq.test(mea1_test[edu=="No education",.(mop, no_mop)], correct = FALSE)
 chisq.test(mea1_test[edu=="Primary",.(mop, no_mop)], correct = FALSE)
 chisq.test(mea1_test[edu=="Secondary or higher",.(mop, no_mop)], correct = FALSE)
@@ -230,14 +245,17 @@ dt3 <- data2[gotit==0,. (no_vaccine=.N), by=.(strata, edu)]
 dt4 <- data2[gotit==0 & dpt_missed_opportunity=="Yes",. (mop=.N), by=.(strata, edu)]
 
 # merge dataset
-dpt_all_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt_all_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt_all_dt[,vaccine:="dpt_all"]
+dpt_all_dt
 
 # statistical test within each level of education
 dpt_all_test <- mea1_dt %>% select(strata, edu, no_vaccine, mop)
 dpt_all_test[,no_mop:=no_vaccine-mop]
+dpt_all_test
+
 chisq.test(dpt_all_test[edu=="No education",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt_all_test[edu=="Primary",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt_all_test[edu=="Secondary or higher",.(mop, no_mop)], correct = FALSE)
@@ -257,14 +275,17 @@ dt3 <- data3[is.na(age_at_dpt1),. (no_vaccine=.N), by=.(strata, edu)]
 dt4 <- data3[is.na(age_at_dpt1) & dpt1_missed_opportunity==1,. (mop=.N), by=.(strata, edu)]
 
 # merge data sets together
-dpt1_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt1_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt1_dt[,vaccine:="dpt1"]
+dpt1_dt
 
 # statistical test within each level of education
 dpt1_test <- dpt1_dt %>% select(strata, edu, no_vaccine, mop)
 dpt1_test[,no_mop:=no_vaccine-mop]
+dpt1_test
+
 chisq.test(dpt1_test[edu=="No education",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt1_test[edu=="Primary",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt1_test[edu=="Secondary or higher",.(mop, no_mop)], correct = FALSE)
@@ -284,14 +305,17 @@ dt3 <- data4[is.na(age_at_dpt2),. (no_vaccine=.N), by=.(strata, edu)]
 dt4 <- data4[is.na(age_at_dpt2) & dpt2_missed_opportunity==1,. (mop=.N), by=.(strata, edu)]
 
 # merge dataset
-dpt2_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt2_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt2_dt[,vaccine:="dpt2"]
+dpt2_dt
 
 # statistical test within each level of education
 dpt2_test <- dpt1_dt %>% select(strata, edu, no_vaccine, mop)
 dpt2_test[,no_mop:=no_vaccine-mop]
+dpt2_test
+
 chisq.test(dpt2_test[edu=="No education",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt2_test[edu=="Primary",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt2_test[edu=="Secondary or higher",.(mop, no_mop)], correct = FALSE)
@@ -311,14 +335,16 @@ dt3 <- data5[is.na(age_at_dpt3),. (no_vaccine=.N), by=.(strata, edu)]
 dt4 <- data5[is.na(age_at_dpt3) & dpt3_missed_opportunity==1,. (mop=.N), by=.(strata, edu)]
 
 # merge dataset
-dpt3_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt3_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt3_dt[,vaccine:="dpt3"]
+dpt3_dt
 
 # statistical test within each level of education
 dpt3_test <- dpt3_dt %>% select(strata, edu, no_vaccine, mop)
 dpt3_test[,no_mop:=no_vaccine-mop]
+dpt3_test
 chisq.test(dpt3_test[edu=="No education",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt3_test[edu=="Primary",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt3_test[edu=="Secondary or higher",.(mop, no_mop)], correct = FALSE)
@@ -362,10 +388,13 @@ mea1_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 mea1_dt[,vaccine:="mea1"]
+mea1_dt
 
 # statistical test within each level of household assets
 mea1_test <- mea1_dt %>% select(strata, assets, no_vaccine, mop)
 mea1_test[,no_mop:=no_vaccine-mop]
+mea1_test
+
 chisq.test(mea1_test[assets=="Quintile 1",.(mop, no_mop)], correct = FALSE)
 chisq.test(mea1_test[assets=="Quintile 2",.(mop, no_mop)], correct = FALSE)
 chisq.test(mea1_test[assets=="Quintile 3",.(mop, no_mop)], correct = FALSE)
@@ -391,14 +420,17 @@ dt3 <- data2[gotit==0,. (no_vaccine=.N), by=.(strata, assets)]
 dt4 <- data2[gotit==0 & dpt_missed_opportunity=="Yes",. (mop=.N), by=.(strata, assets)]
 
 # merge dataset
-dpt_all_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt_all_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt_all_dt[,vaccine:="dpt_all"]
+dpt_all_dt
 
 # statistical test within each level of household assets
 dpt_all_test <- dpt_all_dt %>% select(strata, assets, no_vaccine, mop)
 dpt_all_test[,no_mop:=no_vaccine-mop]
+dpt_all_test
+
 chisq.test(dpt_all_test[assets=="Quintile 1",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt_all_test[assets=="Quintile 2",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt_all_test[assets=="Quintile 3",.(mop, no_mop)], correct = FALSE)
@@ -420,14 +452,16 @@ dt3 <- data3[is.na(age_at_dpt1),. (no_vaccine=.N), by=.(strata, assets)]
 dt4 <- data3[is.na(age_at_dpt1) & dpt1_missed_opportunity==1,. (mop=.N), by=.(strata, assets)]
 
 # merge data sets together
-dpt1_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt1_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt1_dt[,vaccine:="dpt1"]
+dpt1_dt
 
 # statistical test within each level of household assets
 dpt1_test <- dpt1_dt %>% select(strata, assets, no_vaccine, mop)
 dpt1_test[,no_mop:=no_vaccine-mop]
+dpt1_test
 chisq.test(dpt1_test[assets=="Quintile 1",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt1_test[assets=="Quintile 2",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt1_test[assets=="Quintile 3",.(mop, no_mop)], correct = FALSE)
@@ -449,7 +483,7 @@ dt3 <- data4[is.na(age_at_dpt2),. (no_vaccine=.N), by=.(strata, assets)]
 dt4 <- data4[is.na(age_at_dpt2) & dpt2_missed_opportunity==1,. (mop=.N), by=.(strata, assets)]
 
 # merge data set
-dpt2_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt2_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt2_dt[,vaccine:="dpt2"]
@@ -478,14 +512,16 @@ dt3 <- data5[is.na(age_at_dpt3),. (no_vaccine=.N), by=.(strata, assets)]
 dt4 <- data5[is.na(age_at_dpt3) & dpt3_missed_opportunity==1,. (mop=.N), by=.(strata, assets)]
 
 # merge dataset
-dpt3_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt3_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt3_dt[,vaccine:="dpt3"]
+dpt3_dt
 
 # statistical test within each level of household assets
 dpt3_test <- dpt3_dt %>% select(strata, assets, no_vaccine, mop)
 dpt3_test[,no_mop:=no_vaccine-mop]
+dpt3_test
 chisq.test(dpt3_test[assets=="Quintile 1",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt3_test[assets=="Quintile 2",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt3_test[assets=="Quintile 3",.(mop, no_mop)], correct = FALSE)
@@ -529,6 +565,7 @@ mea1_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 mea1_dt[,vaccine:="mea1"]
+mea1_dt
 
 
 # DPT All -----
@@ -546,10 +583,11 @@ dt3 <- data2[gotit==0,. (no_vaccine=.N), by=.(strata, state)]
 dt4 <- data2[gotit==0 & dpt_missed_opportunity=="Yes",. (mop=.N), by=.(strata, state)]
 
 # merge dataset
-dpt_all_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt_all_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt_all_dt[,vaccine:="dpt_all"]
+dpt_all_dt
 
 # DPT 1 -----
 
@@ -566,10 +604,11 @@ dt3 <- data3[is.na(age_at_dpt1),. (no_vaccine=.N), by=.(strata, state)]
 dt4 <- data3[is.na(age_at_dpt1) & dpt1_missed_opportunity==1,. (mop=.N), by=.(strata, state)]
 
 # merge data sets together
-dpt1_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt1_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt1_dt[,vaccine:="dpt1"]
+dpt1_dt
 
 # DPT 2 -----
 
@@ -586,10 +625,11 @@ dt3 <- data4[is.na(age_at_dpt2),. (no_vaccine=.N), by=.(strata, state)]
 dt4 <- data4[is.na(age_at_dpt2) & dpt2_missed_opportunity==1,. (mop=.N), by=.(strata, state)]
 
 # merge data set
-dpt2_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt2_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt2_dt[,vaccine:="dpt2"]
+dpt2_dt
 
 # DPT 3 -----
 
@@ -606,10 +646,11 @@ dt3 <- data5[is.na(age_at_dpt3),. (no_vaccine=.N), by=.(strata, state)]
 dt4 <- data5[is.na(age_at_dpt3) & dpt3_missed_opportunity==1,. (mop=.N), by=.(strata, state)]
 
 # merge dataset
-dpt3_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt3_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt3_dt[,vaccine:="dpt3"]
+dpt3_dt
 
 # merge all vaccine data together
 all_vax_data <- rbind(mea1_dt, dpt_all_dt, dpt1_dt, dpt2_dt, dpt3_dt)
@@ -649,9 +690,12 @@ mea1_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 mea1_dt[,vaccine:="mea1"]
+mea1_dt
 
 # statistical test within each zone
 mea1_test <- mea1_dt %>% select(strata, zone, no_vaccine, mop)
+mea1_test
+
 mea1_test[,no_mop:=no_vaccine-mop]
 chisq.test(mea1_test[zone=="North Central",.(mop, no_mop)], correct = FALSE)
 chisq.test(mea1_test[zone=="North East",.(mop, no_mop)], correct = FALSE)
@@ -675,14 +719,16 @@ dt3 <- data2[gotit==0,. (no_vaccine=.N), by=.(strata, zone)]
 dt4 <- data2[gotit==0 & dpt_missed_opportunity=="Yes",. (mop=.N), by=.(strata, zone)]
 
 # merge dataset
-dpt_all_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt_all_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt_all_dt[,vaccine:="dpt_all"]
+dpt_all_dt
 
 # statistical test within each zone
 dpt_all_test <- dpt_all_dt %>% select(strata, zone, no_vaccine, mop)
 dpt_all_test[,no_mop:=no_vaccine-mop]
+dpt_all_test
 chisq.test(dpt_all_test[zone=="North Central",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt_all_test[zone=="North East",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt_all_test[zone=="North West",.(mop, no_mop)], correct = FALSE)
@@ -705,14 +751,17 @@ dt3 <- data3[is.na(age_at_dpt1),. (no_vaccine=.N), by=.(strata, zone)]
 dt4 <- data3[is.na(age_at_dpt1) & dpt1_missed_opportunity==1,. (mop=.N), by=.(strata, zone)]
 
 # merge data sets together
-dpt1_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt1_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt1_dt[,vaccine:="dpt1"]
+dpt1_dt
 
 # statistical test within each zone
 dpt1_test <- dpt1_dt %>% select(strata, zone, no_vaccine, mop)
 dpt1_test[,no_mop:=no_vaccine-mop]
+dpt1_test
+
 chisq.test(dpt1_test[zone=="North Central",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt1_test[zone=="North East",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt1_test[zone=="North West",.(mop, no_mop)], correct = FALSE)
@@ -735,14 +784,17 @@ dt3 <- data4[is.na(age_at_dpt2),. (no_vaccine=.N), by=.(strata, zone)]
 dt4 <- data4[is.na(age_at_dpt2) & dpt2_missed_opportunity==1,. (mop=.N), by=.(strata, zone)]
 
 # merge data set
-dpt2_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt2_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt2_dt[,vaccine:="dpt2"]
+dpt2_dt
 
 # statistical test within each zone
 dpt2_test <- dpt2_dt %>% select(strata, zone, no_vaccine, mop)
 dpt2_test[,no_mop:=no_vaccine-mop]
+dpt2_test
+
 chisq.test(dpt2_test[zone=="North Central",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt2_test[zone=="North East",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt2_test[zone=="North West",.(mop, no_mop)], correct = FALSE)
@@ -765,14 +817,16 @@ dt3 <- data5[is.na(age_at_dpt3),. (no_vaccine=.N), by=.(strata, zone)]
 dt4 <- data5[is.na(age_at_dpt3) & dpt3_missed_opportunity==1,. (mop=.N), by=.(strata, zone)]
 
 # merge dataset
-dpt3_dt <-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt3_dt <- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt3_dt[,vaccine:="dpt3"]
+dpt3_dt
 
 # statistical test within each zone
 dpt3_test <- dpt3_dt %>% select(strata, zone, no_vaccine, mop)
 dpt3_test[,no_mop:=no_vaccine-mop]
+dpt3_test
 chisq.test(dpt3_test[zone=="North Central",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt3_test[zone=="North East",.(mop, no_mop)], correct = FALSE)
 chisq.test(dpt3_test[zone=="North West",.(mop, no_mop)], correct = FALSE)
@@ -792,7 +846,6 @@ all_vax_data[,percent_with_mop:=round((mop/no_vaccine)*100, 1)]
 # # calculate coverage if no missed opportunity
 all_vax_data[,potential_coverage_with_no_mop:=round((mop+received_vaccine)/total_with_card*100, 1)]
 
-
 # Save the results -----
 setcolorder(all_vax_data,
             c("strata", "zone", "total_with_card", "vaccine", "received_vaccine", "no_vaccine",
@@ -802,14 +855,20 @@ write.csv(all_vax_data, file=paste0(resDir, "aim_1/missed_opportunities/mop_vacc
 
 # check data for correlation between three variables: education, assets, zones -----
 x <- table(data$edu, data$assets)
+x
 chi2 <- chisq.test(x, correct = FALSE)
+chi2
 sqrt(chi2$statistic / sum(x))
 
 y <- table(data$assets, data$zone)
+y
 chi2 <- chisq.test(y, data$zone)
+chi2
 sqrt(chi2$statistic / sum(y))
 
 z <- table(data$edu, data$zone)
+z
 chi2 <- chisq.test(z, correct = FALSE)
+chi2
 sqrt(chi2$statistic / sum(z))
 

@@ -143,3 +143,44 @@ miss_table_2 <- miss_table_2 %>% pivot_longer(cols = !range, names_to = "variabl
 # reshape miss_table to be long
 miss_table_reformat2 <- miss_table_2 %>% pivot_wider(names_from = range, values_from=missingness)
 write.csv(miss_table_reformat2, file=paste0(visDir, "aim_2/10_missingness_in_merged_data_without_locations_dropped.csv"))
+
+# plot DAH trends for locations that are eligible to receive DAH funds
+# load list of ineligible locations for DAH
+ineligible <- readRDS(file=paste0(codebook_directory, "locations_ineligible_for_dah.RDS"))
+
+test <- plotdt1 %>% filter(!location%in%ineligible) %>% filter(variable=="dah_per_cap_ppp_mean")
+dahVar <- unique(test$variable)
+
+# plot time series of the data for DAH with ineligible locations dropped
+dahlist <- list()
+i <- 1
+for(h in unique(test$location)) {
+  dahlist[[i]] <- ggplot(test[location==h], aes_string(y='value', x='year')) + 
+    geom_point() + labs(title = paste0(h))
+  i = i +1
+  }
+
+outputFile11c <- paste0(visDir, "aim_2/12_dah_data_among_eligible_countries.PDF")
+pdf(outputFile11c, height=5.5, width=9)
+for (i in 1:length(dahlist)){
+  print(dahlist[[i]])
+}
+dev.off()
+
+# pltlist3[[i]] <- ggplot(data[location==h], aes_string(y=v, x='year')) + geom_point()+ labs(title = paste0(h)) + geom_point(aes(y=tmp),color='red')
+# ggplot(test, aes(value)) + geom_histogram()
+# histograms1 = lapply(dahVar, function(v) {
+#   l = labelTable[Variable==v]$Label
+#   ggplot(test[variable==v], aes(value)) +
+#     geom_histogram() +
+#     labs(title = paste('Histogram of Pre-transformation', l), y = 'Value', x = l,
+#          caption='Variables are pre-imputation.') +
+#     theme_minimal()
+# })
+
+# save pdf
+
+# plot pdf 
+summary(test$dah_per_cap_ppp_mean)
+
+

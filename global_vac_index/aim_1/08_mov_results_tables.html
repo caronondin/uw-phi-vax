@@ -11,7 +11,7 @@
 
 <meta name="author" content="frc2" />
 
-<meta name="date" content="2022-02-04" />
+<meta name="date" content="2022-02-10" />
 
 <title>08_mov_results_tables.R</title>
 
@@ -167,7 +167,7 @@ pre code {
 
 <h1 class="title toc-ignore">08_mov_results_tables.R</h1>
 <h4 class="author">frc2</h4>
-<h4 class="date">2022-02-04</h4>
+<h4 class="date">2022-02-10</h4>
 
 </div>
 
@@ -195,11 +195,11 @@ source(&quot;C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_1/01_set_up
 <pre><code>## The following objects are masked from &#39;package:base&#39;:
 ## 
 ##     intersect, setdiff, setequal, union</code></pre>
-<pre><code>## -- Attaching packages ---------------------------------------------------------------------------------------------------------------------------------------------- tidyverse 1.3.1 --</code></pre>
+<pre><code>## -- Attaching packages ---------------------------------------------- tidyverse 1.3.1 --</code></pre>
 <pre><code>## v tibble  3.1.6     v stringr 1.4.0
 ## v readr   2.1.1     v forcats 0.5.1
 ## v purrr   0.3.4</code></pre>
-<pre><code>## -- Conflicts ------------------------------------------------------------------------------------------------------------------------------------------------- tidyverse_conflicts() --
+<pre><code>## -- Conflicts ------------------------------------------------- tidyverse_conflicts() --
 ## x dplyr::between()   masks data.table::between()
 ## x dplyr::filter()    masks stats::filter()
 ## x dplyr::first()     masks data.table::first()
@@ -210,7 +210,8 @@ source(&quot;C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_1/01_set_up
 ## Attaching package: &#39;lubridate&#39;</code></pre>
 <pre><code>## The following objects are masked from &#39;package:data.table&#39;:
 ## 
-##     hour, isoweek, mday, minute, month, quarter, second, wday, week, yday, year</code></pre>
+##     hour, isoweek, mday, minute, month, quarter, second, wday, week, yday,
+##     year</code></pre>
 <pre><code>## The following objects are masked from &#39;package:base&#39;:
 ## 
 ##     date, intersect, setdiff, union</code></pre>
@@ -271,10 +272,18 @@ mea1_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 # add vaccine indicator
 mea1_dt[,vaccine:=&quot;mea1&quot;]
 
-# statistical test 
+mea1_dt</code></pre>
+<pre><code>##    strata total_with_card received_vaccine no_vaccine mop vaccine
+## 1:   2018            4558             2546       2012 244    mea1
+## 2:   2013            3535             1959       1576 261    mea1</code></pre>
+<pre class="r"><code># statistical test 
 mea1_test &lt;- mea1_dt %&gt;% select(strata, no_vaccine, mop)
 mea1_test[,no_mop:=no_vaccine-mop]
-chisq.test(mea1_test %&gt;% select(mop, no_mop), correct = FALSE)</code></pre>
+mea1_test</code></pre>
+<pre><code>##    strata no_vaccine mop no_mop
+## 1:   2018       2012 244   1768
+## 2:   2013       1576 261   1315</code></pre>
+<pre class="r"><code>chisq.test(mea1_test %&gt;% select(mop, no_mop), correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -282,7 +291,11 @@ chisq.test(mea1_test %&gt;% select(mop, no_mop), correct = FALSE)</code></pre>
 ## X-squared = 14.365, df = 1, p-value = 0.0001506</code></pre>
 <pre class="r"><code># statistical test of change in vaccine coverage
 mea1_cov_test &lt;- mea1_dt %&gt;% select(strata, no_vaccine, received_vaccine)
-chisq.test(mea1_cov_test %&gt;% select(no_vaccine, received_vaccine), correct = FALSE)</code></pre>
+mea1_cov_test</code></pre>
+<pre><code>##    strata no_vaccine received_vaccine
+## 1:   2018       2012             2546
+## 2:   2013       1576             1959</code></pre>
+<pre class="r"><code>chisq.test(mea1_cov_test %&gt;% select(no_vaccine, received_vaccine), correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -303,15 +316,22 @@ dt3 &lt;- data2[gotit==0,. (no_vaccine=.N), by=strata]
 dt4 &lt;- data2[gotit==0 &amp; dpt_missed_opportunity==&quot;Yes&quot;,. (mop=.N), by=strata]
 
 # merge dataset
-dpt_all_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt_all_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt_all_dt[,vaccine:=&quot;dpt_all&quot;]
-
-# statistical test
+dpt_all_dt</code></pre>
+<pre><code>##    strata total_with_card received_vaccine no_vaccine mop vaccine
+## 1:   2018            6499             3818       2681 840 dpt_all
+## 2:   2013            4998             2274       2724 994 dpt_all</code></pre>
+<pre class="r"><code># statistical test
 dpt_all_test &lt;- dpt_all_dt %&gt;% select(strata, no_vaccine, mop)
 dpt_all_test[,no_mop:=no_vaccine-mop]
-chisq.test(dpt_all_test %&gt;% select(mop, no_mop), correct = FALSE)</code></pre>
+dpt_all_test</code></pre>
+<pre><code>##    strata no_vaccine mop no_mop
+## 1:   2018       2681 840   1841
+## 2:   2013       2724 994   1730</code></pre>
+<pre class="r"><code>chisq.test(dpt_all_test %&gt;% select(mop, no_mop), correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -319,7 +339,11 @@ chisq.test(dpt_all_test %&gt;% select(mop, no_mop), correct = FALSE)</code></pre
 ## X-squared = 16.041, df = 1, p-value = 6.2e-05</code></pre>
 <pre class="r"><code># statistical test of change in vaccine coverage
 dpt_cov_test &lt;- dpt_all_dt %&gt;% select(strata, no_vaccine, received_vaccine)
-chisq.test(dpt_cov_test %&gt;% select(no_vaccine, received_vaccine), correct = FALSE)</code></pre>
+dpt_cov_test</code></pre>
+<pre><code>##    strata no_vaccine received_vaccine
+## 1:   2018       2681             3818
+## 2:   2013       2724             2274</code></pre>
+<pre class="r"><code>chisq.test(dpt_cov_test %&gt;% select(no_vaccine, received_vaccine), correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -340,12 +364,15 @@ dt3 &lt;- data3[is.na(age_at_dpt1),. (no_vaccine=.N), by=strata]
 dt4 &lt;- data3[is.na(age_at_dpt1) &amp; dpt1_missed_opportunity==1,. (mop=.N), by=strata]
 
 # merge data sets together
-dpt1_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt1_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt1_dt[,vaccine:=&quot;dpt1&quot;]
-
-# statistical test
+dpt1_dt</code></pre>
+<pre><code>##    strata total_with_card received_vaccine no_vaccine mop vaccine
+## 1:   2018            6977             5935       1042 342    dpt1
+## 2:   2013            5387             4314       1073 400    dpt1</code></pre>
+<pre class="r"><code># statistical test
 dpt1_test &lt;- dpt1_dt %&gt;% select(strata, no_vaccine, mop)
 dpt1_test[,no_mop:=no_vaccine-mop]
 chisq.test(dpt1_test %&gt;% select(mop, no_mop), correct = FALSE)</code></pre>
@@ -369,15 +396,22 @@ dt3 &lt;- data4[is.na(age_at_dpt2),. (no_vaccine=.N), by=strata]
 dt4 &lt;- data4[is.na(age_at_dpt2) &amp; dpt2_missed_opportunity==1,. (mop=.N), by=strata]
 
 # merge dataset
-dpt2_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt2_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt2_dt[,vaccine:=&quot;dpt2&quot;]
-
-# statistical test
+dpt2_dt</code></pre>
+<pre><code>##    strata total_with_card received_vaccine no_vaccine mop vaccine
+## 1:   2018            6747             5344       1403 214    dpt2
+## 2:   2013            5194             3769       1425 343    dpt2</code></pre>
+<pre class="r"><code># statistical test
 dpt2_test &lt;- dpt2_dt %&gt;% select(strata, no_vaccine, mop)
 dpt2_test[,no_mop:=no_vaccine-mop]
-chisq.test(dpt2_test %&gt;% select(mop, no_mop), correct = FALSE)</code></pre>
+dpt2_test</code></pre>
+<pre><code>##    strata no_vaccine mop no_mop
+## 1:   2018       1403 214   1189
+## 2:   2013       1425 343   1082</code></pre>
+<pre class="r"><code>chisq.test(dpt2_test %&gt;% select(mop, no_mop), correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -398,15 +432,22 @@ dt3 &lt;- data5[is.na(age_at_dpt3),. (no_vaccine=.N), by=strata]
 dt4 &lt;- data5[is.na(age_at_dpt3) &amp; dpt3_missed_opportunity==1,. (mop=.N), by=strata]
 
 # merge dataset
-dpt3_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt3_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt3_dt[,vaccine:=&quot;dpt3&quot;]
-
-# statistical test
+dpt3_dt</code></pre>
+<pre><code>##    strata total_with_card received_vaccine no_vaccine mop vaccine
+## 1:   2018            6499             4657       1842 207    dpt3
+## 2:   2013            4998             3150       1848 382    dpt3</code></pre>
+<pre class="r"><code># statistical test
 dpt3_test &lt;- dpt3_dt %&gt;% select(strata, no_vaccine, mop)
 dpt3_test[,no_mop:=no_vaccine-mop]
-chisq.test(dpt3_test %&gt;% select(mop, no_mop), correct = FALSE)</code></pre>
+dpt3_test</code></pre>
+<pre><code>##    strata no_vaccine mop no_mop
+## 1:   2018       1842 207   1635
+## 2:   2013       1848 382   1466</code></pre>
+<pre class="r"><code>chisq.test(dpt3_test %&gt;% select(mop, no_mop), correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -427,7 +468,6 @@ all_vax_data[,potential_coverage_with_no_mop:=round((mop+received_vaccine)/total
 setcolorder(all_vax_data, 
             c(&quot;strata&quot;, &quot;total_with_card&quot;, &quot;vaccine&quot;, &quot;received_vaccine&quot;, &quot;no_vaccine&quot;, 
               &quot;vac_coverage&quot;, &quot;mop&quot;, &quot;percent_with_mop&quot;, &quot;potential_coverage_with_no_mop&quot;))
-
 write.csv(all_vax_data, file=paste0(resDir, &quot;aim_1/missed_opportunities/mop_vaccine_table.csv&quot;))
 
 
@@ -451,11 +491,26 @@ mea1_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 mea1_dt[,vaccine:=&quot;mea1&quot;]
-
-# statistical test within each level of education
+mea1_dt</code></pre>
+<pre><code>##    strata                 edu total_with_card received_vaccine no_vaccine mop vaccine
+## 1:   2018        No education            1143              464        679 118    mea1
+## 2:   2018             Primary             805              414        391  44    mea1
+## 3:   2018 Secondary or higher            2610             1668        942  82    mea1
+## 4:   2013        No education             631              206        425  67    mea1
+## 5:   2013             Primary             855              428        427  78    mea1
+## 6:   2013 Secondary or higher            2049             1325        724 116    mea1</code></pre>
+<pre class="r"><code># statistical test within each level of education
 mea1_test &lt;- mea1_dt %&gt;% select(strata, edu, no_vaccine, mop)
 mea1_test[,no_mop:=no_vaccine-mop]
-chisq.test(mea1_test[edu==&quot;No education&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
+mea1_test</code></pre>
+<pre><code>##    strata                 edu no_vaccine mop no_mop
+## 1:   2018        No education        679 118    561
+## 2:   2018             Primary        391  44    347
+## 3:   2018 Secondary or higher        942  82    860
+## 4:   2013        No education        425  67    358
+## 5:   2013             Primary        427  78    349
+## 6:   2013 Secondary or higher        724 116    608</code></pre>
+<pre class="r"><code>chisq.test(mea1_test[edu==&quot;No education&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -487,15 +542,30 @@ dt3 &lt;- data2[gotit==0,. (no_vaccine=.N), by=.(strata, edu)]
 dt4 &lt;- data2[gotit==0 &amp; dpt_missed_opportunity==&quot;Yes&quot;,. (mop=.N), by=.(strata, edu)]
 
 # merge dataset
-dpt_all_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt_all_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt_all_dt[,vaccine:=&quot;dpt_all&quot;]
-
-# statistical test within each level of education
+dpt_all_dt</code></pre>
+<pre><code>##    strata                 edu total_with_card received_vaccine no_vaccine mop vaccine
+## 1:   2018        No education            1736              757        979 216 dpt_all
+## 2:   2018             Primary            1114              586        528 191 dpt_all
+## 3:   2018 Secondary or higher            3649             2475       1174 433 dpt_all
+## 4:   2013        No education             882              253        629 140 dpt_all
+## 5:   2013             Primary            1171              456        715 248 dpt_all
+## 6:   2013 Secondary or higher            2945             1565       1380 606 dpt_all</code></pre>
+<pre class="r"><code># statistical test within each level of education
 dpt_all_test &lt;- mea1_dt %&gt;% select(strata, edu, no_vaccine, mop)
 dpt_all_test[,no_mop:=no_vaccine-mop]
-chisq.test(dpt_all_test[edu==&quot;No education&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
+dpt_all_test</code></pre>
+<pre><code>##    strata                 edu no_vaccine mop no_mop
+## 1:   2018        No education        679 118    561
+## 2:   2018             Primary        391  44    347
+## 3:   2018 Secondary or higher        942  82    860
+## 4:   2013        No education        425  67    358
+## 5:   2013             Primary        427  78    349
+## 6:   2013 Secondary or higher        724 116    608</code></pre>
+<pre class="r"><code>chisq.test(dpt_all_test[edu==&quot;No education&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -528,15 +598,30 @@ dt3 &lt;- data3[is.na(age_at_dpt1),. (no_vaccine=.N), by=.(strata, edu)]
 dt4 &lt;- data3[is.na(age_at_dpt1) &amp; dpt1_missed_opportunity==1,. (mop=.N), by=.(strata, edu)]
 
 # merge data sets together
-dpt1_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt1_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt1_dt[,vaccine:=&quot;dpt1&quot;]
-
-# statistical test within each level of education
+dpt1_dt</code></pre>
+<pre><code>##    strata                 edu total_with_card received_vaccine no_vaccine mop vaccine
+## 1:   2018        No education            1860             1433        427 159    dpt1
+## 2:   2018             Primary            1185             1014        171  65    dpt1
+## 3:   2018 Secondary or higher            3932             3488        444 118    dpt1
+## 4:   2013        No education             947              624        323 101    dpt1
+## 5:   2013             Primary            1255              964        291 116    dpt1
+## 6:   2013 Secondary or higher            3185             2726        459 183    dpt1</code></pre>
+<pre class="r"><code># statistical test within each level of education
 dpt1_test &lt;- dpt1_dt %&gt;% select(strata, edu, no_vaccine, mop)
 dpt1_test[,no_mop:=no_vaccine-mop]
-chisq.test(dpt1_test[edu==&quot;No education&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
+dpt1_test</code></pre>
+<pre><code>##    strata                 edu no_vaccine mop no_mop
+## 1:   2018        No education        427 159    268
+## 2:   2018             Primary        171  65    106
+## 3:   2018 Secondary or higher        444 118    326
+## 4:   2013        No education        323 101    222
+## 5:   2013             Primary        291 116    175
+## 6:   2013 Secondary or higher        459 183    276</code></pre>
+<pre class="r"><code>chisq.test(dpt1_test[edu==&quot;No education&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -569,15 +654,30 @@ dt3 &lt;- data4[is.na(age_at_dpt2),. (no_vaccine=.N), by=.(strata, edu)]
 dt4 &lt;- data4[is.na(age_at_dpt2) &amp; dpt2_missed_opportunity==1,. (mop=.N), by=.(strata, edu)]
 
 # merge dataset
-dpt2_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt2_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt2_dt[,vaccine:=&quot;dpt2&quot;]
-
-# statistical test within each level of education
+dpt2_dt</code></pre>
+<pre><code>##    strata                 edu total_with_card received_vaccine no_vaccine mop vaccine
+## 1:   2018        No education            1797             1191        606  80    dpt2
+## 2:   2018             Primary            1156              902        254  53    dpt2
+## 3:   2018 Secondary or higher            3794             3251        543  81    dpt2
+## 4:   2013        No education             918              491        427  75    dpt2
+## 5:   2013             Primary            1212              807        405 104    dpt2
+## 6:   2013 Secondary or higher            3064             2471        593 164    dpt2</code></pre>
+<pre class="r"><code># statistical test within each level of education
 dpt2_test &lt;- dpt1_dt %&gt;% select(strata, edu, no_vaccine, mop)
 dpt2_test[,no_mop:=no_vaccine-mop]
-chisq.test(dpt2_test[edu==&quot;No education&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
+dpt2_test</code></pre>
+<pre><code>##    strata                 edu no_vaccine mop no_mop
+## 1:   2018        No education        427 159    268
+## 2:   2018             Primary        171  65    106
+## 3:   2018 Secondary or higher        444 118    326
+## 4:   2013        No education        323 101    222
+## 5:   2013             Primary        291 116    175
+## 6:   2013 Secondary or higher        459 183    276</code></pre>
+<pre class="r"><code>chisq.test(dpt2_test[edu==&quot;No education&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -610,15 +710,30 @@ dt3 &lt;- data5[is.na(age_at_dpt3),. (no_vaccine=.N), by=.(strata, edu)]
 dt4 &lt;- data5[is.na(age_at_dpt3) &amp; dpt3_missed_opportunity==1,. (mop=.N), by=.(strata, edu)]
 
 # merge dataset
-dpt3_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt3_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt3_dt[,vaccine:=&quot;dpt3&quot;]
-
-# statistical test within each level of education
+dpt3_dt</code></pre>
+<pre><code>##    strata                 edu total_with_card received_vaccine no_vaccine mop vaccine
+## 1:   2018        No education            1736              977        759  78    dpt3
+## 2:   2018             Primary            1114              763        351  50    dpt3
+## 3:   2018 Secondary or higher            3649             2917        732  79    dpt3
+## 4:   2013        No education             882              363        519  72    dpt3
+## 5:   2013             Primary            1171              651        520 109    dpt3
+## 6:   2013 Secondary or higher            2945             2136        809 201    dpt3</code></pre>
+<pre class="r"><code># statistical test within each level of education
 dpt3_test &lt;- dpt3_dt %&gt;% select(strata, edu, no_vaccine, mop)
 dpt3_test[,no_mop:=no_vaccine-mop]
-chisq.test(dpt3_test[edu==&quot;No education&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
+dpt3_test</code></pre>
+<pre><code>##    strata                 edu no_vaccine mop no_mop
+## 1:   2018        No education        759  78    681
+## 2:   2018             Primary        351  50    301
+## 3:   2018 Secondary or higher        732  79    653
+## 4:   2013        No education        519  72    447
+## 5:   2013             Primary        520 109    411
+## 6:   2013 Secondary or higher        809 201    608</code></pre>
+<pre class="r"><code>chisq.test(dpt3_test[edu==&quot;No education&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -675,11 +790,34 @@ mea1_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 mea1_dt[,vaccine:=&quot;mea1&quot;]
-
-# statistical test within each level of household assets
+mea1_dt</code></pre>
+<pre><code>##     strata     assets total_with_card received_vaccine no_vaccine mop vaccine
+##  1:   2018 Quintile 1             624              282        342  57    mea1
+##  2:   2018 Quintile 2             875              452        423  54    mea1
+##  3:   2018 Quintile 3             887              470        417  55    mea1
+##  4:   2018 Quintile 4            1051              591        460  36    mea1
+##  5:   2018 Quintile 5            1121              751        370  42    mea1
+##  6:   2013 Quintile 1             241               78        163  38    mea1
+##  7:   2013 Quintile 2             534              206        328  57    mea1
+##  8:   2013 Quintile 3             766              382        384  66    mea1
+##  9:   2013 Quintile 4             923              544        379  60    mea1
+## 10:   2013 Quintile 5            1071              749        322  40    mea1</code></pre>
+<pre class="r"><code># statistical test within each level of household assets
 mea1_test &lt;- mea1_dt %&gt;% select(strata, assets, no_vaccine, mop)
 mea1_test[,no_mop:=no_vaccine-mop]
-chisq.test(mea1_test[assets==&quot;Quintile 1&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
+mea1_test</code></pre>
+<pre><code>##     strata     assets no_vaccine mop no_mop
+##  1:   2018 Quintile 1        342  57    285
+##  2:   2018 Quintile 2        423  54    369
+##  3:   2018 Quintile 3        417  55    362
+##  4:   2018 Quintile 4        460  36    424
+##  5:   2018 Quintile 5        370  42    328
+##  6:   2013 Quintile 1        163  38    125
+##  7:   2013 Quintile 2        328  57    271
+##  8:   2013 Quintile 3        384  66    318
+##  9:   2013 Quintile 4        379  60    319
+## 10:   2013 Quintile 5        322  40    282</code></pre>
+<pre class="r"><code>chisq.test(mea1_test[assets==&quot;Quintile 1&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -737,15 +875,38 @@ dt3 &lt;- data2[gotit==0,. (no_vaccine=.N), by=.(strata, assets)]
 dt4 &lt;- data2[gotit==0 &amp; dpt_missed_opportunity==&quot;Yes&quot;,. (mop=.N), by=.(strata, assets)]
 
 # merge dataset
-dpt_all_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt_all_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt_all_dt[,vaccine:=&quot;dpt_all&quot;]
-
-# statistical test within each level of household assets
+dpt_all_dt</code></pre>
+<pre><code>##     strata     assets total_with_card received_vaccine no_vaccine mop vaccine
+##  1:   2018 Quintile 1             923              439        484 143 dpt_all
+##  2:   2018 Quintile 2            1232              659        573 164 dpt_all
+##  3:   2018 Quintile 3            1289              737        552 171 dpt_all
+##  4:   2018 Quintile 4            1493              900        593 178 dpt_all
+##  5:   2018 Quintile 5            1562             1083        479 184 dpt_all
+##  6:   2013 Quintile 1             327               81        246  68 dpt_all
+##  7:   2013 Quintile 2             759              236        523 132 dpt_all
+##  8:   2013 Quintile 3            1104              436        668 246 dpt_all
+##  9:   2013 Quintile 4            1309              634        675 252 dpt_all
+## 10:   2013 Quintile 5            1499              887        612 296 dpt_all</code></pre>
+<pre class="r"><code># statistical test within each level of household assets
 dpt_all_test &lt;- dpt_all_dt %&gt;% select(strata, assets, no_vaccine, mop)
 dpt_all_test[,no_mop:=no_vaccine-mop]
-chisq.test(dpt_all_test[assets==&quot;Quintile 1&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
+dpt_all_test</code></pre>
+<pre><code>##     strata     assets no_vaccine mop no_mop
+##  1:   2018 Quintile 1        484 143    341
+##  2:   2018 Quintile 2        573 164    409
+##  3:   2018 Quintile 3        552 171    381
+##  4:   2018 Quintile 4        593 178    415
+##  5:   2018 Quintile 5        479 184    295
+##  6:   2013 Quintile 1        246  68    178
+##  7:   2013 Quintile 2        523 132    391
+##  8:   2013 Quintile 3        668 246    422
+##  9:   2013 Quintile 4        675 252    423
+## 10:   2013 Quintile 5        612 296    316</code></pre>
+<pre class="r"><code>chisq.test(dpt_all_test[assets==&quot;Quintile 1&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -790,15 +951,38 @@ dt3 &lt;- data3[is.na(age_at_dpt1),. (no_vaccine=.N), by=.(strata, assets)]
 dt4 &lt;- data3[is.na(age_at_dpt1) &amp; dpt1_missed_opportunity==1,. (mop=.N), by=.(strata, assets)]
 
 # merge data sets together
-dpt1_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt1_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt1_dt[,vaccine:=&quot;dpt1&quot;]
-
-# statistical test within each level of household assets
+dpt1_dt</code></pre>
+<pre><code>##     strata     assets total_with_card received_vaccine no_vaccine mop vaccine
+##  1:   2018 Quintile 1             989              816        173  52    dpt1
+##  2:   2018 Quintile 2            1318             1100        218  81    dpt1
+##  3:   2018 Quintile 3            1396             1170        226  70    dpt1
+##  4:   2018 Quintile 4            1593             1365        228  79    dpt1
+##  5:   2018 Quintile 5            1681             1484        197  60    dpt1
+##  6:   2013 Quintile 1             349              220        129  52    dpt1
+##  7:   2013 Quintile 2             804              557        247  79    dpt1
+##  8:   2013 Quintile 3            1200              913        287 107    dpt1
+##  9:   2013 Quintile 4            1416             1173        243  91    dpt1
+## 10:   2013 Quintile 5            1618             1451        167  71    dpt1</code></pre>
+<pre class="r"><code># statistical test within each level of household assets
 dpt1_test &lt;- dpt1_dt %&gt;% select(strata, assets, no_vaccine, mop)
 dpt1_test[,no_mop:=no_vaccine-mop]
-chisq.test(dpt1_test[assets==&quot;Quintile 1&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
+dpt1_test</code></pre>
+<pre><code>##     strata     assets no_vaccine mop no_mop
+##  1:   2018 Quintile 1        173  52    121
+##  2:   2018 Quintile 2        218  81    137
+##  3:   2018 Quintile 3        226  70    156
+##  4:   2018 Quintile 4        228  79    149
+##  5:   2018 Quintile 5        197  60    137
+##  6:   2013 Quintile 1        129  52     77
+##  7:   2013 Quintile 2        247  79    168
+##  8:   2013 Quintile 3        287 107    180
+##  9:   2013 Quintile 4        243  91    152
+## 10:   2013 Quintile 5        167  71     96</code></pre>
+<pre class="r"><code>chisq.test(dpt1_test[assets==&quot;Quintile 1&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -843,7 +1027,7 @@ dt3 &lt;- data4[is.na(age_at_dpt2),. (no_vaccine=.N), by=.(strata, assets)]
 dt4 &lt;- data4[is.na(age_at_dpt2) &amp; dpt2_missed_opportunity==1,. (mop=.N), by=.(strata, assets)]
 
 # merge data set
-dpt2_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt2_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt2_dt[,vaccine:=&quot;dpt2&quot;]
@@ -896,15 +1080,38 @@ dt3 &lt;- data5[is.na(age_at_dpt3),. (no_vaccine=.N), by=.(strata, assets)]
 dt4 &lt;- data5[is.na(age_at_dpt3) &amp; dpt3_missed_opportunity==1,. (mop=.N), by=.(strata, assets)]
 
 # merge dataset
-dpt3_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt3_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt3_dt[,vaccine:=&quot;dpt3&quot;]
-
-# statistical test within each level of household assets
+dpt3_dt</code></pre>
+<pre><code>##     strata     assets total_with_card received_vaccine no_vaccine mop vaccine
+##  1:   2018 Quintile 1             923              589        334  30    dpt3
+##  2:   2018 Quintile 2            1232              841        391  38    dpt3
+##  3:   2018 Quintile 3            1289              879        410  59    dpt3
+##  4:   2018 Quintile 4            1493             1079        414  43    dpt3
+##  5:   2018 Quintile 5            1562             1269        293  37    dpt3
+##  6:   2013 Quintile 1             327              124        203  40    dpt3
+##  7:   2013 Quintile 2             759              338        421  63    dpt3
+##  8:   2013 Quintile 3            1104              624        480 113    dpt3
+##  9:   2013 Quintile 4            1309              864        445  99    dpt3
+## 10:   2013 Quintile 5            1499             1200        299  67    dpt3</code></pre>
+<pre class="r"><code># statistical test within each level of household assets
 dpt3_test &lt;- dpt3_dt %&gt;% select(strata, assets, no_vaccine, mop)
 dpt3_test[,no_mop:=no_vaccine-mop]
-chisq.test(dpt3_test[assets==&quot;Quintile 1&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
+dpt3_test</code></pre>
+<pre><code>##     strata     assets no_vaccine mop no_mop
+##  1:   2018 Quintile 1        334  30    304
+##  2:   2018 Quintile 2        391  38    353
+##  3:   2018 Quintile 3        410  59    351
+##  4:   2018 Quintile 4        414  43    371
+##  5:   2018 Quintile 5        293  37    256
+##  6:   2013 Quintile 1        203  40    163
+##  7:   2013 Quintile 2        421  63    358
+##  8:   2013 Quintile 3        480 113    367
+##  9:   2013 Quintile 4        445  99    346
+## 10:   2013 Quintile 5        299  67    232</code></pre>
+<pre class="r"><code>chisq.test(dpt3_test[assets==&quot;Quintile 1&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -971,9 +1178,80 @@ mea1_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 mea1_dt[,vaccine:=&quot;mea1&quot;]
-
-
-# DPT All -----
+mea1_dt</code></pre>
+<pre><code>##     strata       state total_with_card received_vaccine no_vaccine mop vaccine
+##  1:   2018        Abia             102               70         32   4    mea1
+##  2:   2018     Adamawa             141               79         62   5    mea1
+##  3:   2018   Akwa Ibom             111               64         47   6    mea1
+##  4:   2018     Anambra             201              157         44   2    mea1
+##  5:   2018      Bauchi             191               87        104  12    mea1
+##  6:   2018     Bayelsa              50               30         20  12    mea1
+##  7:   2018       Benue             148               83         65   9    mea1
+##  8:   2018       Borno              97               46         51   6    mea1
+##  9:   2018 Cross River              79               52         27   4    mea1
+## 10:   2018      Ebonyi             238              140         98  10    mea1
+## 11:   2018       Ekiti              95               77         18   4    mea1
+## 12:   2018       Enugu              91               50         41   1    mea1
+## 13:   2018   FCT Abuja             163              110         53   2    mea1
+## 14:   2018       Gombe             149               75         74  12    mea1
+## 15:   2018         Imo             163               99         64   4    mea1
+## 16:   2018      Jigawa             168               45        123  10    mea1
+## 17:   2018      Kaduna             151               74         77  10    mea1
+## 18:   2018        Kano             234              107        127  21    mea1
+## 19:   2018     Katsina             124               32         92  10    mea1
+## 20:   2018       Kebbi              83               35         48  15    mea1
+## 21:   2018        Kogi              90               43         47   9    mea1
+## 22:   2018       Kwara              97               71         26   2    mea1
+## 23:   2018       Lagos             192              145         47   2    mea1
+## 24:   2018    Nasarawa             128               72         56   9    mea1
+## 25:   2018       Niger             144               67         77   9    mea1
+## 26:   2018        Ogun              90               49         41   8    mea1
+## 27:   2018        Ondo              83               68         15   2    mea1
+## 28:   2018        Osun              46               33         13   1    mea1
+## 29:   2018     Plateau             165               91         74  11    mea1
+## 30:   2018      Rivers             136               99         37   6    mea1
+## 31:   2018      Sokoto              36               17         19   8    mea1
+## 32:   2018      Taraba             164               70         94  13    mea1
+## 33:   2018        Yobe              98               51         47   4    mea1
+## 34:   2018     Zamfara              19                8         11   1    mea1
+## 35:   2013        Abia             110               72         38   9    mea1
+## 36:   2013     Adamawa             172               96         76  18    mea1
+## 37:   2013   Akwa Ibom             132               73         59   5    mea1
+## 38:   2013     Anambra             109               76         33   5    mea1
+## 39:   2013      Bauchi              83               22         61  14    mea1
+## 40:   2013     Bayelsa              86               46         40   3    mea1
+## 41:   2013       Benue              65               25         40  10    mea1
+## 42:   2013       Borno              27                5         22   4    mea1
+## 43:   2013 Cross River             112               55         57  12    mea1
+## 44:   2013       Delta             106               72         34   4    mea1
+## 45:   2013      Ebonyi             164               75         89  25    mea1
+## 46:   2013         Edo             134               87         47   5    mea1
+## 47:   2013       Ekiti             111               80         31   8    mea1
+## 48:   2013       Enugu             133               87         46   7    mea1
+## 49:   2013   FCT Abuja             135               94         41   4    mea1
+## 50:   2013       Gombe             120               49         71  12    mea1
+## 51:   2013         Imo             110               75         35   4    mea1
+## 52:   2013      Jigawa              53                9         44   2    mea1
+## 53:   2013      Kaduna              66               33         33   4    mea1
+## 54:   2013        Kano              89               37         52   6    mea1
+## 55:   2013     Katsina              48               12         36   5    mea1
+## 56:   2013        Kogi              81               48         33   9    mea1
+## 57:   2013       Kwara             109               67         42   1    mea1
+## 58:   2013       Lagos             182              132         50   5    mea1
+## 59:   2013    Nasarawa             107               40         67   3    mea1
+## 60:   2013       Niger              86               38         48  11    mea1
+## 61:   2013        Ogun              81               50         31   4    mea1
+## 62:   2013        Ondo              94               75         19   5    mea1
+## 63:   2013        Osun             116               85         31   2    mea1
+## 64:   2013         Oyo              83               42         41   8    mea1
+## 65:   2013     Plateau             127               46         81  17    mea1
+## 66:   2013      Rivers              99               71         28   3    mea1
+## 67:   2013      Sokoto              15                8          7   2    mea1
+## 68:   2013      Taraba             113               55         58  17    mea1
+## 69:   2013        Yobe              41               12         29   6    mea1
+## 70:   2013     Zamfara              27                6         21   2    mea1
+##     strata       state total_with_card received_vaccine no_vaccine mop vaccine</code></pre>
+<pre class="r"><code># DPT All -----
 
 # calculate how many children has a vaccination card
 dt1 &lt;- data2[,.(total_with_card= .N), by = .(strata, state)]
@@ -988,12 +1266,88 @@ dt3 &lt;- data2[gotit==0,. (no_vaccine=.N), by=.(strata, state)]
 dt4 &lt;- data2[gotit==0 &amp; dpt_missed_opportunity==&quot;Yes&quot;,. (mop=.N), by=.(strata, state)]
 
 # merge dataset
-dpt_all_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt_all_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt_all_dt[,vaccine:=&quot;dpt_all&quot;]
-
-# DPT 1 -----
+dpt_all_dt</code></pre>
+<pre><code>##     strata       state total_with_card received_vaccine no_vaccine mop vaccine
+##  1:   2018        Abia             140              114         26   7 dpt_all
+##  2:   2018     Adamawa             206              136         70  15 dpt_all
+##  3:   2018   Akwa Ibom             148              101         47  20 dpt_all
+##  4:   2018     Anambra             281              227         54  19 dpt_all
+##  5:   2018      Bauchi             254              125        129  45 dpt_all
+##  6:   2018     Bayelsa              78               40         38  21 dpt_all
+##  7:   2018       Benue             206              130         76  27 dpt_all
+##  8:   2018       Borno             141               69         72  14 dpt_all
+##  9:   2018 Cross River             106               75         31   9 dpt_all
+## 10:   2018       Delta             127               94         33  14 dpt_all
+## 11:   2018      Ebonyi             309              179        130  91 dpt_all
+## 12:   2018         Edo             133               76         57  11 dpt_all
+## 13:   2018       Ekiti             135              114         21   9 dpt_all
+## 14:   2018       Enugu             130               93         37   6 dpt_all
+## 15:   2018   FCT Abuja             231              140         91  39 dpt_all
+## 16:   2018       Gombe             215              118         97  28 dpt_all
+## 17:   2018         Imo             206              144         62  21 dpt_all
+## 18:   2018      Jigawa             270               54        216  51 dpt_all
+## 19:   2018      Kaduna             230               88        142  74 dpt_all
+## 20:   2018        Kano             362              201        161  31 dpt_all
+## 21:   2018     Katsina             211               89        122  34 dpt_all
+## 22:   2018       Kebbi             118               36         82   8 dpt_all
+## 23:   2018        Kogi             128               74         54  13 dpt_all
+## 24:   2018       Kwara             124              101         23  12 dpt_all
+## 25:   2018       Lagos             248              199         49  17 dpt_all
+## 26:   2018    Nasarawa             192              103         89  35 dpt_all
+## 27:   2018       Niger             216              102        114  33 dpt_all
+## 28:   2018        Ogun             133               77         56  12 dpt_all
+## 29:   2018        Ondo             123               98         25   8 dpt_all
+## 30:   2018        Osun              63               43         20   6 dpt_all
+## 31:   2018         Oyo             144               36        108   5 dpt_all
+## 32:   2018     Plateau             230              149         81  25 dpt_all
+## 33:   2018      Rivers             193              144         49  21 dpt_all
+## 34:   2018      Sokoto              57               31         26   6 dpt_all
+## 35:   2018      Taraba             238              125        113  24 dpt_all
+## 36:   2018        Yobe             144               80         64  26 dpt_all
+## 37:   2018     Zamfara              29               13         16   3 dpt_all
+## 38:   2013        Abia             148               83         65  34 dpt_all
+## 39:   2013     Adamawa             244               86        158  64 dpt_all
+## 40:   2013   Akwa Ibom             186               64        122  49 dpt_all
+## 41:   2013     Anambra             141               80         61  28 dpt_all
+## 42:   2013      Bauchi             114               21         93  16 dpt_all
+## 43:   2013     Bayelsa             121               44         77  20 dpt_all
+## 44:   2013       Benue              85               37         48  13 dpt_all
+## 45:   2013       Borno              42                6         36   5 dpt_all
+## 46:   2013 Cross River             158               73         85  43 dpt_all
+## 47:   2013       Delta             145               78         67  33 dpt_all
+## 48:   2013      Ebonyi             225              119        106  56 dpt_all
+## 49:   2013         Edo             194              113         81  39 dpt_all
+## 50:   2013       Ekiti             153               87         66  30 dpt_all
+## 51:   2013       Enugu             183              106         77  45 dpt_all
+## 52:   2013   FCT Abuja             170               96         74  32 dpt_all
+## 53:   2013       Gombe             173               71        102  41 dpt_all
+## 54:   2013         Imo             166               88         78  31 dpt_all
+## 55:   2013      Jigawa              75                7         68  16 dpt_all
+## 56:   2013      Kaduna              91               24         67  26 dpt_all
+## 57:   2013        Kano             153               52        101  29 dpt_all
+## 58:   2013     Katsina              70               15         55  12 dpt_all
+## 59:   2013       Kebbi              17                6         11   5 dpt_all
+## 60:   2013        Kogi             118               54         64  21 dpt_all
+## 61:   2013       Kwara             162               99         63  20 dpt_all
+## 62:   2013       Lagos             268              162        106  47 dpt_all
+## 63:   2013    Nasarawa             143               35        108  26 dpt_all
+## 64:   2013       Niger             115               37         78  20 dpt_all
+## 65:   2013        Ogun             120               61         59  19 dpt_all
+## 66:   2013        Ondo             144              102         42  17 dpt_all
+## 67:   2013        Osun             165              107         58  25 dpt_all
+## 68:   2013         Oyo             111               49         62  17 dpt_all
+## 69:   2013     Plateau             176               53        123  31 dpt_all
+## 70:   2013      Rivers             142               75         67  24 dpt_all
+## 71:   2013      Sokoto              20                7         13   3 dpt_all
+## 72:   2013      Taraba             170               53        117  43 dpt_all
+## 73:   2013        Yobe              55               15         40  10 dpt_all
+## 74:   2013     Zamfara              35                9         26   4 dpt_all
+##     strata       state total_with_card received_vaccine no_vaccine mop vaccine</code></pre>
+<pre class="r"><code># DPT 1 -----
 
 # calculate how many children have a vaccination card
 dt1 &lt;- data3[,.(total_with_card= .N), by = .(strata, state)]
@@ -1008,12 +1362,88 @@ dt3 &lt;- data3[is.na(age_at_dpt1),. (no_vaccine=.N), by=.(strata, state)]
 dt4 &lt;- data3[is.na(age_at_dpt1) &amp; dpt1_missed_opportunity==1,. (mop=.N), by=.(strata, state)]
 
 # merge data sets together
-dpt1_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt1_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt1_dt[,vaccine:=&quot;dpt1&quot;]
-
-# DPT 2 -----
+dpt1_dt</code></pre>
+<pre><code>##     strata       state total_with_card received_vaccine no_vaccine mop vaccine
+##  1:   2018        Abia             157              149          8   3    dpt1
+##  2:   2018     Adamawa             224              207         17   5    dpt1
+##  3:   2018   Akwa Ibom             161              147         14   9    dpt1
+##  4:   2018     Anambra             300              291          9   4    dpt1
+##  5:   2018      Bauchi             269              224         45  26    dpt1
+##  6:   2018     Bayelsa              84               72         12   9    dpt1
+##  7:   2018       Benue             214              191         23   9    dpt1
+##  8:   2018       Borno             156              118         38   9    dpt1
+##  9:   2018 Cross River             114              105          9   3    dpt1
+## 10:   2018       Delta             136              125         11   7    dpt1
+## 11:   2018      Ebonyi             334              319         15   7    dpt1
+## 12:   2018         Edo             138              102         36   2    dpt1
+## 13:   2018       Ekiti             142              138          4   3    dpt1
+## 14:   2018       Enugu             141              117         24   2    dpt1
+## 15:   2018   FCT Abuja             250              211         39   6    dpt1
+## 16:   2018       Gombe             234              194         40  27    dpt1
+## 17:   2018         Imo             224              214         10   1    dpt1
+## 18:   2018      Jigawa             290              137        153  20    dpt1
+## 19:   2018      Kaduna             251              208         43  22    dpt1
+## 20:   2018        Kano             383              326         57  17    dpt1
+## 21:   2018     Katsina             226              158         68  30    dpt1
+## 22:   2018       Kebbi             122               93         29  25    dpt1
+## 23:   2018        Kogi             133              112         21   8    dpt1
+## 24:   2018       Kwara             137              130          7   2    dpt1
+## 25:   2018       Lagos             267              246         21   8    dpt1
+## 26:   2018    Nasarawa             208              171         37   8    dpt1
+## 27:   2018       Niger             229              202         27  13    dpt1
+## 28:   2018        Ogun             136              121         15   7    dpt1
+## 29:   2018        Ondo             139              131          8   1    dpt1
+## 30:   2018        Osun              70               61          9   3    dpt1
+## 31:   2018         Oyo             158               51        107   6    dpt1
+## 32:   2018     Plateau             239              226         13   7    dpt1
+## 33:   2018      Rivers             206              198          8   6    dpt1
+## 34:   2018      Sokoto              64               53         11   4    dpt1
+## 35:   2018      Taraba             252              226         26   9    dpt1
+## 36:   2018        Yobe             154              136         18  10    dpt1
+## 37:   2018     Zamfara              35               25         10   4    dpt1
+## 38:   2013        Abia             159              147         12   9    dpt1
+## 39:   2013     Adamawa             260              191         69  25    dpt1
+## 40:   2013   Akwa Ibom             198              152         46  11    dpt1
+## 41:   2013     Anambra             154              135         19  12    dpt1
+## 42:   2013      Bauchi             125               75         50  20    dpt1
+## 43:   2013     Bayelsa             127               94         33  11    dpt1
+## 44:   2013       Benue              91               69         22   5    dpt1
+## 45:   2013       Borno              48               30         18   6    dpt1
+## 46:   2013 Cross River             168              147         21   5    dpt1
+## 47:   2013       Delta             153              133         20   6    dpt1
+## 48:   2013      Ebonyi             237              199         38  23    dpt1
+## 49:   2013         Edo             216              183         33  14    dpt1
+## 50:   2013       Ekiti             167              145         22   9    dpt1
+## 51:   2013       Enugu             196              183         13   8    dpt1
+## 52:   2013   FCT Abuja             183              154         29   9    dpt1
+## 53:   2013       Gombe             189              153         36  18    dpt1
+## 54:   2013         Imo             174              150         24   7    dpt1
+## 55:   2013      Jigawa              78               37         41  10    dpt1
+## 56:   2013      Kaduna              99               82         17   5    dpt1
+## 57:   2013        Kano             166              129         37  14    dpt1
+## 58:   2013     Katsina              77               44         33   6    dpt1
+## 59:   2013       Kebbi              19               15          4   1    dpt1
+## 60:   2013        Kogi             130              105         25  12    dpt1
+## 61:   2013       Kwara             172              152         20   8    dpt1
+## 62:   2013       Lagos             293              267         26  11    dpt1
+## 63:   2013    Nasarawa             155               80         75  11    dpt1
+## 64:   2013       Niger             123               82         41  18    dpt1
+## 65:   2013        Ogun             130              113         17   9    dpt1
+## 66:   2013        Ondo             154              143         11   5    dpt1
+## 67:   2013        Osun             188              174         14   5    dpt1
+## 68:   2013         Oyo             121              107         14   7    dpt1
+## 69:   2013     Plateau             183               95         88  26    dpt1
+## 70:   2013      Rivers             146              125         21  16    dpt1
+## 71:   2013      Sokoto              20               15          5   1    dpt1
+## 72:   2013      Taraba             191              153         38  25    dpt1
+## 73:   2013        Yobe              60               40         20   5    dpt1
+## 74:   2013     Zamfara              37               16         21   7    dpt1
+##     strata       state total_with_card received_vaccine no_vaccine mop vaccine</code></pre>
+<pre class="r"><code># DPT 2 -----
 
 # # calculate how many children have a vaccination card
 dt1 &lt;- data4[,.(total_with_card= .N), by = .(strata, state)]
@@ -1028,12 +1458,87 @@ dt3 &lt;- data4[is.na(age_at_dpt2),. (no_vaccine=.N), by=.(strata, state)]
 dt4 &lt;- data4[is.na(age_at_dpt2) &amp; dpt2_missed_opportunity==1,. (mop=.N), by=.(strata, state)]
 
 # merge data set
-dpt2_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt2_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt2_dt[,vaccine:=&quot;dpt2&quot;]
-
-# DPT 3 -----
+dpt2_dt</code></pre>
+<pre><code>##     strata       state total_with_card received_vaccine no_vaccine mop vaccine
+##  1:   2018        Abia             150              143          7   1    dpt2
+##  2:   2018     Adamawa             214              179         35   8    dpt2
+##  3:   2018   Akwa Ibom             157              133         24   3    dpt2
+##  4:   2018     Anambra             295              279         16   4    dpt2
+##  5:   2018      Bauchi             262              203         59  10    dpt2
+##  6:   2018     Bayelsa              82               71         11   6    dpt2
+##  7:   2018       Benue             211              177         34   8    dpt2
+##  8:   2018       Borno             153              102         51   2    dpt2
+##  9:   2018 Cross River             106               91         15   6    dpt2
+## 10:   2018       Delta             131              118         13   3    dpt2
+## 11:   2018      Ebonyi             322              303         19   7    dpt2
+## 12:   2018         Edo             135               97         38   2    dpt2
+## 13:   2018       Ekiti             140              133          7   3    dpt2
+## 14:   2018       Enugu             137              109         28   2    dpt2
+## 15:   2018   FCT Abuja             242              200         42   3    dpt2
+## 16:   2018       Gombe             228              167         61  12    dpt2
+## 17:   2018         Imo             218              193         25   3    dpt2
+## 18:   2018      Jigawa             277              129        148  10    dpt2
+## 19:   2018      Kaduna             239              182         57  21    dpt2
+## 20:   2018        Kano             370              274         96  10    dpt2
+## 21:   2018     Katsina             218              137         81  19    dpt2
+## 22:   2018       Kebbi             120               63         57   9    dpt2
+## 23:   2018        Kogi             131               99         32   3    dpt2
+## 24:   2018       Kwara             131              121         10   2    dpt2
+## 25:   2018       Lagos             257              234         23   4    dpt2
+## 26:   2018    Nasarawa             203              155         48  10    dpt2
+## 27:   2018       Niger             221              156         65  10    dpt2
+## 28:   2018        Ogun             135              105         30   4    dpt2
+## 29:   2018        Ondo             131              118         13   1    dpt2
+## 30:   2018        Osun              66               58          8   3    dpt2
+## 31:   2018         Oyo             149               46        103   3    dpt2
+## 32:   2018     Plateau             234              207         27   2    dpt2
+## 33:   2018      Rivers             197              179         18   2    dpt2
+## 34:   2018      Sokoto              60               43         17   4    dpt2
+## 35:   2018      Taraba             246              198         48   4    dpt2
+## 36:   2018        Yobe             148              121         27  10    dpt2
+## 37:   2013        Abia             154              133         21  10    dpt2
+## 38:   2013     Adamawa             252              157         95  24    dpt2
+## 39:   2013   Akwa Ibom             191              121         70  23    dpt2
+## 40:   2013     Anambra             145              124         21   6    dpt2
+## 41:   2013      Bauchi             124               52         72  13    dpt2
+## 42:   2013     Bayelsa             124               78         46  12    dpt2
+## 43:   2013       Benue              87               63         24   2    dpt2
+## 44:   2013       Borno              45               20         25   6    dpt2
+## 45:   2013 Cross River             163              127         36  10    dpt2
+## 46:   2013       Delta             149              121         28   6    dpt2
+## 47:   2013      Ebonyi             233              188         45  12    dpt2
+## 48:   2013         Edo             209              175         34  10    dpt2
+## 49:   2013       Ekiti             158              129         29  10    dpt2
+## 50:   2013       Enugu             190              168         22  13    dpt2
+## 51:   2013   FCT Abuja             174              141         33   8    dpt2
+## 52:   2013       Gombe             183              128         55  23    dpt2
+## 53:   2013         Imo             170              142         28   3    dpt2
+## 54:   2013      Jigawa              77               28         49   9    dpt2
+## 55:   2013      Kaduna              95               65         30   5    dpt2
+## 56:   2013        Kano             159               97         62  12    dpt2
+## 57:   2013     Katsina              72               28         44  10    dpt2
+## 58:   2013       Kebbi              17                9          8   4    dpt2
+## 59:   2013        Kogi             124               95         29   6    dpt2
+## 60:   2013       Kwara             167              134         33   3    dpt2
+## 61:   2013       Lagos             279              239         40  13    dpt2
+## 62:   2013    Nasarawa             148               70         78  12    dpt2
+## 63:   2013       Niger             118               77         41   7    dpt2
+## 64:   2013        Ogun             127              100         27   6    dpt2
+## 65:   2013        Ondo             149              136         13   2    dpt2
+## 66:   2013        Osun             179              157         22   3    dpt2
+## 67:   2013         Oyo             113               82         31   5    dpt2
+## 68:   2013     Plateau             177               87         90  17    dpt2
+## 69:   2013      Rivers             145              120         25   8    dpt2
+## 70:   2013      Sokoto              20               12          8   1    dpt2
+## 71:   2013      Taraba             182              117         65  25    dpt2
+## 72:   2013        Yobe              58               35         23   2    dpt2
+## 73:   2013     Zamfara              37               14         23   2    dpt2
+##     strata       state total_with_card received_vaccine no_vaccine mop vaccine</code></pre>
+<pre class="r"><code># DPT 3 -----
 
 # # calculate how many children have a vaccination card
 dt1 &lt;- data5[,.(total_with_card= .N), by = .(strata, state)]
@@ -1048,12 +1553,85 @@ dt3 &lt;- data5[is.na(age_at_dpt3),. (no_vaccine=.N), by=.(strata, state)]
 dt4 &lt;- data5[is.na(age_at_dpt3) &amp; dpt3_missed_opportunity==1,. (mop=.N), by=.(strata, state)]
 
 # merge dataset
-dpt3_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt3_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt3_dt[,vaccine:=&quot;dpt3&quot;]
-
-# merge all vaccine data together
+dpt3_dt</code></pre>
+<pre><code>##     strata       state total_with_card received_vaccine no_vaccine mop vaccine
+##  1:   2018        Abia             140              122         18   2    dpt3
+##  2:   2018     Adamawa             206              152         54   6    dpt3
+##  3:   2018   Akwa Ibom             148              118         30   4    dpt3
+##  4:   2018      Bauchi             254              166         88  14    dpt3
+##  5:   2018     Bayelsa              78               64         14   3    dpt3
+##  6:   2018       Benue             206              150         56   9    dpt3
+##  7:   2018       Borno             141               80         61   7    dpt3
+##  8:   2018 Cross River             106               82         24   5    dpt3
+##  9:   2018       Delta             127              107         20   2    dpt3
+## 10:   2018      Ebonyi             309              275         34   6    dpt3
+## 11:   2018         Edo             133               87         46   1    dpt3
+## 12:   2018       Ekiti             135              122         13   3    dpt3
+## 13:   2018       Enugu             130               99         31   2    dpt3
+## 14:   2018   FCT Abuja             231              178         53  10    dpt3
+## 15:   2018       Gombe             215              142         73  12    dpt3
+## 16:   2018         Imo             206              165         41   4    dpt3
+## 17:   2018      Jigawa             270              113        157   9    dpt3
+## 18:   2018      Kaduna             230              162         68  12    dpt3
+## 19:   2018        Kano             362              238        124  10    dpt3
+## 20:   2018     Katsina             211              111        100  20    dpt3
+## 21:   2018       Kebbi             118               41         77   5    dpt3
+## 22:   2018        Kogi             128               84         44   5    dpt3
+## 23:   2018       Kwara             124              110         14   3    dpt3
+## 24:   2018       Lagos             248              215         33   5    dpt3
+## 25:   2018    Nasarawa             192              143         49   7    dpt3
+## 26:   2018       Niger             216              128         88  11    dpt3
+## 27:   2018        Ogun             133               91         42   2    dpt3
+## 28:   2018        Ondo             123              106         17   2    dpt3
+## 29:   2018        Osun              63               53         10   1    dpt3
+## 30:   2018         Oyo             144               40        104   2    dpt3
+## 31:   2018     Plateau             230              175         55   5    dpt3
+## 32:   2018      Rivers             193              163         30   5    dpt3
+## 33:   2018      Sokoto              57               36         21   1    dpt3
+## 34:   2018      Taraba             238              156         82   7    dpt3
+## 35:   2018        Yobe             144              109         35   4    dpt3
+## 36:   2018     Zamfara              29               17         12   1    dpt3
+## 37:   2013        Abia             148              114         34  11    dpt3
+## 38:   2013     Adamawa             244              117        127  40    dpt3
+## 39:   2013   Akwa Ibom             186               94         92  26    dpt3
+## 40:   2013     Anambra             141              108         33   7    dpt3
+## 41:   2013      Bauchi             114               37         77   4    dpt3
+## 42:   2013     Bayelsa             121               65         56   8    dpt3
+## 43:   2013       Benue              85               50         35   5    dpt3
+## 44:   2013       Borno              42               11         31   3    dpt3
+## 45:   2013 Cross River             158              110         48  15    dpt3
+## 46:   2013       Delta             145              110         35   6    dpt3
+## 47:   2013      Ebonyi             225              159         66  21    dpt3
+## 48:   2013         Edo             194              156         38  13    dpt3
+## 49:   2013       Ekiti             153              109         44  14    dpt3
+## 50:   2013       Enugu             183              141         42  19    dpt3
+## 51:   2013   FCT Abuja             170              130         40   3    dpt3
+## 52:   2013       Gombe             173              103         70  22    dpt3
+## 53:   2013         Imo             166              125         41   7    dpt3
+## 54:   2013      Jigawa              75               14         61  10    dpt3
+## 55:   2013      Kaduna              91               53         38   4    dpt3
+## 56:   2013        Kano             153               87         66   8    dpt3
+## 57:   2013     Katsina              70               23         47   6    dpt3
+## 58:   2013        Kogi             118               77         41  10    dpt3
+## 59:   2013       Kwara             162              121         41   6    dpt3
+## 60:   2013       Lagos             268              221         47  10    dpt3
+## 61:   2013    Nasarawa             143               57         86   9    dpt3
+## 62:   2013       Niger             115               56         59   8    dpt3
+## 63:   2013        Ogun             120               74         46  12    dpt3
+## 64:   2013        Ondo             144              121         23   7    dpt3
+## 65:   2013        Osun             165              133         32   6    dpt3
+## 66:   2013         Oyo             111               62         49   7    dpt3
+## 67:   2013     Plateau             176               68        108  19    dpt3
+## 68:   2013      Rivers             142              100         42   8    dpt3
+## 69:   2013      Sokoto              20                8         12   2    dpt3
+## 70:   2013      Taraba             170               92         78  18    dpt3
+## 71:   2013        Yobe              55               20         35   8    dpt3
+##     strata       state total_with_card received_vaccine no_vaccine mop vaccine</code></pre>
+<pre class="r"><code># merge all vaccine data together
 all_vax_data &lt;- rbind(mea1_dt, dpt_all_dt, dpt1_dt, dpt2_dt, dpt3_dt)
 
 # calculate vaccination coverage
@@ -1091,10 +1669,37 @@ mea1_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 mea1_dt[,vaccine:=&quot;mea1&quot;]
-
-# statistical test within each zone
+mea1_dt</code></pre>
+<pre><code>##     strata          zone total_with_card received_vaccine no_vaccine mop vaccine
+##  1:   2018 North Central             935              537        398  51    mea1
+##  2:   2018    North East             840              408        432  52    mea1
+##  3:   2018    North West             815              318        497  75    mea1
+##  4:   2018    South East             795              516        279  21    mea1
+##  5:   2018   South South             561              373        188  28    mea1
+##  6:   2018    South West             612              394        218  17    mea1
+##  7:   2013 North Central             710              358        352  55    mea1
+##  8:   2013    North East             556              239        317  71    mea1
+##  9:   2013    North West             307              109        198  21    mea1
+## 10:   2013    South East             626              385        241  50    mea1
+## 11:   2013   South South             669              404        265  32    mea1
+## 12:   2013    South West             667              464        203  32    mea1</code></pre>
+<pre class="r"><code># statistical test within each zone
 mea1_test &lt;- mea1_dt %&gt;% select(strata, zone, no_vaccine, mop)
-mea1_test[,no_mop:=no_vaccine-mop]
+mea1_test</code></pre>
+<pre><code>##     strata          zone no_vaccine mop
+##  1:   2018 North Central        398  51
+##  2:   2018    North East        432  52
+##  3:   2018    North West        497  75
+##  4:   2018    South East        279  21
+##  5:   2018   South South        188  28
+##  6:   2018    South West        218  17
+##  7:   2013 North Central        352  55
+##  8:   2013    North East        317  71
+##  9:   2013    North West        198  21
+## 10:   2013    South East        241  50
+## 11:   2013   South South        265  32
+## 12:   2013    South West        203  32</code></pre>
+<pre class="r"><code>mea1_test[,no_mop:=no_vaccine-mop]
 chisq.test(mea1_test[zone==&quot;North Central&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
@@ -1146,15 +1751,42 @@ dt3 &lt;- data2[gotit==0,. (no_vaccine=.N), by=.(strata, zone)]
 dt4 &lt;- data2[gotit==0 &amp; dpt_missed_opportunity==&quot;Yes&quot;,. (mop=.N), by=.(strata, zone)]
 
 # merge dataset
-dpt_all_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt_all_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt_all_dt[,vaccine:=&quot;dpt_all&quot;]
-
-# statistical test within each zone
+dpt_all_dt</code></pre>
+<pre><code>##     strata          zone total_with_card received_vaccine no_vaccine mop vaccine
+##  1:   2018 North Central            1327              799        528 184 dpt_all
+##  2:   2018    North East            1198              653        545 152 dpt_all
+##  3:   2018    North West            1277              512        765 207 dpt_all
+##  4:   2018    South East            1066              757        309 144 dpt_all
+##  5:   2018   South South             785              530        255  96 dpt_all
+##  6:   2018    South West             846              567        279  57 dpt_all
+##  7:   2013 North Central             969              411        558 163 dpt_all
+##  8:   2013    North East             798              252        546 179 dpt_all
+##  9:   2013    North West             461              120        341  95 dpt_all
+## 10:   2013    South East             863              476        387 194 dpt_all
+## 11:   2013   South South             946              447        499 208 dpt_all
+## 12:   2013    South West             961              568        393 155 dpt_all</code></pre>
+<pre class="r"><code># statistical test within each zone
 dpt_all_test &lt;- dpt_all_dt %&gt;% select(strata, zone, no_vaccine, mop)
 dpt_all_test[,no_mop:=no_vaccine-mop]
-chisq.test(dpt_all_test[zone==&quot;North Central&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
+dpt_all_test</code></pre>
+<pre><code>##     strata          zone no_vaccine mop no_mop
+##  1:   2018 North Central        528 184    344
+##  2:   2018    North East        545 152    393
+##  3:   2018    North West        765 207    558
+##  4:   2018    South East        309 144    165
+##  5:   2018   South South        255  96    159
+##  6:   2018    South West        279  57    222
+##  7:   2013 North Central        558 163    395
+##  8:   2013    North East        546 179    367
+##  9:   2013    North West        341  95    246
+## 10:   2013    South East        387 194    193
+## 11:   2013   South South        499 208    291
+## 12:   2013    South West        393 155    238</code></pre>
+<pre class="r"><code>chisq.test(dpt_all_test[zone==&quot;North Central&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -1205,15 +1837,42 @@ dt3 &lt;- data3[is.na(age_at_dpt1),. (no_vaccine=.N), by=.(strata, zone)]
 dt4 &lt;- data3[is.na(age_at_dpt1) &amp; dpt1_missed_opportunity==1,. (mop=.N), by=.(strata, zone)]
 
 # merge data sets together
-dpt1_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt1_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt1_dt[,vaccine:=&quot;dpt1&quot;]
-
-# statistical test within each zone
+dpt1_dt</code></pre>
+<pre><code>##     strata          zone total_with_card received_vaccine no_vaccine mop vaccine
+##  1:   2018 North Central            1410             1243        167  53    dpt1
+##  2:   2018    North East            1289             1105        184  86    dpt1
+##  3:   2018    North West            1371             1000        371 122    dpt1
+##  4:   2018    South East            1156             1090         66  17    dpt1
+##  5:   2018   South South             839              749         90  36    dpt1
+##  6:   2018    South West             912              748        164  28    dpt1
+##  7:   2013 North Central            1037              737        300  89    dpt1
+##  8:   2013    North East             873              642        231  99    dpt1
+##  9:   2013    North West             496              338        158  44    dpt1
+## 10:   2013    South East             920              814        106  59    dpt1
+## 11:   2013   South South            1008              834        174  63    dpt1
+## 12:   2013    South West            1053              949        104  46    dpt1</code></pre>
+<pre class="r"><code># statistical test within each zone
 dpt1_test &lt;- dpt1_dt %&gt;% select(strata, zone, no_vaccine, mop)
 dpt1_test[,no_mop:=no_vaccine-mop]
-chisq.test(dpt1_test[zone==&quot;North Central&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
+dpt1_test</code></pre>
+<pre><code>##     strata          zone no_vaccine mop no_mop
+##  1:   2018 North Central        167  53    114
+##  2:   2018    North East        184  86     98
+##  3:   2018    North West        371 122    249
+##  4:   2018    South East         66  17     49
+##  5:   2018   South South         90  36     54
+##  6:   2018    South West        164  28    136
+##  7:   2013 North Central        300  89    211
+##  8:   2013    North East        231  99    132
+##  9:   2013    North West        158  44    114
+## 10:   2013    South East        106  59     47
+## 11:   2013   South South        174  63    111
+## 12:   2013    South West        104  46     58</code></pre>
+<pre class="r"><code>chisq.test(dpt1_test[zone==&quot;North Central&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -1264,15 +1923,42 @@ dt3 &lt;- data4[is.na(age_at_dpt2),. (no_vaccine=.N), by=.(strata, zone)]
 dt4 &lt;- data4[is.na(age_at_dpt2) &amp; dpt2_missed_opportunity==1,. (mop=.N), by=.(strata, zone)]
 
 # merge data set
-dpt2_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt2_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt2_dt[,vaccine:=&quot;dpt2&quot;]
-
-# statistical test within each zone
+dpt2_dt</code></pre>
+<pre><code>##     strata          zone total_with_card received_vaccine no_vaccine mop vaccine
+##  1:   2018 North Central            1373             1115        258  38    dpt2
+##  2:   2018    North East            1251              970        281  46    dpt2
+##  3:   2018    North West            1315              849        466  73    dpt2
+##  4:   2018    South East            1122             1027         95  17    dpt2
+##  5:   2018   South South             808              689        119  22    dpt2
+##  6:   2018    South West             878              694        184  18    dpt2
+##  7:   2013 North Central             995              667        328  55    dpt2
+##  8:   2013    North East             844              509        335  93    dpt2
+##  9:   2013    North West             477              253        224  43    dpt2
+## 10:   2013    South East             892              755        137  44    dpt2
+## 11:   2013   South South             981              742        239  69    dpt2
+## 12:   2013    South West            1005              843        162  39    dpt2</code></pre>
+<pre class="r"><code># statistical test within each zone
 dpt2_test &lt;- dpt2_dt %&gt;% select(strata, zone, no_vaccine, mop)
 dpt2_test[,no_mop:=no_vaccine-mop]
-chisq.test(dpt2_test[zone==&quot;North Central&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
+dpt2_test</code></pre>
+<pre><code>##     strata          zone no_vaccine mop no_mop
+##  1:   2018 North Central        258  38    220
+##  2:   2018    North East        281  46    235
+##  3:   2018    North West        466  73    393
+##  4:   2018    South East         95  17     78
+##  5:   2018   South South        119  22     97
+##  6:   2018    South West        184  18    166
+##  7:   2013 North Central        328  55    273
+##  8:   2013    North East        335  93    242
+##  9:   2013    North West        224  43    181
+## 10:   2013    South East        137  44     93
+## 11:   2013   South South        239  69    170
+## 12:   2013    South West        162  39    123</code></pre>
+<pre class="r"><code>chisq.test(dpt2_test[zone==&quot;North Central&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -1323,15 +2009,42 @@ dt3 &lt;- data5[is.na(age_at_dpt3),. (no_vaccine=.N), by=.(strata, zone)]
 dt4 &lt;- data5[is.na(age_at_dpt3) &amp; dpt3_missed_opportunity==1,. (mop=.N), by=.(strata, zone)]
 
 # merge dataset
-dpt3_dt &lt;-Reduce(merge,list(dt1,dt2,dt3,dt4))
+dpt3_dt &lt;- Reduce(merge,list(dt1,dt2,dt3,dt4))
 
 # add vaccine indicator
 dpt3_dt[,vaccine:=&quot;dpt3&quot;]
-
-# statistical test within each zone
+dpt3_dt</code></pre>
+<pre><code>##     strata          zone total_with_card received_vaccine no_vaccine mop vaccine
+##  1:   2018 North Central            1327              968        359  50    dpt3
+##  2:   2018    North East            1198              805        393  50    dpt3
+##  3:   2018    North West            1277              718        559  58    dpt3
+##  4:   2018    South East            1066              918        148  14    dpt3
+##  5:   2018   South South             785              621        164  20    dpt3
+##  6:   2018    South West             846              627        219  15    dpt3
+##  7:   2013 North Central             969              559        410  60    dpt3
+##  8:   2013    North East             798              380        418  95    dpt3
+##  9:   2013    North West             461              209        252  30    dpt3
+## 10:   2013    South East             863              647        216  65    dpt3
+## 11:   2013   South South             946              635        311  76    dpt3
+## 12:   2013    South West             961              720        241  56    dpt3</code></pre>
+<pre class="r"><code># statistical test within each zone
 dpt3_test &lt;- dpt3_dt %&gt;% select(strata, zone, no_vaccine, mop)
 dpt3_test[,no_mop:=no_vaccine-mop]
-chisq.test(dpt3_test[zone==&quot;North Central&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
+dpt3_test</code></pre>
+<pre><code>##     strata          zone no_vaccine mop no_mop
+##  1:   2018 North Central        359  50    309
+##  2:   2018    North East        393  50    343
+##  3:   2018    North West        559  58    501
+##  4:   2018    South East        148  14    134
+##  5:   2018   South South        164  20    144
+##  6:   2018    South West        219  15    204
+##  7:   2013 North Central        410  60    350
+##  8:   2013    North East        418  95    323
+##  9:   2013    North West        252  30    222
+## 10:   2013    South East        216  65    151
+## 11:   2013   South South        311  76    235
+## 12:   2013    South West        241  56    185</code></pre>
+<pre class="r"><code>chisq.test(dpt3_test[zone==&quot;North Central&quot;,.(mop, no_mop)], correct = FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test
 ## 
@@ -1379,7 +2092,6 @@ all_vax_data[,percent_with_mop:=round((mop/no_vaccine)*100, 1)]
 # # calculate coverage if no missed opportunity
 all_vax_data[,potential_coverage_with_no_mop:=round((mop+received_vaccine)/total_with_card*100, 1)]
 
-
 # Save the results -----
 setcolorder(all_vax_data,
             c(&quot;strata&quot;, &quot;zone&quot;, &quot;total_with_card&quot;, &quot;vaccine&quot;, &quot;received_vaccine&quot;, &quot;no_vaccine&quot;,
@@ -1389,18 +2101,61 @@ write.csv(all_vax_data, file=paste0(resDir, &quot;aim_1/missed_opportunities/mop
 
 # check data for correlation between three variables: education, assets, zones -----
 x &lt;- table(data$edu, data$assets)
-chi2 &lt;- chisq.test(x, correct = FALSE)
-sqrt(chi2$statistic / sum(x))</code></pre>
+x</code></pre>
+<pre><code>##                      
+##                       Quintile 1 Quintile 2 Quintile 3 Quintile 4 Quintile 5
+##   No education              6050       4796       2923       1598        464
+##   Primary                    942       1487       1712       1463        653
+##   Secondary or higher        690       1595       2669       3846       5089</code></pre>
+<pre class="r"><code>chi2 &lt;- chisq.test(x, correct = FALSE)
+chi2</code></pre>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  x
+## X-squared = 11706, df = 8, p-value &lt; 2.2e-16</code></pre>
+<pre class="r"><code>sqrt(chi2$statistic / sum(x))</code></pre>
 <pre><code>## X-squared 
 ## 0.5704212</code></pre>
 <pre class="r"><code>y &lt;- table(data$assets, data$zone)
-chi2 &lt;- chisq.test(y, data$zone)
-sqrt(chi2$statistic / sum(y))</code></pre>
+y</code></pre>
+<pre><code>##             
+##              North Central North East North West South East South South South West
+##   Quintile 1           656       2626       3565        514         117        204
+##   Quintile 2          1156       2074       3146        633         422        447
+##   Quintile 3          1576       1398       1934        710         970        716
+##   Quintile 4          1380        952       1326        872        1189       1188
+##   Quintile 5          1096        417        690       1050        1292       1661</code></pre>
+<pre class="r"><code>chi2 &lt;- chisq.test(y, data$zone)
+chi2</code></pre>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  y
+## X-squared = 8313.1, df = 20, p-value &lt; 2.2e-16</code></pre>
+<pre class="r"><code>sqrt(chi2$statistic / sum(y))</code></pre>
 <pre><code>## X-squared 
 ## 0.4806956</code></pre>
 <pre class="r"><code>z &lt;- table(data$edu, data$zone)
-chi2 &lt;- chisq.test(z, correct = FALSE)
-sqrt(chi2$statistic / sum(z))</code></pre>
+z</code></pre>
+<pre><code>##                      
+##                       North Central North East North West South East South South
+##   No education                 2002       4900       8087        135         266
+##   Primary                      1271       1116       1216        826         973
+##   Secondary or higher          2591       1451       1358       2818        2751
+##                      
+##                       South West
+##   No education               441
+##   Primary                    855
+##   Secondary or higher       2920</code></pre>
+<pre class="r"><code>chi2 &lt;- chisq.test(z, correct = FALSE)
+chi2</code></pre>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  z
+## X-squared = 13460, df = 10, p-value &lt; 2.2e-16</code></pre>
+<pre class="r"><code>sqrt(chi2$statistic / sum(z))</code></pre>
 <pre><code>## X-squared 
 ## 0.6116535</code></pre>
 

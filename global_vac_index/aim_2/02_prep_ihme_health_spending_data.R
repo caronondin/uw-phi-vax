@@ -16,7 +16,7 @@ dt1 <- read_csv(file_path, show_col_types = FALSE)
 dt1 <- dt1 %>% filter(level=="Country")
 
 # Subset columns
-dt1 <- dt1 %>% select(location_id, location_name, iso3, year, the_per_cap_mean, ghes_per_the_mean, dah_per_the_mean)
+dt1 <- dt1 %>% select(location_id, location_name, iso3, year, the_per_cap_mean, ghes_per_the_mean, dah_per_the_mean, dah_per_cap_ppp_mean)
 
 # # rename variables for merging
 dt1 <- rename(dt1,
@@ -31,7 +31,7 @@ location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_map
 merged_data <- dt1 %>% left_join(location_map, by=c("gbd_location_id", "iso_code"))
 
 # Select columns to keep
-final_data <- merged_data %>% select(location, year, gbd_location_id, iso_code, iso_num_code, the_per_cap_mean, ghes_per_the_mean, dah_per_the_mean)
+final_data <- merged_data %>% select(location, year, gbd_location_id, iso_code, iso_num_code, the_per_cap_mean, ghes_per_the_mean, dah_per_the_mean, dah_per_cap_ppp_mean)
 
 # Save data
 saveRDS(final_data, file=paste0(prepped_data_dir, "aim_2/01_prepped_ihme_health_spending_data.RDS"))

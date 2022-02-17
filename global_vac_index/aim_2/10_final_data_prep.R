@@ -23,11 +23,22 @@ for (v in rescaleVars) {
   data[, (v):=rescaleTransform(get(v))]
 }
 
-# extrapolate where necessary using GLM (three different kinds of models depending on the variable type)
-percentVars <- names(data)[c(6:7, 9:17)]
-# monetaryVars <- names(data)[8]
-# ordVars <- names(data)[]
-# percentVars <- names(data)[17]
+# create complement variables
+complVars = c('cpi', 'imm_pop_perc')
+
+complTransform = function(x) {
+  1-x
+}
+
+for (v in complVars) {
+  data[, (v):=complTransform(get(v))]
+}
+
+# extrapolate where necessary using GLM for variables that range between 0 and 1
+percentVars <-  c("sdi", "dah_per_the_mean", "haqi", "cpi", "ghes_per_the_mean",
+                  "perc_skill_attend", "imm_pop_perc", "perc_urban", 
+                  "mean_agree_vac_safe", "mean_agree_vac_important", "mean_agree_vac_effective")
+
 i<-1
 pltlist <- list()
 for(v in percentVars) {
@@ -59,11 +70,10 @@ for(i in seq(length(pltlist))) {
 }
 dev.off()
 
-# extrapolate where necessary using GLM (three different kinds of models depending on the variable type)
-# percentVars <- names(data)[c(7, 9:17)]
-monetaryVars <- names(data)[8]
-# ordVars <- names(data)[]
-# percentVars <- names(data)[17]
+# extrapolate where necessary using GLM for numeric variables
+
+monetaryVars <- c("the_per_cap_mean", "dah_per_cap_ppp_mean")
+
 i=1
 pltlist2 <- list()
 for(v in monetaryVars) {
@@ -96,42 +106,34 @@ for(i in seq(length(pltlist2))) {
 }
 dev.off()
 
-# Drop variables that do not have too much missing values (namely locations without any estimates for specific variables)
+# Drop variables that have too much missing values (namely locations without any estimates for specific variables)
 prepped_data <- na.omit(data)
 
-# Create new categorical variable to organize the development assistance
-
-# load list of ineligible locations for DAH
-ineligible <- readRDS(file=paste0(codebook_directory, "locations_ineligible_for_dah.RDS"))
-
-# subset data to exclude countries not eligible for development assistance
-test <- prepped_data %>% filter(!location%in%ineligible)
-summary(test$dah_per_the_mean)
-prepped_data$dah_per_the_mean_cat <- prepped_data$dah_per_the_mean
-
-# recode variables that are not eligible for funds and did not receive any as dah_per_the
-
-prepped_data <- prepped_data %>%
-  mutate(
-    dah_per_the_mean_cat = case_when(dah_per_the_mean==0 & location %in% ineligible ~ "5", # not eligible for funds and did not receive any
-                                   dah_per_the_mean >0  & dah_per_the_mean <= 0.005 ~ "3", # received first quartile (least)
-                                   dah_per_the_mean >0.005 & dah_per_the_mean <0.121 ~ "2", # between first and third quartile (average)
-                                   dah_per_the_mean >= 0.121 ~ "1", # received above third quartile (most)
-                                   dah_per_the_mean==0 ~ "4")) # eligible for funds but did not receive any
+# # Create new categorical variable to organize the development assistance
+# 
+# # load list of ineligible locations for DAH
+# ineligible <- readRDS(file=paste0(codebook_directory, "locations_ineligible_for_dah.RDS"))
+# 
+# # subset data to exclude countries not eligible for development assistance
+# test <- prepped_data %>% filter(!location%in%ineligible)
+# summary(test$dah_per_the_mean)
+# prepped_data$dah_per_the_mean_cat <- prepped_data$dah_per_the_mean
+# 
+# # recode variables that are not eligible for funds and did not receive any as dah_per_the
+# 
+# # prepped_data <- prepped_data %>%
+# #   mutate(
+# #     dah_per_the_mean_cat = case_when(dah_per_the_mean==0 & location %in% ineligible ~ "5", # not eligible for funds and did not receive any
+# #                                    dah_per_the_mean >0  & dah_per_the_mean <= 0.005 ~ "3", # received first quartile (least)
+# #                                    dah_per_the_mean >0.005 & dah_per_the_mean <0.121 ~ "2", # between first and third quartile (average)
+# #                                    dah_per_the_mean >= 0.121 ~ "1", # received above third quartile (most)
+# #                                    dah_per_the_mean==0 ~ "4")) # eligible for funds but did not receive any
 
 # save as numeric variable
-prepped_data$dah_per_the_mean_cat <- as.numeric(prepped_data$dah_per_the_mean_cat)
+# prepped_data$dah_per_the_mean_cat <- as.numeric(prepped_data$dah_per_the_mean_cat)
 
-# Change direction of the variables
-complVars = c('cpi', 'imm_pop_perc')
 
-complTransform = function(x) {
-  1-x
-}
 
-for (v in complVars) {
-  prepped_data[, (v):=complTransform(get(v))]
-}
 
 # make sure all variables are within a reasonable range none of them exceed the realistic maximum
 # prepped_data[perc_skil_attend>100, perc_skil_attend:=100]
@@ -139,7 +141,7 @@ for (v in complVars) {
 # prepped_data[mean_agree_vac_important>100, mean_agree_vac_important:=100]
 
 # re arrange variables and save final
-prepped_data <- prepped_data %>% select(location, year, gbd_location_id, iso_code, iso_num_code, sdi, dah_per_the_mean_cat, the_per_cap_mean, 
+prepped_data <- prepped_data %>% select(location, year, gbd_location_id, iso_code, iso_num_code, sdi, dah_per_cap_ppp_mean, the_per_cap_mean, 
                                       ghes_per_the_mean, haqi, cpi, perc_skill_attend, imm_pop_perc, perc_urban,
                                       mean_agree_vac_safe, mean_agree_vac_important, mean_agree_vac_effective)
 

@@ -200,27 +200,27 @@ for(i in seq(length(tsPlots))) {
 dev.off()
 
 # 5. make time series graphs of countries with missing values in 2014 as an extra check -----
-# dt5 <- copy(data)
-# dt5 <- dt5[year_id == 2014 & prop_val == 0]
-# 
-# missing <- unique(dt5[sdi_group_present == "low",.(location_name, vaccine_name)])
-# 
-# msgPlots = lapply(seq(nrow(missing)), function(g) {
-#   ggplot(data[location_name == missing$location_name[[g]] & vaccine_name == missing$vaccine_name[[g]]], aes(y = prop_val, x = year_id, color = vaccine_name)) + 
-#     geom_line(size = 1, alpha = .8) +
-#     labs(title = paste('Time series of', missing$vaccine_name[[g]],  'vaccine coverage for', missing$location_name[[g]]), 
-#          y = 'Percent', 
-#          x = 'Year', 
-#          subtitle = paste('low-SDI locations that had 0% coverage in 2014')) + 
-#     theme_minimal() + 
-#     ylim(0, 1)
-# })
+dt5 <- copy(data)
+dt5 <- dt5[year_id == 2014 & prop_val == 0]
 
-# # Save file
-# print(paste('Saving:', outputFile04_05)) 
-# pdf(outputFile04_05, height = 5.5, width = 9)
-# par(mfrow = c(2,2))
-# for(i in seq(length(msgPlots))) { 
-#   print(msgPlots[[i]])
-# }
-# dev.off()
+missing <- unique(dt5[sdi_group_present == "low",.(location_name, vaccine_name)])
+
+msgPlots = lapply(seq(nrow(missing)), function(g) {
+  ggplot(data[location_name == missing$location_name[[g]] & vaccine_name == missing$vaccine_name[[g]]], aes(y = prop_val, x = year_id, color = vaccine_name)) +
+    geom_line(size = 1, alpha = .8) +
+    labs(title = paste('Time series of', missing$vaccine_name[[g]],  'vaccine coverage for', missing$location_name[[g]]),
+         y = 'Percent',
+         x = 'Year',
+         subtitle = paste('low-SDI locations that had 0% coverage in 2014')) +
+    theme_minimal() +
+    ylim(0, 1)
+})
+
+# Save file
+print(paste('Saving:', outputFile04_05))
+pdf(outputFile04_05, height = 5.5, width = 9)
+par(mfrow = c(2,2))
+for(i in seq(length(msgPlots))) {
+  print(msgPlots[[i]])
+}
+dev.off()
