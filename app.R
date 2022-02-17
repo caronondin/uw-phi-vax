@@ -18,27 +18,30 @@ library(leaflet)
 library(plotly)
 library(readxl)
 library(shinycssloaders)
-#library(shinyWidgets)
+library(shinyWidgets)
+library(shinyhelper)
 
 #setwd("~/Desktop/PHI - Research Assitant/Winter/vax/aim1")
-vaccine_trends <- readRDS("aim_1/01_vaccine_trends.RDS")
-sdi <- readRDS("aim_1/02_sdi.RDS")
-raw_extracted_dhs <- readRDS("aim_1/03_raw_extracted_dhs.RDS")
-prepped_dhs_for_mov <- readRDS("aim_1/04_prepped_dhs_for_mov.RDS")
-disease_trends <- readRDS("aim_1/05_disease_trends.RDS")
-merged_data_for_visuals <- readRDS("aim_1/06_merged_data_for_visuals.RDS")
+vaccine_trends <- readRDS("aim_1/New/01_vaccine_trends.RDS")
+sdi <- readRDS("aim_1/New/02_sdi.RDS")
+raw_extracted_dhs <- readRDS("aim_1/New/03_raw_extracted_dhs.RDS")
+#prepped_dhs_for_mov <- readRDS("aim_1/New/04_prepped_dhs_for_mov.RDS")
+disease_trends <- readRDS("aim_1/New/05_disease_trends.RDS")
+merged_data_for_visuals <- readRDS("aim_1/New/06_merged_data_for_visuals.RDS")
 vaccine_preventable_diseases <- read_excel("aim_1/vaccine_preventable_diseases.xlsx")
+
+#available disase data for cause name
 merged_data_for_vac_dis <- dplyr::left_join(vaccine_preventable_diseases,disease_trends, "cause_name", "cause_name")
+# availavle vaccin data with description and cause name
+preventable_vac_trend <- vaccine_trends
 
-
+print(vaccine_preventable_diseases)
 #aim_2
 index_results <- readRDS("aim_2/10_index_results.RDS")
 sdi_dup <- sdi
 colnames(sdi_dup)[2] <- "location"
 colnames(sdi_dup)[4] <- "year"
 merged_data_for_vacii_sdi <- dplyr::left_join(index_results,sdi_dup[,-c("sdi")], by=c("location","year"))
-
-print(merged_data_for_vacii_sdi)
 
 
 #library(sf)
@@ -51,7 +54,7 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                   #title = strong("Global Vaccination Improvement Dashboard"),
                   sidebarPanel(
                       h3(strong("Improvement Index Ranking Table")),
-                      sliderInput("year", "Year", value =2019, min = 1990, max=2019,step=1,sep = "",animate=TRUE),
+                      sliderInput("year", "Year", value =2020, min = 1990, max=2020,step=1,sep = "",animate=TRUE),
                       radioButtons("sdi_group_present","SDI Group Present", choices = c("All"="all","Low" ="low","Medium" = "medium","High" = "high"),inline = TRUE),
                       tags$style(HTML('table.dataTable tr.selected td, table.dataTable td.selected {background-color: #92c9e8 !important;}')),
                       DT::dataTableOutput("table")),
@@ -63,23 +66,48 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                ".shiny-output-error:before { visibility: hidden; }"
                     ),
                       tabsetPanel(id = "t1",
-                                  tabPanel("Vaccination Improvement Index Mapper",value="t_sdi",
-                                           #leaflet::leafletOutput("mymap", height = "80vh")),
-                                           fluidRow(column(6, " ", style='padding:5px;')),
-                                           fluidRow(column(width = 12, "Select location by clicking location_name in left Improvement Index Ranking table.",
-                                                           style='font-family:Avenir, Helvetica;font-size:30;text-align:center')),
-                                           fluidRow(column(6, " ", style='padding:5px;')),
-                                           fluidRow(column(12,plotlyOutput("index_map",height = "60vh"))),
-                                          # tags$head(tags$style(HTML('.info-box {min-height: 40px;} .info-box-icon {height: 40px; line-height: 40px;} .info-box-content {padding-top: 0px; padding-bottom: 0px;}'))),
-                                           #fluidRow(infoBoxOutput("dah_per_the_mean_cat"),tags$style("#dah_per_the_mean_cat {width:630px;"),infoBoxOutput("the_per_cap_mean"),tags$style("#the_per_cap_mean {width:400px")),
-                                           #fluidRow(infoBoxOutput("ghes_per_the_mean"),tags$style("#ghes_per_the_mean {width:570px;"),
-                                            #        infoBoxOutput("haqi"),tags$style("#haqi {width:180px"),
-                                           #         infoBoxOutput("cpi"),tags$style("#cpi {width:370px")),
-                                          fluidRow(column(6, " ", style='padding:2px;')),
-                                          fluidRow(column(12, plotlyOutput("index_trend_plot",height = "30vh")))),
-                                  tabPanel("Vaccination Improvement Index Ranking Table",
-                                           DT::dataTableOutput("indextable")
-                                           ),
+                                  tabPanel("Vaccination Improvement",value="t_sdi",
+                                           #tags$li(class = "dropdown",
+                                                   #dropMenu(
+                                                    # dropdownButton("Info", status = 'success', icon = icon('info')),
+                                                    # h3(strong('Information')),
+                                                    # br(),
+                                                    # h5('This is really helpful'),
+                                                    # textInput('text', 'You can also put UI elements here'),
+                                                    # placement = "bottom",
+                                                    # arrow = TRUE)),
+                                           fluidRow(column(6, " ", style='padding:10px;')),
+                                           fluidRow(column(width = 11, h3(strong(textOutput("yeartitle")),style='text-align:left')),
+                                               column(width = 1,div(switchInput(
+                                                 inputId = "view",
+                                                 onLabel = "Table",
+                                                 offLabel = "Map",
+                                                 value = FALSE,
+                                                 labelWidth = "50px"),style = "display:inline-block; float:right"))),
+                                           conditionalPanel("!input.view",
+                                                            fluidRow(column(12, " ", style='padding:5px;')),
+                                              radioButtons(inputId = "show",label = NULL,
+                                                           choices = c("Improvement Index Mapper","Improvement Indicator Mapper"),
+                                                           selected = "Improvement Index Mapper",
+                                                           inline = TRUE),
+                                              conditionalPanel("input.show == 'Improvement Index Mapper'",
+                                                               fluidRow(column(width = 12, "Select location by clicking location_name in left Improvement Index Ranking table.",
+                                                                               style='font-family:Avenir, Helvetica;font-size:30;text-align:center')),
+                                                               fluidRow(column(12, " ", style='padding:5px;')),
+                                                               fluidRow(column(12,plotlyOutput("index_map",height = "55vh"))),
+                                                               fluidRow(column(12, " ", style='padding:2px;')),
+                                                               fluidRow(column(12, plotlyOutput("index_trend_plot",height = "30vh")))),
+                                              conditionalPanel("input.show == 'Improvement Indicator Mapper'",
+                                                               selectInput("indicators", "Indicator:",choices=c("SDI","Development Assistance Per Total Health Spending Categorical","Total Health Spending per Person","Government Health Spending per Total Health Spending",
+                                                                                                                "HAQI","Corruption Perception Index","Skilled Attendants at Birth","Immigrant Population (%)","Urbanicity (%)","Agreement Vaccines are Safe",
+                                                                                                                "Agreement Vaccines are Important","Agreement Vaccines are Effective")),
+                                                               fluidRow(column(12, " ", style='padding:5px;')),
+                                                               fluidRow(column(12,plotlyOutput("indicator_map",height = "60vh"))),
+                                                               fluidRow(column(12, " ", style='padding:2px;'))
+                                                               #fluidRow(column(12, plotlyOutput("indicator_trend_plot",height = "30vh"))
+                                              )),
+                                          conditionalPanel("input.view",
+                                             DT::dataTableOutput("indextable"))),
                                   tabPanel("Vaccination Trends", value = "t_vac",
                                            fluidRow(column(width = 11,h3(strong(htmlOutput("content_vac"))))),
                                            fluidRow(column(width = 11, "Select location by clicking location_name in left Improvement Index Ranking table.",
@@ -132,13 +160,13 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
 )
 
 server <- function(input, output,session) {
-    #year <- reactive({
-     #   req(input$year)
-      #  merged_data_for_visuals[merged_data_for_visuals$year == input$year,]
-    #})
-  
   year <- reactive({
     merged_data_for_vacii_sdi[merged_data_for_vacii_sdi$year == input$year,]
+  })
+  
+  output$yeartitle <- renderText({ 
+    #print("mapdatatitle")
+    paste0(input$year)
   })
   
   observeEvent(year(),{
@@ -147,21 +175,19 @@ server <- function(input, output,session) {
                       min = min(as.numeric(choices)), max = max(as.numeric(choices)), step = 1)
   })
   
-  #observeEvent(index_results,{
-    #choices = sort(unique(index_results$year))
-    #updateSliderInput(session,'index_year', value=range(choices),
-         #             min = min(as.numeric(choices)), max = max(as.numeric(choices)), step = 1)
-  #})
-  
-  
   index_year_input <- reactive({
     req(input$index_year_input)
     index_results[index_results$year == input$index_year_input,]
   })
   
-
-  observeEvent(merged_data_for_vac_dis,{
-    choices = sort(unique(merged_data_for_vac_dis$vaccine_name))
+  #Vaccination and Disease Trend Tab
+  #update select vaccine
+  observeEvent(preventable_vac_trend,{
+    vacdata = filter(preventable_vac_trend, gsub(" ", "", location_name) == gsub(" ", "", "United States of America"))
+    disdata = filter(merged_data_for_vac_dis, gsub(" ", "", location_name) == gsub(" ", "", "United States of America"))
+    merged = dplyr::inner_join(vacdata,disdata,"vaccine_name","vaccine_name")
+    print(merged)
+    choices = sort(unique(merged$vaccine_name))
     updateSelectInput(session,'vaccinations', choices = choices)
   })
   
@@ -172,7 +198,7 @@ server <- function(input, output,session) {
   selected_dis_vac_data <- reactive({
     return(
       list(
-        selected_vac_data = filter(vaccine_trends, vaccine_trends$vaccine_name==input$vaccinations),
+        selected_vac_data = filter(preventable_vac_trend, vaccine_trends$vaccine_name==input$vaccinations),
         dis_data_for_selected_vac = filter(merged_data_for_vac_dis, merged_data_for_vac_dis$vaccine_name==input$vaccinations)
       ))
   })
@@ -230,6 +256,132 @@ server <- function(input, output,session) {
   observeEvent(sdi_group_present(),{
     print("map data")
     map_data <- sdi_group_present()
+    
+    indicatorsdata <- reactive({
+      req(input$indicators)
+      indicators <-as.data.frame.matrix(map_data[,-c("gbd_location_id","iso_num_code")])
+    })
+    
+    observeEvent(indicatorsdata(),{
+      print("indicatorsdata()")
+      print(indicatorsdata())
+      print(input$indicators)
+      
+      output$indicator_map <- renderPlotly({
+        height  = 1500
+        units="px"
+        
+        # light grey boundaries
+        l <- list(color = toRGB("white"), width = 0.5)
+        
+        # specify map projection/options
+        g <- list(
+          showframe = FALSE,
+          showcoastlines = FALSE,showland = TRUE,showcountries = TRUE,
+          resolution = 150,
+          countrycolor = toRGB("white"),
+          landcolor = toRGB("grey85"),
+          projection = list(scale=1.2))
+        
+        fig <- plot_ly(indicatorsdata())
+        if (input$indicators == "SDI"){
+          fig <- fig %>% 
+            add_trace(
+              z = ~sdi, color = ~sdi, type = 'choropleth', locations = ~iso_code, colors="Purples", 
+              text = ~paste0(location),
+              marker = list(line = l))
+        }
+        else if (input$indicators == "Development Assistance Per Total Health Spending Categorical"){
+          fig <- fig %>% 
+            add_trace(
+              z = ~dah_per_the_mean_cat, color = ~dah_per_the_mean_cat, type = 'choropleth', locations = ~iso_code, colors="Purples", 
+              text = ~paste0(location),
+              marker = list(line = l))
+        }
+        else if (input$indicators == "Total Health Spending per Person"){
+          fig <- fig %>% 
+            add_trace(
+              z = ~the_per_cap_mean, color = ~the_per_cap_mean, type = 'choropleth', locations = ~iso_code, colors="Purples", 
+              text = ~paste0(location),
+              marker = list(line = l))
+        }
+        else if (input$indicators == "Government Health Spending per Total Health Spending"){
+          fig <- fig %>% 
+            add_trace(
+              z = ~ghes_per_the_mean, color = ~ghes_per_the_mean, type = 'choropleth', locations = ~iso_code, colors="Purples", 
+              text = ~paste0(location),
+              marker = list(line = l))
+        }
+        else if (input$indicators == "HAQI"){
+          fig <- fig %>% 
+            add_trace(
+              z = ~haqi, color = ~haqi, type = 'choropleth', locations = ~iso_code, colors="Purples", 
+              text = ~paste0(location),
+              marker = list(line = l))
+        }
+        else if (input$indicators == "Corruption Perception Index"){
+          fig <- fig %>% 
+            add_trace(
+              z = ~cpi, color = ~cpi, type = 'choropleth', locations = ~iso_code, colors="Purples",
+              text = ~paste0(location),
+              marker = list(line = l))
+        }
+        else if (input$indicators == "Skilled Attendants at Birth"){
+          fig <- fig %>% 
+            add_trace(
+              z = ~perc_skil_attend, color = ~perc_skil_attend, type = 'choropleth', locations = ~iso_code, colors="Purples", 
+              text = ~paste0(location),
+              marker = list(line = l))
+        }
+        else if (input$indicators == "Immigrant Population (%)"){
+          fig <- fig %>% 
+            add_trace(
+              z = ~imm_pop_perc, color = ~imm_pop_perc, type = 'choropleth', locations = ~iso_code, colors="Purples", 
+              text = ~paste0(location),
+              marker = list(line = l))
+        }
+        else if (input$indicators == "Urbanicity (%)"){
+          fig <- fig %>% 
+            add_trace(
+              z = ~perc_urban, color = ~perc_urban, type = 'choropleth', locations = ~iso_code, colors="Purples", 
+              text = ~paste0(location),
+              marker = list(line = l))
+        }
+        else if (input$indicators == "Agreement Vaccines are Safe"){
+          fig <- fig %>% 
+            add_trace(
+              z = ~mean_agree_vac_safe, color = ~mean_agree_vac_safe, type = 'choropleth', locations = ~iso_code, colors="Purples", 
+              text = ~paste0(location),
+              marker = list(line = l))
+        }
+        else if (input$indicators == "Agreement Vaccines are Important"){
+          fig <- fig %>% 
+            add_trace(
+              z = ~mean_agree_vac_important, color = ~mean_agree_vac_important, type = 'choropleth', locations = ~iso_code, colors="Purples", 
+              text = ~paste0(location),
+              marker = list(line = l))
+        }
+        else{
+          fig <- fig %>% 
+            add_trace(
+              z = ~mean_agree_vac_effective, color = ~mean_agree_vac_effective, type = 'choropleth', locations = ~iso_code, colors="Purples", 
+              text = ~paste0(location),
+              marker = list(line = l))
+        }
+        
+        fig <-fig%>%
+          #colorbar(title = 'Indicator Value')%>% 
+          layout(
+            autosize = T,
+            title = paste0(input$year," Global Vaccine Improvement Indicator Mapper"),
+            mapbox=list(
+              style="carto-positron",
+              center = list(lon = -90, lat = 80)),
+            geo = g)
+      })
+    })
+    
+    
     map_data$hover <- with(map_data, paste(location, '<br>','<br>',
                                            "Development Assistance Per Total Health Spending Categorical: ",round(dah_per_the_mean_cat,3),'<br>',
                                            "Total Health Spending per Personn: ",round(the_per_cap_mean,3),'<br>',
@@ -244,7 +396,7 @@ server <- function(input, output,session) {
                                            "Agreement Vaccines are Effective: ",round(mean_agree_vac_effective,3)
                                            ))
     output$index_map <- renderPlotly({
-      height  = 2000 
+      height  = 1500
       units="px"
       
       # light grey boundaries
@@ -271,8 +423,8 @@ server <- function(input, output,session) {
           autosize = T,
           title = paste0(input$year," Global Vaccine Improvement Index Mapper"),
           mapbox=list(
-            style="open-street-map",
-            center = list(lon = -90, lat = 34)),
+            style="carto-positron",
+            center = list(lon = -90, lat = 80)),
           geo = g)
       })
     
@@ -337,29 +489,28 @@ server <- function(input, output,session) {
       customGreen0 = "#DeF7E9"
       customGreen = "#71CA97"
         
-        print(index_rank_table)
       formattable(
         index_rank_table,
         list(
           ## a coloured bar with length proportional to value
           'Improvement Index' = color_tile("white", "#569eca"),
           "SDI" = color_tile("white", "pink"),
-          "Development Assistance Per Total Health Spending Categorical" = color_tile(customGreen, customGreen0),
-          "Total Health Spending per Person"= color_tile(customGreen, customGreen0),
-          "Government Health Spending per Total Health Spending"= color_tile(customGreen, customGreen0),
-          "HAQI"= color_tile(customGreen, customGreen0),
-          "Corruption Perception Index"= color_tile(customGreen, customGreen0),
-          "Skilled Attendants at Birth"= color_tile(customGreen, customGreen0),
-          "Immigrant Population (%)"= color_tile(customGreen, customGreen0),
-          "Urbanicity (%)"= color_tile(customGreen, customGreen0),
-          "Agreement Vaccines are Safe"= color_tile(customGreen, customGreen0),
-          "Agreement Vaccines are Important"= color_tile(customGreen, customGreen0),
-          "Agreement Vaccines are Effective"= color_tile(customGreen, customGreen0)
+          "Development Assistance Per Total Health Spending Categorical" = color_tile(customGreen0, customGreen),
+          "Total Health Spending per Person"= color_tile(customGreen0, customGreen),
+          "Government Health Spending per Total Health Spending"= color_tile(customGreen0, customGreen),
+          "HAQI"= color_tile(customGreen0, customGreen),
+          "Corruption Perception Index"= color_tile(customGreen0, customGreen),
+          "Skilled Attendants at Birth"= color_tile(customGreen0, customGreen),
+          "Immigrant Population (%)"= color_tile(customGreen0, customGreen),
+          "Urbanicity (%)"= color_tile(customGreen0, customGreen),
+          "Agreement Vaccines are Safe"= color_tile(customGreen0, customGreen),
+          "Agreement Vaccines are Important"= color_tile(customGreen0, customGreen),
+          "Agreement Vaccines are Effective"= color_tile(customGreen0, customGreen)
         )
       ) %>%
         as.datatable(rownames = FALSE, 
                      options = list(paging = FALSE,
-                                    scrollY = '620px', 
+                                    scrollY = '570px', 
                                     scrollY=TRUE, 
                                     scrollX=TRUE, 
                                     #searching = FALSE,
@@ -488,7 +639,7 @@ server <- function(input, output,session) {
                                   yaxis = list(title = "Vaccine",showgrid = FALSE, showline = FALSE, showticklabels = TRUE, domain= c(0, 0.85)),
                                   xaxis = list(title = "Vaccination coverage (%)", zeroline = FALSE, showline = FALSE, showticklabels = TRUE, showgrid = TRUE)) 
           fig1 <- fig1 %>% add_annotations(xref = 'x1', yref = 'y',
-                                           x = single_year_vac_plotdata$prop_val * 1 - 0.05,  y = single_year_vac_plotdata$vaccine_name,
+                                           x = single_year_vac_plotdata$prop_val * 1 + 0.05,  y = single_year_vac_plotdata$vaccine_name,
                                            text = paste(round(single_year_vac_plotdata$prop_val*100, 2), '%'),
                                            font = list(family = 'Arial', size = 12, color = 'rgba(0, 0, 0, 1)'),
                                            showarrow = FALSE)
@@ -499,20 +650,22 @@ server <- function(input, output,session) {
       print("input")
       print(input$disease_estimate)
       disease_plotdata <- filter(disease_trends,gsub(" ", "", location_name) == gsub(" ", "", "United States of America"))
+      print("disease_plotdata")
+      print(disease_plotdata)
       if (input$disease_estimate == "number_val"){
-          fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_number_val, color = ~cause_name)%>%
+          fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~round(deaths_number_val,8), color = ~cause_name)%>%
               add_lines()
           title = "Time Series of Deaths, Disease or Disability Number"
           y_title = "Number of Deaths in Population (Log scale)"
       }
       else if (input$disease_estimate == "percent_val"){
-          fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_percent_val, color = ~cause_name)%>%
+          fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~round(deaths_percent_val,8), color = ~cause_name)%>%
               add_lines()
           title = "Time Series of Deaths, Disease or Disability Percent"
           y_title="Deaths for a particular cuase/Deaths from all causes (Log scale)"
       }
       else{
-          fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_rate_val, color = ~cause_name)%>%
+          fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~round(deaths_rate_val,8), color = ~cause_name)%>%
               add_lines()
           title = "Time Series of Deaths, Disease or Disability Rate"
           y_title="Deaths per 100,000 population (Log scale)"
@@ -559,13 +712,17 @@ server <- function(input, output,session) {
   observeEvent(selected_dis_vac_data(),{
     output$selected_vac_dis_plot <- renderPlotly({
       selected_vac_plotdata <- filter(selected_dis_vac_data()$selected_vac_data,gsub(" ", "", location_name) == gsub(" ", "", "United States of America"))
+      print("here")
+      print(selected_vac_plotdata)
       selected_dis_plotdata <- filter(selected_dis_vac_data()$dis_data_for_selected_vac,gsub(" ", "", location_name) == gsub(" ", "", "United States of America"))
-      merged_selected_plotdata <- dplyr::left_join(selected_vac_plotdata,selected_dis_plotdata, "year_id", "year_id")
       print(selected_dis_plotdata)
+      merged_selected_plotdata <- dplyr::left_join(selected_vac_plotdata,selected_dis_plotdata, "year_id", "year_id")
+      print("complete")
+      print(merged_selected_plotdata)
       fig <- plot_ly()
       # Add traces
       fig <- plot_ly(merged_selected_plotdata)
-      fig <- fig %>% add_trace(x= ~year_id, y = ~deaths_rate_val, type = 'scatter', mode = 'lines+makers', color = ~cause_name) 
+      fig <- fig %>% add_trace(x= ~year_id, y = ~round(deaths_rate_val,8), type = 'scatter', mode = 'lines+makers', color = ~cause_name) 
       ay <- list(
         overlaying = "y",
         side = "right",
@@ -608,6 +765,15 @@ server <- function(input, output,session) {
       
       print("info value")
       print(info$value)
+      
+      vacdata = filter(preventable_vac_trend, gsub(" ", "", location_name) == gsub(" ", "", info$value))
+      disdata = filter(merged_data_for_vac_dis, gsub(" ", "", location_name) == gsub(" ", "", info$value))
+      merged = dplyr::inner_join(vacdata,disdata,"vaccine_name","vaccine_name")
+      print(merged)
+      choices = sort(unique(merged$vaccine_name))
+      updateSelectInput(session,'vaccinations', choices = choices)
+      
+      
       output$content_vac <- renderText(info$value)
       output$content_dis <- renderText(info$value)
       output$content_vac_dis <- renderText(info$value)
@@ -678,7 +844,7 @@ server <- function(input, output,session) {
                                       yaxis = list(title = "Vaccine",showgrid = FALSE, showline = FALSE, showticklabels = TRUE, domain= c(0, 0.85)),
                                       xaxis = list(title = "Vaccination coverage (%)", zeroline = FALSE, showline = FALSE, showticklabels = TRUE, showgrid = TRUE)) 
               fig1 <- fig1 %>% add_annotations(xref = 'x1', yref = 'y',
-                                               x = single_year_vac_plotdata$prop_val * 1- 0.05,  y = single_year_vac_plotdata$vaccine_name,
+                                               x = single_year_vac_plotdata$prop_val * 1+ 0.05,  y = single_year_vac_plotdata$vaccine_name,
                                                text = paste(round(single_year_vac_plotdata$prop_val*100, 2), '%'),
                                                font = list(family = 'Arial', size = 12, color = 'rgb(0,0,0,1)'),
                                                showarrow = FALSE)
@@ -687,19 +853,19 @@ server <- function(input, output,session) {
       output$all_disease_plot <- renderPlotly({
           disease_plotdata <- filter(disease_trends,gsub(" ", "", location_name) == gsub(" ", "", info$value))
           if (input$disease_estimate == "number_val"){
-              fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_number_val, color = ~cause_name)%>%
+              fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~round(deaths_number_val,8), color = ~cause_name)%>%
                   add_lines()
               title = "Time Series of Deaths, Disease or Disability Number"
               y_title = "Number of Deaths in Population (Log scale)"
           }
           else if (input$disease_estimate == "percent_val"){
-              fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_percent_val, color = ~cause_name)%>%
+              fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~round(deaths_percent_val,8), color = ~cause_name)%>%
                   add_lines()
               title = "Time Series of Deaths, Disease or Disability Percent"
               y_title="Deaths for a particular cuase/Deaths from all causes (Log scale)"
           }
           else{
-              fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~deaths_rate_val, color = ~cause_name)%>%
+              fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~round(deaths_rate_val,8), color = ~cause_name)%>%
                   add_lines()
               title = "Time Series of Deaths, Disease or Disability Rate"
               y_title="Deaths per 100,000 population (Log scale)"
@@ -751,7 +917,7 @@ server <- function(input, output,session) {
           fig <- plot_ly()
           # Add traces
           fig <- plot_ly(merged_selected_plotdata)
-          fig <- fig %>% add_trace(x= ~year_id, y = ~deaths_rate_val, type = 'scatter', mode = 'lines+makers', color = ~cause_name) 
+          fig <- fig %>% add_trace(x= ~year_id, y = ~round(deaths_rate_val,8), type = 'scatter', mode = 'lines+makers', color = ~cause_name) 
           ay <- list(
             overlaying = "y",
             side = "right",

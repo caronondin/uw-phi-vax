@@ -137,6 +137,32 @@ input[type="radio"], input[type="checkbox"] {
   background: #4b2e83;
 }/* slider year hover color*/
 
+.radio-inline, .checkbox-inline {
+  position: relative;
+  display: inline-block;
+  padding-left: 20px;
+  margin-bottom: 3;
+  vertical-align: middle;
+  font-weight: bold;
+  cursor: pointer;
+}
 
+.bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary, .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-primary {
+  background: #4b2e83;
+  color: #fff;
+}
 
+Style Attribute {
+  width: 90%;
+  height: 80%;
+  position: relative;
+  cursor: inherit;
+}
 
+.slider-animate-button .play {
+  display: inline;
+  background-color: #efe8d4;
+  color: #3f059e;
+}
+
+.slider-animate-button { font-size: 15pt !important; }
