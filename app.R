@@ -91,39 +91,42 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                            selected = "Improvement Index Mapper",
                                                            inline = TRUE),
                                               conditionalPanel("input.show == 'Improvement Index Mapper'",
-                                                               fluidRow(column(width = 12, "Select location by clicking location_name in left Improvement Index Ranking table.",
+                                                               fluidRow(column(width = 12, "Select location in left Improvement Index Ranking table.",
                                                                                style='font-family:Avenir, Helvetica;font-size:30;text-align:center')),
                                                                fluidRow(column(12, " ", style='padding:5px;')),
                                                                fluidRow(column(12,plotlyOutput("index_map",height = "55vh"))),
                                                                fluidRow(column(12, " ", style='padding:2px;')),
                                                                fluidRow(column(12, plotlyOutput("index_trend_plot",height = "30vh")))),
                                               conditionalPanel("input.show == 'Improvement Indicator Mapper'",
-                                                               selectInput("indicators", "Indicator:",choices=c("SDI","Development Assistance Per Total Health Spending Categorical","Total Health Spending per Person","Government Health Spending per Total Health Spending",
+                                                               fluidRow(column(4,selectInput("indicators", "Indicator:",choices=c("SDI","Development Assistance Per Total Health Spending Categorical","Total Health Spending per Person","Government Health Spending per Total Health Spending",
                                                                                                                 "HAQI","Corruption Perception Index","Skilled Attendants at Birth","Immigrant Population (%)","Urbanicity (%)","Agreement Vaccines are Safe",
-                                                                                                                "Agreement Vaccines are Important","Agreement Vaccines are Effective")),
-                                                               fluidRow(column(12, " ", style='padding:5px;')),
-                                                               fluidRow(column(12,plotlyOutput("indicator_map",height = "60vh"))),
-                                                               fluidRow(column(12, " ", style='padding:2px;'))
-                                                               #fluidRow(column(12, plotlyOutput("indicator_trend_plot",height = "30vh"))
+                                                                                                                "Agreement Vaccines are Important","Agreement Vaccines are Effective"),width = "500px")),
+                                                                        column(width = 8, "Select location in left Improvement Index Ranking table.",
+                                                                               style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
+                                                               #fluidRow(column(12, " ", style='padding:5px;')),
+                                                               fluidRow(column(12,plotlyOutput("indicator_map",height = "50vh"))),
+                                                               fluidRow(column(12, " ", style='padding:2px;')),
+                                                               fluidRow(column(12, plotlyOutput("indicator_trend_plot",height = "27vh")))
                                               )),
                                           conditionalPanel("input.view",
-                                             DT::dataTableOutput("indextable"))),
+                                                           fluidRow(column(11, DT::dataTableOutput("indextable")),column(1,"")))),
                                   tabPanel("Vaccination Trends", value = "t_vac",
                                            fluidRow(column(width = 11,h3(strong(htmlOutput("content_vac"))))),
-                                           fluidRow(column(width = 11, "Select location by clicking location_name in left Improvement Index Ranking table.",
+                                           fluidRow(column(width = 11, "Select location in left Improvement Index Ranking table",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
                                            fluidRow(column(11,h2(("   ")))),
                                            radioButtons("vaccine_plot","Plot type:", choices = c("Time Series of Vaccine Coverage" ="line_trend","Single Year Vaccine Coverage"="bar_plot"),inline = TRUE),
                                            fluidRow(column(12,plotlyOutput("all_vaccine_plot",height = "50vh")))),
                                   tabPanel("Mortality and Disability Trends",value = "d_vac",
                                            fluidRow(column(width = 11,h3(strong(htmlOutput("content_dis"))))),
-                                           fluidRow(column(width = 11, "Select location by clicking location_name in left Improvement Index Ranking table.",
+                                           fluidRow(column(width = 11, "Select location in left Improvement Index Ranking table",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
                                            #fluidRow(column(6, radioButtons("disease_estimate","Choose y-axis:", choices = c("Number Value"="number_val","Percent Value" ="percent_val","Rate Value" = "rate_val"),inline = TRUE)),
                                                     #column(6,radioButtons("disease_plot","Choose plot type:", choices = c("Time Series of Disease Trend" ="line_trend","Single Year Disease trend"="bar_plot"),inline = TRUE))),
                                            radioButtons("disease_estimate","Choose y-axis:", choices = c("Number Value"="number_val","Percent Value" ="percent_val","Rate Value" = "rate_val"),inline = TRUE),
-                                           fluidRow(column(12,plotlyOutput("all_disease_plot", height = "38vh"))),
-                                           fluidRow(column(12,plotlyOutput("all_disability_plot", height = "38vh")))),
+                                           fluidRow(column(12,plotlyOutput("all_disease_plot", height = "40vh"))),
+                                           fluidRow(column(12, " ", style='padding:15px;')),
+                                           fluidRow(column(12,plotlyOutput("all_disability_plot", height = "40vh")))),
                                   tabPanel("Vaccination and Disease Trends",value="vac_dis_tab",
                                            fluidRow(column(11,h3(strong(htmlOutput("content_vac_dis"))))),
                                            selectInput("vaccinations", "Vaccination:",choices=NULL),
@@ -153,7 +156,7 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                   tabPanel("Data Explorer",
                                            fluidRow(column(6, " ", style='padding:5px;')),
                                            fluidRow(column(6, radioButtons("dataset","Choose Dataset", choices = c("Improvement Index"= "improvement index","Vaccine Trends" = "vaccine trends","Disease Trends" = "disease trends"),inline = TRUE)),
-                                                           column(5, style = "margin-top: 10px;",div(downloadButton("download","Download the data"), style = "float: right"))),
+                                                           column(5, style = "margin-top: 10px;",div(downloadButton("download","Download Raw Data"), style = "float: right"))),
                                            fluidRow(column(11,DT::dataTableOutput("alldatatable") %>% withSpinner(color="#4b2e83"))))
                       )
                   )))
@@ -263,10 +266,6 @@ server <- function(input, output,session) {
     })
     
     observeEvent(indicatorsdata(),{
-      print("indicatorsdata()")
-      print(indicatorsdata())
-      print(input$indicators)
-      
       output$indicator_map <- renderPlotly({
         height  = 1500
         units="px"
@@ -457,11 +456,11 @@ server <- function(input, output,session) {
         showarrow = FALSE)
       
       fig_a <- plot_ly(index_trend_data, x = ~year)
-      fig_a <- fig_a  %>% add_trace(y=~result,type='scatter', name = "vaccine improvement index", mode = 'lines', line = list(color = 'rgba(49,130,189, 1)',width=2))
+      fig_a <- fig_a  %>% add_trace(y=~result,type='scatter', name = "vaccine improvement index in United States of America", mode = 'lines', line = list(color = 'rgba(49,130,189, 1)',width=2))
       fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(result[1], result[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgba(49,130,189, 1)', size = 10))
       fig_a <- fig_a %>% 
         layout( autosize = T,
-                title = paste0("Time Series of Vaccine Improvement Index in United States of America"), 
+                title = paste0("Time Series of Vaccine Improvement Index"), 
                 showlegend = FALSE,
                 xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
                 yaxis = list(title = "Vaccine Improvement Index",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
@@ -469,6 +468,181 @@ server <- function(input, output,session) {
       fig_a <- fig_a %>% layout(annotations = vii_right) 
       fig_a
     })
+    
+    output$indicator_trend_plot <- renderPlotly({
+      indicator_trend_data <- filter(index_results,location == "United States of America")
+      fig_a <- plot_ly(indicator_trend_data, x = ~year)
+      
+      if (input$indicators == "SDI"){
+        left_text = round(indicator_trend_data$sdi[1],3)
+        right_text =round(indicator_trend_data$sdi[26],3)
+        left_y = indicator_trend_data$sdi[1]+0.01
+        right_y = indicator_trend_data$sdi[26]+0.02
+        titles = paste0("Time Series of SDI in United States of America")
+        ytitles = "SDI"
+        fig_a <- fig_a  %>% add_trace(y=~sdi,type='scatter', name = "SDI", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+        fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(sdi[1], sdi[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+        
+      }
+      else if (input$indicators == "Development Assistance Per Total Health Spending Categorical"){
+        left_text = round(indicator_trend_data$dah_per_the_mean_cat[1],3)
+        right_text =round(indicator_trend_data$dah_per_the_mean_cat[26],3)
+        left_y = indicator_trend_data$dah_per_the_mean_cat[1]+0.01
+        right_y = indicator_trend_data$dah_per_the_mean_cat[26]+0.02
+        titles = paste0("Time Series of Development Assistance Per Total Health Spending Categorical in United States of America")
+        ytitles = "Development Assistance Per Total Health Spending Categorical"
+        fig_a <- fig_a  %>% add_trace(y=~dah_per_the_mean_cat,type='scatter', name = "Development Assistance Per Total Health Spending Categorical", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+        fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(dah_per_the_mean_cat[1], dah_per_the_mean_cat[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+        
+      }
+      else if (input$indicators == "Total Health Spending per Person"){
+        left_text = round(indicator_trend_data$the_per_cap_mean[1],3)
+        right_text =round(indicator_trend_data$the_per_cap_mean[26],3)
+        left_y = indicator_trend_data$the_per_cap_mean[1]+0.01
+        right_y = indicator_trend_data$the_per_cap_mean[26]+0.02
+        titles=paste0("Time Series of Total Health Spending per Person in United States of America")
+        ytitles = "Total Health Spending per Person"
+        fig_a <- fig_a  %>% add_trace(y=~the_per_cap_mean,type='scatter', name = "Total Health Spending per Person", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+        fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(the_per_cap_mean[1], the_per_cap_mean[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+        
+      }
+      else if (input$indicators == "Government Health Spending per Total Health Spending"){
+        left_text = round(indicator_trend_data$ghes_per_the_mean[1],3)
+        right_text =round(indicator_trend_data$ghes_per_the_mean[26],3)
+        left_y = indicator_trend_data$ghes_per_the_mean[1]+0.01
+        right_y = indicator_trend_data$ghes_per_the_mean[26]+0.02
+        titles=paste0("Time Series of Government Health Spending per Total Health Spending in United States of America")
+        ytitles = "Government Health Spending per Total Health Spending"
+        fig_a <- fig_a  %>% add_trace(y=~ghes_per_the_mean,type='scatter', name = "Government Health Spending per Total Health Spending", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+        fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(ghes_per_the_mean[1], ghes_per_the_mean[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+        
+      }
+      else if (input$indicators == "HAQI"){
+        left_text = round(indicator_trend_data$haqi[1],3)
+        right_text =round(indicator_trend_data$haqi[26],3)
+        left_y = indicator_trend_data$haqi[1]+0.01
+        right_y = indicator_trend_data$haqi[26]+0.02
+        titles=paste0("Time Series of HAQI in United States of America")
+        ytitles = "HAQI"
+        fig_a <- fig_a  %>% add_trace(y=~haqi,type='scatter', name = "HAQI", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+        fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(haqi[1], haqi[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+        
+      }
+      else if (input$indicators == "Corruption Perception Index"){
+        left_text = round(indicator_trend_data$cpi[1],3)
+        right_text =round(indicator_trend_data$cpi[26],3)
+        left_y = indicator_trend_data$cpi[1]+0.01
+        right_y = indicator_trend_data$cpi[26]+0.02
+        titles=paste0("Time Series of Corruption Perception Index in United States of America")
+        ytitles = "Corruption Perception Index"
+        fig_a <- fig_a  %>% add_trace(y=~cpi,type='scatter', name = "Corruption Perception Inde", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+        fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(cpi[1], cpi[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+        
+      }
+      else if (input$indicators == "Skilled Attendants at Birth"){
+        left_text = round(indicator_trend_data$perc_skil_attend[1],3)
+        right_text =round(indicator_trend_data$perc_skil_attend[26],3)
+        left_y = indicator_trend_data$perc_skil_attend[1]+0.01
+        right_y = indicator_trend_data$perc_skil_attend[26]+0.02
+        titles=paste0("Time Series of Skilled Attendants at Birth in United States of America")
+        ytitles = "Skilled Attendants at Birth"
+        fig_a <- fig_a  %>% add_trace(y=~perc_skil_attend,type='scatter', name = "Skilled Attendants at Birth", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+        fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(perc_skil_attend[1], perc_skil_attend[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+        
+      }
+      else if (input$indicators == "Immigrant Population (%)"){
+        left_text = round(indicator_trend_data$imm_pop_perc[1],3)
+        right_text =round(indicator_trend_data$imm_pop_perc[26],3)
+        left_y = indicator_trend_data$imm_pop_perc[1]+0.01
+        right_y = indicator_trend_data$imm_pop_perc[26]+0.02
+        titles=paste0("Time Series of Immigrant Population (%) in United States of America")
+        ytitles = "Immigrant Population (%)"
+        fig_a <- fig_a  %>% add_trace(y=~imm_pop_perc,type='scatter', name = "Immigrant Population (%)", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+        fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(imm_pop_perc[1], imm_pop_perc[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+        
+      }
+      else if (input$indicators == "Urbanicity (%)"){
+        left_text = round(indicator_trend_data$perc_urban[1],3)
+        right_text =round(indicator_trend_data$perc_urban[26],3)
+        left_y = indicator_trend_data$perc_urban[1]+0.01
+        right_y = indicator_trend_data$perc_urban[26]+0.02
+        titles=paste0("Time Series of Urbanicity (%) in United States of America")
+        ytitles = "Urbanicity (%)"
+        fig_a <- fig_a  %>% add_trace(y=~perc_urban,type='scatter', name = "Urbanicity (%)", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+        fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(perc_urban[1], perc_urban[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+        
+      }
+      else if (input$indicators == "Agreement Vaccines are Safe"){
+        left_text = round(indicator_trend_data$mean_agree_vac_safe[1],3)
+        right_text =round(indicator_trend_data$mean_agree_vac_safe[26],3)
+        left_y = indicator_trend_data$mean_agree_vac_safe[1]+0.01
+        right_y = indicator_trend_data$mean_agree_vac_safe[26]+0.02
+        titles=paste0("Time Series of Agreement Vaccines are Safe in United States of America")
+        ytitles = "Agreement Vaccines are Safe"
+        fig_a <- fig_a  %>% add_trace(y=~mean_agree_vac_safe,type='scatter', name = "Agreement Vaccines are Safe", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+        fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(mean_agree_vac_safe[1], mean_agree_vac_safe[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+        
+      }
+      else if (input$indicators == "Agreement Vaccines are Important"){
+        left_text = round(indicator_trend_data$mean_agree_vac_important[1],3)
+        right_text =round(indicator_trend_data$mean_agree_vac_important[26],3)
+        left_y = indicator_trend_data$mean_agree_vac_important[1]+0.01
+        right_y = indicator_trend_data$mean_agree_vac_important[26]+0.02
+        titles=paste0("Time Series of Agreement Vaccines are Important in United States of America")
+        ytitles = "Agreement Vaccines are Important"
+        fig_a <- fig_a  %>% add_trace(y=~mean_agree_vac_important,type='scatter', name = "Agreement Vaccines are Important", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+        fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(mean_agree_vac_important[1], mean_agree_vac_important[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+        
+      }
+      else{
+        left_text = round(indicator_trend_data$mean_agree_vac_effective[1],3)
+        right_text =round(indicator_trend_data$mean_agree_vac_effective[26],3)
+        left_y = indicator_trend_data$mean_agree_vac_effective[1]+0.01
+        right_y = indicator_trend_data$mean_agree_vac_effective[26]+0.02
+        titles=paste0("Time Series of Agreement Vaccines are Effectivel in United States of America")
+        ytitles = "Agreement Vaccines are Effective"
+        fig_a <- fig_a  %>% add_trace(y=~mean_agree_vac_effective,type='scatter', name = "Agreement Vaccines are Effective", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+        fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(mean_agree_vac_effective[1], mean_agree_vac_effective[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+        
+      }
+      
+      vii_left <- list(
+        xref = 'paper',
+        yref = 'y',
+        x = 0.01,
+        y = left_y,
+        xanchor = 'middle',
+        yanchor = 'center',
+        text = ~left_text,
+        font = list(family = 'Arial',
+                    size = 16,
+                    color = 'rgba(67,67,67,1)'),
+        showarrow = FALSE)
+      
+      vii_right <- list(
+        xref = 'paper',
+        yref = 'y',
+        x = 0.97,
+        y = right_y,
+        xanchor = 'middle',
+        yanchor = 'center',
+        text = ~right_text,
+        font = list(family = 'Arial',
+                    size = 16,
+                    color = 'rgba(67,67,67,1)'),
+        showarrow = FALSE)
+      
+        fig_a <- fig_a %>% 
+        layout( autosize = T,
+                title = titles, 
+                showlegend = FALSE,
+                xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
+                yaxis = list(title = ytitles,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
+      fig_a <- fig_a %>% layout(annotations = vii_left) 
+      fig_a <- fig_a %>% layout(annotations = vii_right) 
+      fig_a
+    })
+    
     
     output$indextable = DT::renderDataTable({
       index_rank_table<-sdi_group_present()[,-c("year","gbd_location_id","iso_code","iso_num_code")]
@@ -569,48 +743,6 @@ server <- function(input, output,session) {
       )
   })
 
-  
-  
-  #output$dah_per_the_mean_cat <- renderInfoBox({
-    #infoBox(
-    #  "Development Assistance Per Total Health Spending Categorical", " ",
-    #  color = "purple",
-    #  fill = TRUE,
-    #)
- # })
-  
- # output$the_per_cap_mean <- renderInfoBox({
-   # infoBox(
-    #  "Total Health Spending per Person", " ",
-    #  color = "yellow",
-    #  fill = TRUE,
-    #)
-  #})
-  
-  #output$ghes_per_the_mean <- renderInfoBox({
-  #  infoBox(
-  #    "Government Health Spending per Total Health Spending", " ",
-   #   color = "aqua",
-   #   fill = TRUE,
-  #  )
- # })
-  
-  #output$haqi <- renderInfoBox({
-   # infoBox(
-   #   "HAQI", " ",
-   #   color = "blue",
-   #   fill = TRUE,
-   # )
-  #})
-  
-  #output$cpi <- renderInfoBox({
-  #  infoBox(
-  #    "Corruption Perception Index", " ",
-  #    color = "orange",
-  #    fill = TRUE,
-  #  )
-  #})
-  
   output$content_vac <- renderText("United States of America")
   output$content_dis <- renderText("United States of America")
   output$content_vac_dis <- renderText("United States of America")
@@ -683,13 +815,13 @@ server <- function(input, output,session) {
       if (input$disease_estimate == "number_val"){
           fig_dis <- plot_ly(disability_plotdata, x = ~year_id,y= ~ylds_number_val, color = ~cause_name)%>%
               add_lines()
-          title = "Time Series of Years Lived in Less Than Ideal health"
+          title = "Time Series of Number of Years Lived in Less Than Ideal health in Population"
           y_title = "Years lived with disability in population (Log scale) "
       }
       else if (input$disease_estimate == "percent_val"){
           fig_dis <- plot_ly(disability_plotdata, x = ~year_id,y= ~ylds_percent_val, color = ~cause_name)%>%
               add_lines()
-          title = "Time Series of Proportion of Years Lived in Less Than Ideal health"
+          title = "Time Series of Proportion of Years Lived in Less Than Ideal health in Population"
           y_title="YLDs for particular cause/YLDs for all causes (Log scale)"
       }
       else{
@@ -821,6 +953,180 @@ server <- function(input, output,session) {
         fig_a
       })
       
+      output$indicator_trend_plot <- renderPlotly({
+        indicator_trend_data <- filter(index_results,gsub(" ", "",location) == gsub(" ", "", info$value))
+        fig_a <- plot_ly(indicator_trend_data, x = ~year)
+        
+        if (input$indicators == "SDI"){
+          left_text = round(indicator_trend_data$sdi[1],3)
+          right_text =round(indicator_trend_data$sdi[26],3)
+          left_y = indicator_trend_data$sdi[1]+0.01
+          right_y = indicator_trend_data$sdi[26]+0.02
+          titles = paste0("Time Series of SDI")
+          ytitles = "SDI"
+          fig_a <- fig_a  %>% add_trace(y=~sdi,type='scatter', name = "SDI", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+          fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(sdi[1], sdi[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+          
+        }
+        else if (input$indicators == "Development Assistance Per Total Health Spending Categorical"){
+          left_text = round(indicator_trend_data$dah_per_the_mean_cat[1],3)
+          right_text =round(indicator_trend_data$dah_per_the_mean_cat[26],3)
+          left_y = indicator_trend_data$dah_per_the_mean_cat[1]+0.01
+          right_y = indicator_trend_data$dah_per_the_mean_cat[26]+0.02
+          titles = paste0("Time Series of Development Assistance Per Total Health Spending Categorical")
+          ytitles = "Development Assistance Per Total Health Spending Categorical"
+          fig_a <- fig_a  %>% add_trace(y=~dah_per_the_mean_cat,type='scatter', name = "Development Assistance Per Total Health Spending Categorical", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+          fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(dah_per_the_mean_cat[1], dah_per_the_mean_cat[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+          
+        }
+        else if (input$indicators == "Total Health Spending per Person"){
+          left_text = round(indicator_trend_data$the_per_cap_mean[1],3)
+          right_text =round(indicator_trend_data$the_per_cap_mean[26],3)
+          left_y = indicator_trend_data$the_per_cap_mean[1]+0.01
+          right_y = indicator_trend_data$the_per_cap_mean[26]+0.02
+          titles=paste0("Time Series of Total Health Spending per Person")
+          ytitles = "Total Health Spending per Person"
+          fig_a <- fig_a  %>% add_trace(y=~the_per_cap_mean,type='scatter', name = "Total Health Spending per Person", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+          fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(the_per_cap_mean[1], the_per_cap_mean[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+          
+        }
+        else if (input$indicators == "Government Health Spending per Total Health Spending"){
+          left_text = round(indicator_trend_data$ghes_per_the_mean[1],3)
+          right_text =round(indicator_trend_data$ghes_per_the_mean[26],3)
+          left_y = indicator_trend_data$ghes_per_the_mean[1]+0.01
+          right_y = indicator_trend_data$ghes_per_the_mean[26]+0.02
+          titles=paste0("Time Series of Government Health Spending per Total Health Spending")
+          ytitles = "Government Health Spending per Total Health Spending"
+          fig_a <- fig_a  %>% add_trace(y=~ghes_per_the_mean,type='scatter', name = "Government Health Spending per Total Health Spending", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+          fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(ghes_per_the_mean[1], ghes_per_the_mean[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+          
+        }
+        else if (input$indicators == "HAQI"){
+          left_text = round(indicator_trend_data$haqi[1],3)
+          right_text =round(indicator_trend_data$haqi[26],3)
+          left_y = indicator_trend_data$haqi[1]+0.01
+          right_y = indicator_trend_data$haqi[26]+0.02
+          titles=paste0("Time Series of HAQI")
+          ytitles = "HAQI"
+          fig_a <- fig_a  %>% add_trace(y=~haqi,type='scatter', name = "HAQI", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+          fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(haqi[1], haqi[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+          
+        }
+        else if (input$indicators == "Corruption Perception Index"){
+          left_text = round(indicator_trend_data$cpi[1],3)
+          right_text =round(indicator_trend_data$cpi[26],3)
+          left_y = indicator_trend_data$cpi[1]+0.01
+          right_y = indicator_trend_data$cpi[26]+0.02
+          titles=paste0("Time Series of Corruption Perception Index")
+          ytitles = "Corruption Perception Index"
+          fig_a <- fig_a  %>% add_trace(y=~cpi,type='scatter', name = "Corruption Perception Inde", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+          fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(cpi[1], cpi[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+          
+        }
+        else if (input$indicators == "Skilled Attendants at Birth"){
+          left_text = round(indicator_trend_data$perc_skil_attend[1],3)
+          right_text =round(indicator_trend_data$perc_skil_attend[26],3)
+          left_y = indicator_trend_data$perc_skil_attend[1]+0.01
+          right_y = indicator_trend_data$perc_skil_attend[26]+0.02
+          titles=paste0("Time Series of Skilled Attendants at Birth")
+          ytitles = "Skilled Attendants at Birth"
+          fig_a <- fig_a  %>% add_trace(y=~perc_skil_attend,type='scatter', name = "Skilled Attendants at Birth", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+          fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(perc_skil_attend[1], perc_skil_attend[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+          
+        }
+        else if (input$indicators == "Immigrant Population (%)"){
+          left_text = round(indicator_trend_data$imm_pop_perc[1],3)
+          right_text =round(indicator_trend_data$imm_pop_perc[26],3)
+          left_y = indicator_trend_data$imm_pop_perc[1]+0.01
+          right_y = indicator_trend_data$imm_pop_perc[26]+0.02
+          titles=paste0("Time Series of Immigrant Population (%)")
+          ytitles = "Immigrant Population (%)"
+          fig_a <- fig_a  %>% add_trace(y=~imm_pop_perc,type='scatter', name = "Immigrant Population (%)", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+          fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(imm_pop_perc[1], imm_pop_perc[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+          
+        }
+        else if (input$indicators == "Urbanicity (%)"){
+          left_text = round(indicator_trend_data$perc_urban[1],3)
+          right_text =round(indicator_trend_data$perc_urban[26],3)
+          left_y = indicator_trend_data$perc_urban[1]+0.01
+          right_y = indicator_trend_data$perc_urban[26]+0.02
+          titles=paste0("Time Series of Urbanicity (%)")
+          ytitles = "Urbanicity (%)"
+          fig_a <- fig_a  %>% add_trace(y=~perc_urban,type='scatter', name = "Urbanicity (%)", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+          fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(perc_urban[1], perc_urban[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+          
+        }
+        else if (input$indicators == "Agreement Vaccines are Safe"){
+          left_text = round(indicator_trend_data$mean_agree_vac_safe[1],3)
+          right_text =round(indicator_trend_data$mean_agree_vac_safe[26],3)
+          left_y = indicator_trend_data$mean_agree_vac_safe[1]+0.01
+          right_y = indicator_trend_data$mean_agree_vac_safe[26]+0.02
+          titles=paste0("Time Series of Agreement Vaccines are Safe")
+          ytitles = "Agreement Vaccines are Safe"
+          fig_a <- fig_a  %>% add_trace(y=~mean_agree_vac_safe,type='scatter', name = "Agreement Vaccines are Safe", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+          fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(mean_agree_vac_safe[1], mean_agree_vac_safe[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+          
+        }
+        else if (input$indicators == "Agreement Vaccines are Important"){
+          left_text = round(indicator_trend_data$mean_agree_vac_important[1],3)
+          right_text =round(indicator_trend_data$mean_agree_vac_important[26],3)
+          left_y = indicator_trend_data$mean_agree_vac_important[1]+0.01
+          right_y = indicator_trend_data$mean_agree_vac_important[26]+0.02
+          titles=paste0("Time Series of Agreement Vaccines are Important")
+          ytitles = "Agreement Vaccines are Important"
+          fig_a <- fig_a  %>% add_trace(y=~mean_agree_vac_important,type='scatter', name = "Agreement Vaccines are Important", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+          fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(mean_agree_vac_important[1], mean_agree_vac_important[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+          
+        }
+        else{
+          left_text = round(indicator_trend_data$mean_agree_vac_effective[1],3)
+          right_text =round(indicator_trend_data$mean_agree_vac_effective[26],3)
+          left_y = indicator_trend_data$mean_agree_vac_effective[1]+0.01
+          right_y = indicator_trend_data$mean_agree_vac_effective[26]+0.02
+          titles=paste0("Time Series of Agreement Vaccines are Effectivel")
+          ytitles = "Agreement Vaccines are Effective"
+          fig_a <- fig_a  %>% add_trace(y=~mean_agree_vac_effective,type='scatter', name = "Agreement Vaccines are Effective", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
+          fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[26]), y = ~c(mean_agree_vac_effective[1], mean_agree_vac_effective[26]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
+          
+        }
+        
+        vii_left <- list(
+          xref = 'paper',
+          yref = 'y',
+          x = 0.01,
+          y = left_y,
+          xanchor = 'middle',
+          yanchor = 'center',
+          text = ~left_text,
+          font = list(family = 'Arial',
+                      size = 16,
+                      color = 'rgba(67,67,67,1)'),
+          showarrow = FALSE)
+        
+        vii_right <- list(
+          xref = 'paper',
+          yref = 'y',
+          x = 0.97,
+          y = right_y,
+          xanchor = 'middle',
+          yanchor = 'center',
+          text = ~right_text,
+          font = list(family = 'Arial',
+                      size = 16,
+                      color = 'rgba(67,67,67,1)'),
+          showarrow = FALSE)
+        
+        fig_a <- fig_a %>% 
+          layout( autosize = T,
+                  title = paste0(titles, " in ",info$value),
+                  showlegend = FALSE,
+                  xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
+                  yaxis = list(title = ytitles,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
+        fig_a <- fig_a %>% layout(annotations = vii_left) 
+        fig_a <- fig_a %>% layout(annotations = vii_right) 
+        fig_a
+      })
+      
       output$all_vaccine_plot <- renderPlotly({
           vac_plotdata <- filter(vaccine_trends,gsub(" ", "", location_name) == gsub(" ", "", info$value))
           if (input$vaccine_plot == "line_trend"){
@@ -883,13 +1189,13 @@ server <- function(input, output,session) {
           if (input$disease_estimate == "number_val"){
               fig_dis <- plot_ly(disability_plotdata, x = ~year_id,y= ~ylds_number_val, color = ~cause_name)%>%
                   add_lines()
-              title = "Time Series of Years Lived in Less Than Ideal health"
+              title = "Time Series of Years Lived in Less Than Ideal health in Population"
               y_title = "Years lived with disability in population(Log scale)"
           }
           else if (input$disease_estimate == "percent_val"){
               fig_dis <- plot_ly(disability_plotdata, x = ~year_id,y= ~ylds_percent_val, color = ~cause_name)%>%
                   add_lines()
-              title = "Time Series of Proportion of Years Lived in Less Than Ideal health" 
+              title = "Time Series of Proportion of Years Lived in Less Than Ideal health in Population" 
               y_title="YLDs for particular cause/YLDs for all causes (Log scale)" 
           }
           else{
