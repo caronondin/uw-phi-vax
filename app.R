@@ -43,7 +43,6 @@ colnames(sdi_dup)[2] <- "location"
 colnames(sdi_dup)[4] <- "year"
 merged_data_for_vacii_sdi <- dplyr::left_join(index_results,sdi_dup[,-c("sdi")], by=c("location","year"))
 
-
 #library(sf)
 #shape <- read_sf(dsn = "./aim_2", layer = "gadm36_0")
 
@@ -51,9 +50,8 @@ merged_data_for_vacii_sdi <- dplyr::left_join(index_results,sdi_dup[,-c("sdi")],
 body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                   theme = shinytheme("flatly"), collapsible = TRUE,
                   title = div(img(src="https://uw-s3-cdn.s3.us-west-2.amazonaws.com/wp-content/uploads/sites/98/2014/09/07214416/W-Logo_White.png",width= "73px", height="45px"),  strong(toupper("Global Vaccination Improvement Dashboard"))),
-                  #title = strong("Global Vaccination Improvement Dashboard"),
                   sidebarPanel(
-                      h3(strong("Improvement Index Ranking Table")),
+                      h4(strong("Improvement Index Ranking Table")),
                       sliderInput("year", "Year", value =2020, min = 1990, max=2020,step=1,sep = "",animate=TRUE),
                       radioButtons("sdi_group_present","SDI Group Present", choices = c("All"="all","Low" ="low","Medium" = "medium","High" = "high"),inline = TRUE),
                       tags$style(HTML('table.dataTable tr.selected td, table.dataTable td.selected {background-color: #92c9e8 !important;}')),
@@ -67,17 +65,8 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                     ),
                       tabsetPanel(id = "t1",
                                   tabPanel("Vaccination Improvement",value="t_sdi",
-                                           #tags$li(class = "dropdown",
-                                                   #dropMenu(
-                                                    # dropdownButton("Info", status = 'success', icon = icon('info')),
-                                                    # h3(strong('Information')),
-                                                    # br(),
-                                                    # h5('This is really helpful'),
-                                                    # textInput('text', 'You can also put UI elements here'),
-                                                    # placement = "bottom",
-                                                    # arrow = TRUE)),
                                            fluidRow(column(6, " ", style='padding:10px;')),
-                                           fluidRow(column(width = 11, h3(strong(textOutput("yeartitle")),style='text-align:left')),
+                                           fluidRow(column(width = 11, h4(strong(textOutput("yeartitle")),style='text-align:left')),
                                                column(width = 1,div(switchInput(
                                                  inputId = "view",
                                                  onLabel = "Table",
@@ -93,10 +82,11 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                               conditionalPanel("input.show == 'Improvement Index Mapper'",
                                                                fluidRow(column(width = 12, "Select location in left Improvement Index Ranking table.",
                                                                                style='font-family:Avenir, Helvetica;font-size:30;text-align:center')),
-                                                               fluidRow(column(12, " ", style='padding:5px;')),
-                                                               fluidRow(column(12,plotlyOutput("index_map",height = "55vh"))),
-                                                               fluidRow(column(12, " ", style='padding:2px;')),
-                                                               fluidRow(column(12, plotlyOutput("index_trend_plot",height = "30vh")))),
+                                                               fluidRow(column(12, " ", style='padding:3px;')),
+                                                               fluidRow(column(11,plotlyOutput("index_map",height = "45vh")),column(1,"")),
+                                                               #fluidRow(column(12, " ", style='padding:2px;')),
+                                                               fluidRow(column(11, plotlyOutput("index_trend_plot",height = "30vh"))),column(1,"")),
+                                               fluidRow(column(12, " ", style='padding:2px;')),
                                               conditionalPanel("input.show == 'Improvement Indicator Mapper'",
                                                                fluidRow(column(4,selectInput("indicators", "Indicator:",choices=c("SDI","Development Assistance Per Total Health Spending Categorical","Total Health Spending per Person","Government Health Spending per Total Health Spending",
                                                                                                                 "HAQI","Corruption Perception Index","Skilled Attendants at Birth","Immigrant Population (%)","Urbanicity (%)","Agreement Vaccines are Safe",
@@ -104,33 +94,33 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                                         column(width = 8, "Select location in left Improvement Index Ranking table.",
                                                                                style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
                                                                #fluidRow(column(12, " ", style='padding:5px;')),
-                                                               fluidRow(column(12,plotlyOutput("indicator_map",height = "50vh"))),
-                                                               fluidRow(column(12, " ", style='padding:2px;')),
-                                                               fluidRow(column(12, plotlyOutput("indicator_trend_plot",height = "27vh")))
+                                                               fluidRow(column(11,plotlyOutput("indicator_map",height = "43vh")),column(1,"")),
+                                                               #fluidRow(column(12, " ", style='padding:2px;')),
+                                                               fluidRow(column(11, plotlyOutput("indicator_trend_plot",height = "27vh")),column(1,""))
                                               )),
                                           conditionalPanel("input.view",
                                                            fluidRow(column(11, DT::dataTableOutput("indextable")),column(1,"")))),
                                   tabPanel("Vaccination Trends", value = "t_vac",
-                                           fluidRow(column(width = 11,h3(strong(htmlOutput("content_vac"))))),
+                                           fluidRow(column(width = 11,h4(strong(htmlOutput("content_vac"))))),
                                            fluidRow(column(width = 11, "Select location in left Improvement Index Ranking table",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
                                            fluidRow(column(11,h2(("   ")))),
                                            radioButtons("vaccine_plot","Plot type:", choices = c("Time Series of Vaccine Coverage" ="line_trend","Single Year Vaccine Coverage"="bar_plot"),inline = TRUE),
-                                           fluidRow(column(12,plotlyOutput("all_vaccine_plot",height = "50vh")))),
-                                  tabPanel("Mortality and Disability Trends",value = "d_vac",
-                                           fluidRow(column(width = 11,h3(strong(htmlOutput("content_dis"))))),
+                                           fluidRow(column(11,plotlyOutput("all_vaccine_plot",height = "50vh")),column(1,""))),
+                                  tabPanel("Mortality & Disability Trends",value = "d_vac",
+                                           fluidRow(column(width = 11,h4(strong(htmlOutput("content_dis"))))),
                                            fluidRow(column(width = 11, "Select location in left Improvement Index Ranking table",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
                                            #fluidRow(column(6, radioButtons("disease_estimate","Choose y-axis:", choices = c("Number Value"="number_val","Percent Value" ="percent_val","Rate Value" = "rate_val"),inline = TRUE)),
                                                     #column(6,radioButtons("disease_plot","Choose plot type:", choices = c("Time Series of Disease Trend" ="line_trend","Single Year Disease trend"="bar_plot"),inline = TRUE))),
                                            radioButtons("disease_estimate","Choose y-axis:", choices = c("Number Value"="number_val","Percent Value" ="percent_val","Rate Value" = "rate_val"),inline = TRUE),
-                                           fluidRow(column(12,plotlyOutput("all_disease_plot", height = "40vh"))),
+                                           fluidRow(column(12,plotlyOutput("all_disease_plot", height = "35vh"))),
                                            fluidRow(column(12, " ", style='padding:15px;')),
-                                           fluidRow(column(12,plotlyOutput("all_disability_plot", height = "40vh")))),
-                                  tabPanel("Vaccination and Disease Trends",value="vac_dis_tab",
-                                           fluidRow(column(11,h3(strong(htmlOutput("content_vac_dis"))))),
+                                           fluidRow(column(12,plotlyOutput("all_disability_plot", height = "35vh")))),
+                                  tabPanel(paste0("Vaccination & Disease Trends"),value="vac_dis_tab",
+                                           fluidRow(column(12,h4(strong(htmlOutput("content_vac_dis"))))),
                                            selectInput("vaccinations", "Vaccination:",choices=NULL),
-                                           fluidRow(column(12,plotlyOutput("selected_vac_dis_plot",height = "45vh"))),
+                                           fluidRow(column(12,plotlyOutput("selected_vac_dis_plot",height = "40vh"))),
                                            fluidRow(
                                              column(3,
                                                     h4("BCG"),
@@ -158,7 +148,15 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                            fluidRow(column(6, radioButtons("dataset","Choose Dataset", choices = c("Improvement Index"= "improvement index","Vaccine Trends" = "vaccine trends","Disease Trends" = "disease trends"),inline = TRUE)),
                                                            column(5, style = "margin-top: 10px;",div(downloadButton("download","Download Raw Data"), style = "float: right"))),
                                            fluidRow(column(11,DT::dataTableOutput("alldatatable") %>% withSpinner(color="#4b2e83"))))
-                      )
+                      ),
+                    tags$head(
+                        tags$style(
+                          'ul.nav.nav-tabs {
+                    overflow-y: hidden;
+                    display: flex;
+                  }'
+                        )
+                      ),
                   )))
 )
 
@@ -218,13 +216,13 @@ server <- function(input, output,session) {
   })
     
   output$table = DT::renderDataTable({
-      sdi_rank_table<-sdi_group_present()[,c("location","result","sdi","sdi_group_present")]
+      sdi_rank_table<-sdi_group_present()[,c("location","result","sdi_group_present")]
       print("sorting")
       print(sdi_rank_table)
       sdi_rank_table$rank <- NA
       sdi_rank_table$rank = dense_rank(desc(sdi_rank_table$result))
-      sdi_rank_table <- sdi_rank_table[,c("rank","location","result","sdi","sdi_group_present")]
-      colnames(sdi_rank_table) <- c('Rank','Location','Improvement Index', "SDI","SDI Group Present")
+      sdi_rank_table <- sdi_rank_table[,c("rank","location","result","sdi_group_present")]
+      colnames(sdi_rank_table) <- c('Rank','Location','Improvement Index', "SDI Group Present")
       sdi_rank_table<-sdi_rank_table[order(sdi_rank_table$Rank),]
       true_false_formatter <-
           formatter("span",
@@ -238,7 +236,7 @@ server <- function(input, output,session) {
           list(
               ## a coloured bar with length proportional to value
               'Improvement Index' = color_tile("white", "#569eca"),
-              'SDI' = color_tile("white", "pink"),
+              #'SDI' = color_tile("white", "pink"),
               ## use custom formatter for TRUE/FALSE values
               'SDI Group Present' = true_false_formatter
           )
@@ -246,7 +244,7 @@ server <- function(input, output,session) {
           as.datatable(rownames = FALSE, 
                        selection = list(mode = 'single',target="cell", selected = matrix(c(0, 1), nrow = 1,ncol = 2)), 
                        options = list(paging = FALSE,
-                                      scrollY = '500px', 
+                                      scrollY = '450px', 
                                       scrollY=TRUE, 
                                       autoWidth = FALSE,
                                       ordering = FALSE,
@@ -684,7 +682,7 @@ server <- function(input, output,session) {
       ) %>%
         as.datatable(rownames = FALSE, 
                      options = list(paging = FALSE,
-                                    scrollY = '570px', 
+                                    scrollY = '520px', 
                                     scrollY=TRUE, 
                                     scrollX=TRUE, 
                                     #searching = FALSE,
@@ -751,13 +749,15 @@ server <- function(input, output,session) {
       vac_plotdata <- filter(vaccine_trends,gsub(" ", "", location_name) == gsub(" ", "", "United States of America"))
       if (input$vaccine_plot == "line_trend"){
           fig_a <- plot_ly(vac_plotdata, x = ~year_id,y=~prop_val, color = ~vaccine_name)%>%
-              add_lines()
+             add_lines()
+          
           fig_a <- fig_a %>% 
               layout(autosize = T,
                      title ="Time Series of Vaccination Coverage",  showlegend = T,
                      xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
                      yaxis = list(title = "Vaccination coverage (%)",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
           fig_a
+
       }
       else{
           single_year_vac_plotdata <- filter(vac_plotdata,year_id == input$year)
@@ -788,19 +788,19 @@ server <- function(input, output,session) {
           fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~round(deaths_number_val,8), color = ~cause_name)%>%
               add_lines()
           title = "Time Series of Deaths, Disease or Disability Number"
-          y_title = "Number of Deaths in Population (Log scale)"
+          y_title = "Number of Deaths in Population"
       }
       else if (input$disease_estimate == "percent_val"){
           fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~round(deaths_percent_val,8), color = ~cause_name)%>%
               add_lines()
           title = "Time Series of Deaths, Disease or Disability Percent"
-          y_title="Deaths for a particular cuase/Deaths from all causes (Log scale)"
+          y_title="Deaths for a particular cuase/Deaths from all causes"
       }
       else{
           fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~round(deaths_rate_val,8), color = ~cause_name)%>%
               add_lines()
           title = "Time Series of Deaths, Disease or Disability Rate"
-          y_title="Deaths per 100,000 population (Log scale)"
+          y_title="Deaths per 100,000 population"
       }
       fig_dis <- fig_dis %>% 
           layout( autosize = T,
@@ -1340,16 +1340,16 @@ server <- function(input, output,session) {
           if(input$dataset == "vaccine trends"){
               x<-data %>%
                   dplyr::select(-c("location_id"))
-              pl=17
+              pl=16
           }
           else if (input$dataset == "disease trends"){
             x<-data %>%
               dplyr::select(-c("location_id","cause_id"))
-            pl=11
+            pl=10
           }
           else{
               x<-data 
-              pl=17
+              pl=16
           }
           formattable(
              x

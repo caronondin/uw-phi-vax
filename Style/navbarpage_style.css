@@ -11,18 +11,18 @@
     font-family: "Encode Sans Compressed",sans-serif;
     src: "Style/Encode Sans Family";
     color: #ffffff; /*title color*/
-    font-size: 24px; 
+    font-size: 22px; 
   }
 
   body {
     font-family: "Open Sans",sans-serif;
     src: "Style/Open Sans Family";
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.42857143;
     background-color: #ffffff;
 }
   p {
-    font-size: 17px;
+    font-size: 14px;
     line-height: 1.72222;
     margin: 0 0 14.5px;
     font-weight: normal;
@@ -97,7 +97,7 @@ input[type="radio"], input[type="checkbox"] {
 
   .well {
     min-height: 20px;
-    padding: 19px;
+    padding: 15px;
     margin-bottom: 20px;
     background-color: #e8e3d3;
     border: 1px solid transparent;
@@ -166,3 +166,14 @@ Style Attribute {
 }
 
 .slider-animate-button { font-size: 15pt !important; }
+
+
+.navbar {
+  height: 45px;
+  min-height:45px !important;
+}
+.navbar-nav > li > a, .navbar-brand {
+    padding-top:1px !important; 
+    padding-bottom:1px !important;
+    height: 45px;
+}
