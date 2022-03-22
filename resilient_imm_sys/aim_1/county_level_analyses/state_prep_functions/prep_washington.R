@@ -2,7 +2,7 @@
 # Date: February 11 2022
 # Purpose: Function to prep washington data at county level
 
-washington = function(dir, inFile) {
+prep_washington = function(dir, inFile) {
   
   # uncomment below to trouble-shoot
   # dir = file_dir
@@ -32,7 +32,8 @@ washington = function(dir, inFile) {
   # drop un-necessary rows
   county_dataset <- county_dataset %>% 
     filter(!is.na(county)) %>% 
-    filter(!county=="Geography")
+    filter(!county=="Geography") %>%
+    filter(!county=="Statewide")
   
   # pivot data long 
   county_dataset <- county_dataset %>% pivot_longer(
@@ -43,7 +44,7 @@ washington = function(dir, inFile) {
   )
   
   # only keep columns of interest
-  county_dataset <- county_dataset %>% select(county, vaccine_name, variable_name, value)
+  county_dataset <- county_dataset %>% select(county,  year, vaccine_name, variable_name, value)
   
   # subset rows
   county_dataset <- county_dataset %>% filter(variable_name %in% c("population", "proportion"))
@@ -55,6 +56,10 @@ washington = function(dir, inFile) {
   
   # change data type
   county_dataset$proportion <- as.numeric(county_dataset$proportion)
+  
+  # add year variable
+  year_of_data <- file_list$year[i]
+  county_dataset$year <- year_of_data
   
   # add in additional variables from file_list
   return(county_dataset)

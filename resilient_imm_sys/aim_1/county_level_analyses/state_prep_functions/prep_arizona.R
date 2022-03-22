@@ -2,12 +2,12 @@
 # Date: February 11 2022
 # Purpose: Function to prep washington data at county level
 
-arizona = function(dir, inFile) {
+prep_arizona = function(dir, inFile) {
   
   # uncomment below to trouble-shoot
   # dir = file_dir
   # inFile = file_list$file_name[i]
-  
+
   # Load/prep data
   county_dataset <- read_xlsx(paste0(dir, inFile))
   
@@ -42,5 +42,8 @@ arizona = function(dir, inFile) {
   county_dataset$population <- as.numeric(county_dataset$population)
   
   # add in additional variables from file_list
+  year_of_data <- file_list$year[i]
+  county_dataset$year <- year_of_data
+  
   return(county_dataset)
 }

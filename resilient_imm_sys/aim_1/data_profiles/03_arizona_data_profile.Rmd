@@ -1,0 +1,75 @@
+---
+title: "Arizona Data Profiles"
+author: "UW PHI"
+date: "3/21/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# source set-up file
+source("C:/Users/frc2/Documents/uw-phi-vax/resilient_imm_sys/aim_1/data_profiles/01_set_up_R.r")
+
+# load data to be used
+data <- readRDS(paste0(prepped_data_dir, "11_merged_data_for_profile_docs.RDS"))
+
+# subset state and counties of interest
+data <- data %>% filter(state=="Arizona" & county %in% c("Navajo County", "Gila County", "Yavapai County"))
+
+```
+
+# Arizona
+
+### Map of county populations
+
+```{r}
+# plot map of Arizona counties selected
+plot_data <- data %>% filter(variable=="total_population") %>%
+  select(county, fips, value)
+
+plot_data$value <- as.numeric(plot_data$value)
+
+plot_usmap(data = plot_data, values = "value", include=c("AZ"), "counties", labels = TRUE) +
+  scale_fill_continuous(name = "Population (2019)", label = scales::comma) +
+  theme(legend.position = "right")
+```
+
+## County #1
+
+### Demographics of children under 4 in each county
+
+```{r}
+
+demo_data <- data %>% filter(variable %in% c("Non-Hispanic White",
+ "African-American/Black",
+ "Percent American Indian",
+ "Percent Asian-American",
+  "Percent Hispanic"))
+
+demo_data$value <- as.numeric(demo_data$value)
+
+ggplot(demo_data, aes(fill=variable, y=value, x=county)) + 
+  geom_bar(position = "fill", stat="identity") + 
+  scale_fill_brewer(palette = "Pastel1") + 
+  theme_gray()
+```
+
+### Data Points
+```{r}
+plot_table <- data %>% filter(variable %in% c("Fully vaccinated children in 2015",
+                                         "Fully vaccinated children in 2019",
+                                         "Change between time points",
+                                         "Fully vaccinated adults, Covid-19 vaccine")) %>% 
+  select(county, variable, value)
+
+s <- unique(data$county)
+plot_table %>% filter(county==s[1]) %>% kbl() %>% kable_paper("hover")
+plot_table %>% filter(county==s[2]) %>% kbl() %>% kable_paper("hover")
+plot_table %>% filter(county==s[3]) %>% kbl() %>% kable_paper("hover")
+```
+
+
+
+
+

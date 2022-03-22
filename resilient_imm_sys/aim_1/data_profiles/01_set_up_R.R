@@ -1,5 +1,5 @@
 # Author: Francisco Rios 
-# Purpose: Set up R for prepping UW PHI Vaccination Data for individual states
+# Purpose: Set up R for creating markdown files for individual locations
 # Date: Last modified February 11, 2022
 
 # Load required packages -----
@@ -12,6 +12,9 @@ library(Hmisc)
 library(ggrepel)
 library(scales)
 library(RColorBrewer) 
+library(usmap)
+library(scales)
+library(kableExtra)
 
 # Define important variables -----
 set.seed(500)

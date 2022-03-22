@@ -100,4 +100,4 @@ birth_attendant_data <- bind_rows(dt2, dt3)
 birth_attendant_data <- birth_attendant_data %>% filter(!is.na(perc_skill_attend))
 
 # save the file on the prepped data folder
-saveRDS(birth_attendant_data, file = paste0(prepped_data_dir, "aim_2/04_prepped_un_birth_attendant_data.RDS"))
+saveRDS(birth_attendant_data, file = paste0(prepped_data_dir, "aim_2/05_prepped_un_birth_attendant_data.RDS"))

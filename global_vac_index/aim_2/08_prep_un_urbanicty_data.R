@@ -92,4 +92,4 @@ prepped_urban_dataset <- prepped_urban_dataset %>%
 prepped_urban_dataset$perc_urban <- prepped_urban_dataset$perc_urban/100
 
 # Save file in the prepped data folder
-saveRDS(prepped_urban_dataset, file = paste0(prepped_data_dir, "aim_2/06_prepped_un_perc_urban_data.RDS"))
+saveRDS(prepped_urban_dataset, file = paste0(prepped_data_dir, "aim_2/07_prepped_un_perc_urban_data.RDS"))

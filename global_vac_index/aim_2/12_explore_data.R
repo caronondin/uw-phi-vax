@@ -11,15 +11,15 @@ library(ggcorrplot)
 library(vtable)
 
 # load data sets
-dt1 <- as.data.table(readRDS(file=paste0(prepped_data_dir, "aim_2/08_merged_dataset.RDS"))) # merged data set with missing values
-dt2 <- as.data.table(readRDS(file=paste0(prepped_data_dir, "aim_2/09_prepped_data_for_analysis.RDS"))) # prepped data set with full series and dropped rows
+dt1 <- as.data.table(readRDS(file=paste0(prepped_data_dir, "aim_2/09_merged_dataset.RDS"))) # merged data set with missing values
+dt2 <- as.data.table(readRDS(file=paste0(prepped_data_dir, "aim_2/10_prepped_data_for_analysis.RDS"))) # prepped data set with full series and dropped rows
 
 # Load "codeTable" for easy labeling
 codeTable <- as.data.table(read_xlsx(path=paste0(codebook_directory, "vaccine_index_variable_codebook.xlsx")))
 labelTable <- unique(codeTable[,.(Variable, Label)])
 
 # Reshape each transformed data for plotting
-idVars <- unique(codeTable$Variable)[1:5]
+idVars <- unique(codeTable$Variable)[1:7]
 plotdt1 <- melt(dt1, id.vars = idVars, variable.name = 'variable') # raw data
 plotdt2 <- melt(dt2, id.vars = idVars, variable.name = 'variable') # imputed data
 
@@ -57,18 +57,33 @@ for(i in seq(length(histograms1))) {
 }
 dev.off()
 
-# Compute correlation matrix for full dataset-----
-corr <- round(cor(dt2[,6:17]), 1)
-corrplot <-ggcorrplot(corr,
+# add vaccine coverage data and compute correlation matrix for full dataset-----
+# load vaccination coverage dataset
+vax_data <- readRDS(paste0(prepped_data_dir, "aim_1/01_vaccine_trends.RDS"))
+
+# reshape the vaccination data
+vax_data <- pivot_wider(vax_data,
+                        id_cols=c("location_id", "location_name", "year_id"),
+                        names_from = "vaccine_name",
+                        values_from = c(prop_val, prop_upper, prop_lower))  %>% 
+  select(location_id, year_id, location_name, prop_val_BCG, prop_val_DTP1, prop_val_DTP3, prop_val_MCV1, prop_val_MCV2, prop_val_Pol3, 
+         prop_val_RCV1, prop_val_RotaC)
+
+# merge the data set with the vaccination data
+corr_data <- dt2 %>% left_join(vax_data, by=c("gbd_location_id"="location_id", "year"="year_id", "location"="location_name"))
+
+corr <- round(cor(corr_data[,8:24], use="complete.obs"), 1)
+corrplot <- ggcorrplot(corr,
                        ggtheme = ggplot2::theme_gray,
                        outline.color = "white",
+                       # type = "upper",
                        colors = c("#6D9EC1", "white", "#E46726"),
                        lab = TRUE,
                        title = "Correlation of variables ")
 
 # Save correlations on a PDF
 outputFile11b <- paste0(visDir, "aim_2/04_correlation_matrix.PDF")
-pdf(outputFile11b, height=11, width=8.5)
+pdf(outputFile11b, height=11, width=11)
 corrplot
 dev.off()
 
@@ -144,43 +159,58 @@ miss_table_2 <- miss_table_2 %>% pivot_longer(cols = !range, names_to = "variabl
 miss_table_reformat2 <- miss_table_2 %>% pivot_wider(names_from = range, values_from=missingness)
 write.csv(miss_table_reformat2, file=paste0(visDir, "aim_2/10_missingness_in_merged_data_without_locations_dropped.csv"))
 
-# plot DAH trends for locations that are eligible to receive DAH funds
+##############################################
+# Create plot of DAH trends among locations 
+# eligible to receive such funds
+##############################################
+
 # load list of ineligible locations for DAH
-ineligible <- readRDS(file=paste0(codebook_directory, "locations_ineligible_for_dah.RDS"))
+# ineligible <- readRDS(file=paste0(codebook_directory, "locations_ineligible_for_dah.RDS"))
 
-test <- plotdt1 %>% filter(!location%in%ineligible) %>% filter(variable=="dah_per_cap_ppp_mean")
-dahVar <- unique(test$variable)
+# create two data sets one with original data with missing values and one with imputed values
+# dahdata1 <- plotdt1 %>% filter(!location%in%ineligible) %>% filter(variable=="dah_per_cap_ppp_mean")
+# dahdata2 <- plotdt2 %>% filter(!location%in%ineligible) %>% filter(variable=="dah_per_cap_ppp_mean")
+# 
+# # dahVar <- unique(test$variable)
+# 
+# # plot time series of the data for DAH with ineligible locations dropped
+# dahlist1 <- list()
+# dahlist2 <- list()
+# 
+# i <- 1
+# for(h in unique(dahdata1$location)) {
+#   dahlist1[[i]] <- ggplot(dahdata1[location==h], aes_string(y='value', x='year')) + 
+#     geom_point() + labs(title = paste0(h), subtitle = "Among original data")
+#   i = i +1
+# }
+# 
+# i <- 1
+# for(h in unique(dahdata2$location)) {
+#   dahlist2[[i]] <- ggplot(dahdata2[location==h], aes_string(y='value', x='year')) + 
+#     geom_point() + labs(title = paste0(h), subtitle = "Among complete series data")
+# }
+# 
+# outputFile11c <- paste0(visDir, "aim_2/12_dah_data_among_eligible_countries.PDF")
+# pdf(outputFile11c, height=5.5, width=9)
+# for (i in 1:length(dahlist1)){
+#   print(dahlist1[[i]])
+# }
+# for (i in 1:length(dahlist2)) {
+#   print(dahlist2[[i]])
+# }
+# dev.off()
+# 
+# # explore how often 0 appears in locations eligible for DAH funding
+# zerodah <- dahdata1 %>% filter(value==0) %>% group_by(location) %>% count(location)
 
-# plot time series of the data for DAH with ineligible locations dropped
-dahlist <- list()
-i <- 1
-for(h in unique(test$location)) {
-  dahlist[[i]] <- ggplot(test[location==h], aes_string(y='value', x='year')) + 
-    geom_point() + labs(title = paste0(h))
-  i = i +1
-  }
-
-outputFile11c <- paste0(visDir, "aim_2/12_dah_data_among_eligible_countries.PDF")
-pdf(outputFile11c, height=5.5, width=9)
-for (i in 1:length(dahlist)){
-  print(dahlist[[i]])
-}
-dev.off()
-
-# pltlist3[[i]] <- ggplot(data[location==h], aes_string(y=v, x='year')) + geom_point()+ labs(title = paste0(h)) + geom_point(aes(y=tmp),color='red')
-# ggplot(test, aes(value)) + geom_histogram()
-# histograms1 = lapply(dahVar, function(v) {
-#   l = labelTable[Variable==v]$Label
-#   ggplot(test[variable==v], aes(value)) +
-#     geom_histogram() +
-#     labs(title = paste('Histogram of Pre-transformation', l), y = 'Value', x = l,
-#          caption='Variables are pre-imputation.') +
-#     theme_minimal()
-# })
-
-# save pdf
+# save csv file of zerodah
+# write.csv(zerodah, file = paste0(visDir, "aim_2/13_locations_with_value_0.csv"))
 
 # plot pdf 
-summary(test$dah_per_cap_ppp_mean)
+# summary(test$dah_per_cap_ppp_mean)
+
+
+
+# explore a few variables that could serve as proxies to vaccine confidence
 
 

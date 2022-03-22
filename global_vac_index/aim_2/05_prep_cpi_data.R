@@ -61,4 +61,4 @@ full_cpi_dataset <- cpi_dataset %>%
 full_cpi_dataset <- full_cpi_dataset %>% select(location, year, gbd_location_id, iso_code, iso_num_code, cpi)
 
 # save the file on the prepped data folder
-saveRDS(full_cpi_dataset, file = paste0(prepped_data_dir, "aim_2/03_prepped_cpi_data.RDS"))
+saveRDS(full_cpi_dataset, file = paste0(prepped_data_dir, "aim_2/04_prepped_cpi_data.RDS"))

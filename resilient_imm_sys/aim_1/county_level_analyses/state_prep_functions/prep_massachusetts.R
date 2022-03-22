@@ -2,7 +2,7 @@
 # Date: February 11 2022
 # Purpose: Function to prep Massachusetts data at county level
 
-massachusetts = function(dir, inFile) {
+prep_massachusetts = function(dir, inFile) {
   
   # uncomment below to trouble-shoot
   # dir = file_dir
@@ -34,14 +34,21 @@ massachusetts = function(dir, inFile) {
   # reshape the data
   county_dataset <- pivot_longer(county_dataset, !c(county, number_of_programs, population), names_to="vaccine_name", values_to="proportion")
   
+  year_of_data <- file_list$year[i]
+  county_dataset$year <- year_of_data
+  
   # if (na_proportion!=0){
   #   stop("Some rows with NA for location_name still have proportion data--review drop conditions before dropping NAs in key variables")
   # } else {
   #   county_dataset <- county_dataset %>% filter(!is.na(county))
   # }
   
+  # filter out non-vaccine data
+  county_dataset <- county_dataset %>% filter(vaccine_name%in%c("4 DTaP", "3 Polio", "1 MMR", 
+                                                                "3 Hib", "3 Hep B", "1 Varicella", "Series Complete"))
+  
   # only keep columns of interest
-  county_dataset <- county_dataset %>% select(county, population, vaccine_name, proportion)
+  county_dataset <- county_dataset %>% select(county, year, population, vaccine_name, proportion)
   return(county_dataset)
   
 }

@@ -103,4 +103,4 @@ prepped_vacc_confid_dataset$mean_agree_vac_important <- prepped_vacc_confid_data
 prepped_vacc_confid_dataset$mean_agree_vac_effective <- prepped_vacc_confid_dataset$mean_agree_vac_effective/100
 
 # Save prepped data source
-saveRDS(prepped_vacc_confid_dataset, paste0(prepped_data_dir, "aim_2/07_prepped_vaccine_confidence_data.RDS"))
+saveRDS(prepped_vacc_confid_dataset, paste0(prepped_data_dir, "aim_2/08_prepped_vaccine_confidence_data.RDS"))

@@ -1,6 +1,6 @@
 # Author: Francisco Rios 
-# Purpose: Set up R for prepping UW PHI Vaccination Data for individual states
-# Date: Last modified February 11, 2022
+# Purpose: Set up R for prepping UW PHI Vaccination Data
+# Date: Last modified January 07, 2022
 
 # Load required packages -----
 library(data.table)
@@ -33,13 +33,7 @@ if (Sys.info()[2]=='10 x64'){
 setwd(code_dir) # set the working directory to wherever code is stored
 raw_data_dir <- paste0(team_drive,"Data/raw_data/") # location of raw data
 prepped_data_dir <- paste0(team_drive,"Data/prepped_data/") # location of prepped data
-codebook_directory <- paste0(team_drive,"Data/documentation/codebooks/") # location of codebooks for interpreting data
+codebook_directory <- paste0(team_drive,"Data/documentation/codebooks/aim_2/") # location of codebooks for interpreting data
 resDir <- paste0(team_drive, "Results/") # location of  any result outputs
 visDir <- paste0(resDir, "graphics/") # location where visualizations are saved
 
-# Source shared functions to prep county-level data for each state-----
-source(paste0(code_dir, "aim_1/county_level_analyses/state_prep_functions/prep_massachusetts.R"))
-source(paste0(code_dir, "aim_1/county_level_analyses/state_prep_functions/prep_arizona.R"))
-source(paste0(code_dir, "aim_1/county_level_analyses/state_prep_functions/prep_washington.R"))
-source(paste0(code_dir, "aim_1/county_level_analyses/state_prep_functions/prep_north_carolina.R"))
-source(paste0(code_dir, "aim_1/county_level_analyses/state_prep_functions/prep_virginia.R"))
