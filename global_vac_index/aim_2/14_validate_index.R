@@ -7,11 +7,11 @@ rm(list=ls())
 
 source(paste0("C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_2/01_set_up_R.R"))
 
-library(sklearn)
+# library(sklearn)
 library(DescTools)
 
 # load index dataset
-index_data <- readRDS(paste0(prepped_data_dir, "aim_2/10_index_results.RDS"))
+index_data <- readRDS(paste0(prepped_data_dir, "aim_2/11_index_results.RDS"))
 
 # load vaccination coverage dataset
 vax_data <- readRDS(paste0(prepped_data_dir, "aim_1/01_vaccine_trends.RDS"))
@@ -26,7 +26,33 @@ vax_data <- pivot_wider(vax_data,
 full_data <- index_data %>% left_join(vax_data, by=c("gbd_location_id"="location_id", "year"="year_id", "location"="location_name"))
 
 # subset columns
-full_data <- full_data %>% select(location, year, gbd_location_id, iso_code, iso_num_code, result, prop_val_MCV1, prop_val_DTP1, prop_val_DTP3) %>% filter(year!=2020)
+full_data <- full_data %>% select(location, region, year, gbd_location_id, iso_code, iso_num_code, result, prop_val_MCV1, prop_val_DTP1, prop_val_DTP3) %>% filter(year!=2020)
+
+########################################
+##### METHOD 1 OF VALIDATING INDEX #####
+########################################
+
+# create a training dataset
+# row.number <- sample(1:nrow(full_data), 0.8*nrow(full_data))
+train <- full_data %>% filter(year<2019)
+test <- full_data %>% filter(year==2019)
+
+# fit a model for each vaccine
+model1 <- glm(prop_val_MCV1~factor(region)+year+result, data=train, family = "binomial")
+summary(model1)
+par(mfrow=c(2,2))
+plot(model1)
+
+# evaluate the success of the model 
+pred1 <- predict(model1, newdata = test, type = "response")
+BrierScore(model1)
+par(mfrow=c(1,1))
+plot(test$prop_val_MCV1, pred1)
+
+
+########################################
+##### METHOD 2 OF VALIDATING INDEX #####
+########################################
 
 # create a training dataset
 row.number <- sample(1:nrow(full_data), 0.8*nrow(full_data))
@@ -34,7 +60,7 @@ train <- full_data[row.number,]
 test <- full_data[-row.number,]
 
 # fit a model for each vaccine
-model1 <- glm(prop_val_MCV1~factor(location)+factor(year)+result, data=train, family = "binomial")
+model1 <- glm(prop_val_MCV1~factor(region)+year+result, data=train, family = "binomial")
 summary(model1)
 par(mfrow=c(2,2))
 plot(model1)
@@ -134,3 +160,4 @@ plot(test$prop_val_DTP3, pred3)
 # ggplot(data[year=="2019"], aes_string(y='prop_val_DTP3', x='prop_val_DTP3_estimated')) + geom_point()
 
 # Quantify how much agreement there is between predicted and estimated value
+

@@ -6,10 +6,41 @@
 rm(list=ls())
 
 # source set-up file
-source("C:/Users/frc2/Documents/uw-phi-vax/resilient_imm_sys/aim_1/data_profiles/01_set_up_R.r")
+source("C:/Users/frc2/Documents/uw-phi-vax/resilient_imm_sys/aim_1/03_data_profiles/01_set_up_R.r")
 
 # want to create a dataset that includes:
 # vaccinations, demographics, covid data, covid hesitation, fips values
+
+# load state-level analyses from NIS
+state_vacc_data <- readRDS(paste0(prepped_data_dir, "03_estimates_vaccine_coverage_2007-2019.RDS"))
+
+# recode state names
+state_vacc_data <- state_vacc_data %>% mutate(state = case_when(
+  ESTIAP=="29" ~ "North Carolina",
+  ESTIAP=="66" ~ "Arizona",
+  ESTIAP=="77" ~ "Washington")) %>% 
+  mutate(race = case_when(RACEETHK_R==1 ~ "white",
+                                       RACEETHK_R==2 ~ "hispa",
+                                       RACEETHK_R==3 ~ "black",
+                                       RACEETHK_R==4 ~ "other"),
+                income = case_when(INCPOV1==1 ~ "high",
+                                    INCPOV1==2 ~ "med", 
+                                    INCPOV1==3 ~ "low",
+                                    INCPOV1==4 ~ "miss")) %>% 
+  filter(state%in%c("Arizona", "North Carolina", "Washington")) %>%
+  select(state, race, income, VACCINE, YEAR, PredictedProb)
+
+# reshape new variables
+state_rates <- state_vacc_data %>% 
+  pivot_wider(id_cols = c(state, YEAR, income, VACCINE), names_from = c(race), values_from = c(PredictedProb))
+
+# calculate new variables
+state_rates <- state_rates %>% mutate(hispa_diff = white-hispa,
+                                      black_diff = white-black,
+                                      other_diff = white-other)
+
+# save final dataset
+saveRDS(state_rates, file=paste0(prepped_data_dir, "11_merged_data_for_state_profile_docs.RDS"))
 
 # load demo_vacc_data
 demo_vacc_data <- readRDS(paste0(prepped_data_dir, "07_all_merged_county_vaccination_demographic_data.RDS")) %>%
@@ -134,4 +165,4 @@ full_data <- full_data %>% mutate(variable= case_when(
 full_data <- full_data %>% select(state, county, fips, variable, value)
 
 # save file
-saveRDS(full_data, paste0(prepped_data_dir, "11_merged_data_for_profile_docs.RDS"))
+saveRDS(full_data, paste0(prepped_data_dir, "12_merged_data_for_county_profile_docs.RDS"))
