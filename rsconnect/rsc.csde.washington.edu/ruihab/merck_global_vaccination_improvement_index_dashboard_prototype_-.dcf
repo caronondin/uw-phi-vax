@@ -5,9 +5,9 @@ account: ruihab
 server: rsc.csde.washington.edu
 hostUrl: https://rsc.csde.washington.edu/__api__
 appId: 16
-bundleId: 241
+bundleId: 254
 url: https://rsc.csde.washington.edu/content/24460f21-2f69-4aff-a6c0-d3d1b10d3805/
-when: 1647912970.68246
-lastSyncTime: 1647912970.68252
+when: 1649138807.75923
+lastSyncTime: 1649138807.75933
 asMultiple: FALSE
 asStatic: FALSE

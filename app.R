@@ -50,7 +50,7 @@ colnames(sdi_dup)[2] <- "location"
 colnames(sdi_dup)[4] <- "year"
 merged_data_for_vacii_sdi <- dplyr::left_join(index_results,sdi_dup[,-c("sdi")], by=c("location","year"))
 
-
+update = Sys.Date()
 ############################################### ui.R ##################################################
 body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                   introjsUI(),
@@ -73,20 +73,20 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                       tabsetPanel(id = "t1",
                                   tabPanel("Vaccination Improvement",value="t_sdi",
                                            fluidRow(column(6, " ", style='padding:10px;')),
-                                           fluidRow(column(width = 11, h4(strong(textOutput("yeartitle")),style='text-align:left')),
-                                               column(width = 1,div(switchInput(
+                                           fluidRow(column(width = 9, h4(strong(textOutput("yeartitle")),style='text-align:left')),
+                                               column(width = 3,div(switchInput(
                                                  inputId = "view",
                                                  onLabel = "Table",
                                                  offLabel = "Map",
                                                  value = FALSE,
-                                                 labelWidth = "50px"),style = "display:inline-block; float:right")),),
+                                                 labelWidth = "50px")))),
                                            conditionalPanel("!input.view",
-                                                            fluidRow(column(12, " ", style='padding:5px;')),
-                                                            fluidRow(column(9, radioButtons(inputId = "show",label = NULL,
+                                                            fluidRow(column(12, " ", style='padding:3px;')),
+                                                            fluidRow(column(10, radioButtons(inputId = "show",label = NULL,
                                                                                              choices = c("Improvement Index Mapper","Improvement Indicator Mapper"),
                                                                                              selected = "Improvement Index Mapper",
                                                                                              inline = TRUE)), 
-                                                                            column(3,
+                                                                            column(2,
                                                                                    dropMenu(
                                                                                      circleButton(label = "", inputId='info',icon = icon('info')),
                                                                                      h4(strong('Index Mapper')),
@@ -98,15 +98,15 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                                fluidRow(column(width = 12, "Select location in left Improvement Index Ranking table.",
                                                                                style='font-family:Avenir, Helvetica;font-size:30;text-align:center')),
                                                                fluidRow(column(12, " ", style='padding:3px;')),
-                                                               fluidRow(column(11,plotlyOutput("index_map",height = "45vh")),column(1,"")),
-                                                               fluidRow(column(9,''),column(3,
+                                                               fluidRow(column(12,plotlyOutput("index_map",height = "40vh")),column(1,"")),
+                                                               fluidRow(column(10,''),column(2,
                                                                        dropMenu(
                                                                          circleButton(label = "", inputId='info2',icon = icon('info')),
                                                                          h4(strong('Time series of vaccine index')),
                                                                          h5('The Index value is estimated yearly between 1990 and 2019, in order to track improvement or change over time. '),
                                                                          placement = "bottom",
                                                                          arrow = TRUE))),
-                                                               fluidRow(column(11, plotlyOutput("index_trend_plot",height = "30vh"))),column(1,"")),
+                                                               fluidRow(column(12, plotlyOutput("index_trend_plot",height = "30vh"))),column(1,"")),
                                                fluidRow(column(12, " ", style='padding:2px;')),
                                               conditionalPanel("input.show == 'Improvement Indicator Mapper'",
                                                                #fluidRow(column(4,selectInput("indicators", "Indicator:",choices=c("SDI","Development Assistance Per Total Health Spending Categorical","Total Health Spending per Person","Government Health Spending per Total Health Spending",
@@ -123,9 +123,9 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                            fluidRow(column(11, DT::dataTableOutput("indextable")),column(1,"")))),
                                   tabPanel("Vaccination Trends", value = "t_vac",
                                            fluidRow(column(width = 11,h4(strong(htmlOutput("content_vac"))))),
-                                           fluidRow(column(width = 9, "Select location in left Improvement Index Ranking table",
+                                           fluidRow(column(width = 10, "Select location in left Improvement Index Ranking table",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left'),
-                                                    column(3,
+                                                    column(2,
                                                            dropMenu(
                                                              circleButton(label = "", inputId='info3',icon = icon('info')),
                                                              h4(strong('Vaccination Trends')),
@@ -137,9 +137,9 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                            fluidRow(column(11,plotlyOutput("all_vaccine_plot",height = "50vh")),column(1,""))),
                                   tabPanel("Mortality & Disability Trends",value = "d_vac",
                                            fluidRow(column(width = 11,h4(strong(htmlOutput("content_dis"))))),
-                                           fluidRow(column(width = 9, "Select location in left Improvement Index Ranking table",
+                                           fluidRow(column(width = 10, "Select location in left Improvement Index Ranking table",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left'),
-                                                    column(3,
+                                                    column(2,
                                                            dropMenu(
                                                              circleButton(label = "", inputId='info4',icon = icon('info')),
                                                              h4(strong('Mortality and Disability Trends')),
@@ -148,8 +148,8 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                              arrow = TRUE))),
                                            radioButtons("disease_estimate","Choose y-axis:", choices = c("Number Value"="number_val","Percent Value" ="percent_val","Rate Value" = "rate_val"),inline = TRUE),
                                            fluidRow(column(12,plotlyOutput("all_disease_plot", height = "35vh"))),
-                                           fluidRow(column(9, " ", style='padding:30px;'),
-                                                    column(3,
+                                           fluidRow(column(10, " ", style='padding:30px;'),
+                                                    column(2,
                                                            dropMenu(
                                                              circleButton(label = "", inputId='info5',icon = icon('info')),
                                                              h4(strong('Time series of years lived in less than ideal health')),
@@ -157,10 +157,10 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                              placement = "bottom",
                                                              arrow = TRUE))),
                                            fluidRow(column(12,plotlyOutput("all_disability_plot", height = "35vh")))),
-                                  tabPanel(paste0("Vaccination & Disease Trends"),value="vac_dis_tab",
+                                  tabPanel(paste0("Vaccination & Corresponding Disease Trends"),value="vac_dis_tab",
                                            fluidRow(column(12,h4(strong(htmlOutput("content_vac_dis"))))),
-                                           fluidRow(column(9,selectInput("vaccinations", "Vaccination:",choices=NULL)),
-                                                    column(3,
+                                           fluidRow(column(10,selectInput("vaccinations", "Vaccination:",choices=NULL)),
+                                                    column(2,
                                                            dropMenu(
                                                              circleButton(label = "", inputId='info6',icon = icon('info')),
                                                              h4(strong('Vaccination and Disease Trends')),
@@ -193,10 +193,10 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                   tabPanel("Data Explorer",
                                            fluidRow(column(5, " ", style='padding:5px;')),
                                            fluidRow(column(7, radioButtons("dataset","Choose Dataset", choices = c("Improvement Index"= "improvement index","Vaccine Trends" = "vaccine trends","Disease Trends" = "disease trends"),inline = TRUE)),
-                                                    column(4, style = "margin-top: 10px;",div(downloadButton("download","Download Raw Data"),style='float:right'))),
+                                                    column(5, style = "margin-top: 10px;",div(downloadButton("download","Download Raw Data"),style='float:right'))),
                                            fluidRow(column(width = 9, "Download custom datasets from the variables that were used to create visuals on the previous tabs. ",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
-                                           fluidRow(column(11,DT::dataTableOutput("alldatatable") %>% withSpinner(color="#4b2e83"))))
+                                           fluidRow(column(12,DT::dataTableOutput("alldatatable") %>% withSpinner(color="#4b2e83"))))
                       ),
                     tags$head(
                         tags$style(
@@ -209,14 +209,18 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                   )))),
                   tabPanel("Sample Report",
                            sidebarPanel(
-                             h3(strong("Sample Report: for Nigeria")),
-                             fluidRow(column(6, " ", style='padding:30px;')),
+                             h4(strong("Sample Report: for Nigeria")),
+                             fluidRow(column(6, " ", style='padding:15px;')),
+                             h5(strong("Comparison with other locations of similar geography or SDI")),
                              c("The construction of the Vaccine Improvement Index is based, in-part, on research on individual and socioeconomic factors associated with vaccine coverage in Nigeria. Prior research has found that mother’s age, education, and wealth as significantly related to immunization coverage after adjusting for other factors. In addition, the child’s birth order, family size, and place of delivery (home, public, or private facility) were related to vaccination coverage as well (1). "),
-                             fluidRow(column(6, " ", style='padding:20px;')),
+                             fluidRow(column(6, " ", style='padding:15px;')),
+                             h5(strong("Vaccination Trends")),
                              c("Between 2014 and 2019, Nigeria saw greater-than average improvements in seven routine vaccinations (out of 11 measured) (2). The progress demonstrated in this period contrasts to many years of stalled and even worsening vaccine coverage previously. Between 2005 and 2009, barriers to vaccination included structural issues including lack of security and armed conflict (3), supply chain and service delivery issues (4), and cultural and religious beliefs affecting vaccine hesitancy (5)."),
-                             fluidRow(column(6, " ", style='padding:20px;')),
+                             fluidRow(column(6, " ", style='padding:15px;')),
+                             h5(strong("Mortality and Disability Trends")),
                              c("Several vaccine-preventable diseases present a large burden on the population in Nigeria. For instance, by 2013 Nigeria was one of three countries in the world with endemic polio; yet, Nigeria also struggled with declining polio vaccine coverage (6). "),
-                             fluidRow(column(6, " ", style='padding:20px;')),
+                             fluidRow(column(6, " ", style='padding:15px;')),
+                             h5(strong("Relationship between Vaccines and Corresponding Diseases")),
                              c("Greater attention to polio and other vaccine-preventable diseases led to both improved vaccination coverage and decreases in the number of deaths from diseases like measles. Revised national strategic plans for polio and routine immunizations (2013-2015) have also allowed the country to implement additional evidence-based interventions and plans for routine immunization (3–5,7)."),
                              tags$head(tags$style("{color: #0060bf;
                                  font-size: 20px;
@@ -224,10 +228,54 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                              )
                              )),
                            mainPanel(
-                           tabsetPanel(tabPanel("Comparison with other locations of similar geography or SDI"),
-                                       tabPanel("Vaccination Trends"),
-                                       tabPanel("Mortality and Disability Trends"),
-                                       tabPanel("Relationship between Vaccines and Corresponding Diseases"))))
+                           tabsetPanel(tabPanel("Comparison",
+                                                fluidRow(column(8, " ", style='padding:100px;')),
+                                                fluidRow(column(width = 12, "Comparison Visuals will be updated later......",
+                                                                style='font-family:Avenir, Helvetica;font-size:20px;text-align:center'))),
+                                       tabPanel("Vaccination Trends",
+                                                fluidRow(column(width = 11,h4(strong("Nigeria")))),
+                                                fluidRow(column(8, " ", style='padding:10px;')),
+                                                fluidRow(column(11,plotlyOutput("nigeria_vaccine_plot",height = "50vh")),column(1,""))),
+                                       tabPanel("Mortality and Disability Trends",
+                                                fluidRow(column(width = 11,h4(strong("Nigeria")))),
+                                                fluidRow(column(8, " ", style='padding:10px;')),
+                                                fluidRow(column(12,plotlyOutput("nigeria_disability_plot", height = "50vh")))),
+                                       tabPanel("Vaccination and Corresponding Diseases Trends",
+                                                fluidRow(column(width = 11,h4(strong("Nigeria")))),
+                                                fluidRow(column(width = 11,h5(strong("Selected Vaccination: MCV1")))),
+                                                fluidRow(column(8, " ", style='padding:10px;')),
+                                                fluidRow(column(12,plotlyOutput("selected_nigeria_vac_dis_plot", height = "50vh")))
+                            )))
+                           ),
+                  tabPanel("About this site",
+                           tags$div(
+                             tags$h4(strong("Last update")), 
+                             h6(paste0(update)),
+                             tags$h4(strong("Background")),
+                             "Improving routine vaccination coverage is an important global health goal. Reaching and maintaining high vaccination coverage helps avoid death and illness from many preventable diseases, especially in children.",
+                             tags$br(),tags$br(),"The factors that drive vaccination coverage are many and can differ between countries. The Global Vaccine Index Project is an attempt to organize data on several of these factors into a single index that allows a quick comparison between locations and across time. This project builds on prior research that identified factors that contribute to higher vaccination rates in multiple low and middle income countries.",
+                             tags$br(),tags$br(),"As part of the Global Vaccine Index Project, this website offers data and resources to people interested in learning more about vaccination trends, vaccine-preventable diseases, and information on the importance of vaccines to promote health and well-being in communities around the world. ",
+                             tags$br(),tags$br(),tags$h4(strong("Sources")),
+                             "1. Global Burden of Disease Collaborative Network.",
+                             tags$a("Global Burden of Disease Study 2020, Release 1 (GBD 2020 R1) Routine Childhood Vaccination Coverage 1980-2019 [Internet]",href="https://ghdx.healthdata.org/record/ihme-data/gbd-2020-routine-childhood-vaccination-coverage-1980-2019"),
+                                    "Institute for Health Metrics and Evaluation (IHME); 2021 [cited 2021 Jul 21].",
+                                    tags$br(),
+                             "2. Barau I, Zubairu M, Mwanza MN, Seaman VY. Improving polio vaccination coverage in Nigeria through the use of geographic information system technology. J Infect Dis. 2014 Nov 1;210 Suppl 1:S102-110.",
+                             tags$br(),
+                             "3. National Primary Health Care Development Agency.",
+                             tags$a("Nigeria: National Routine Immunization Strategic Plan 2013-2015 | NITAG RESOURCE CENTER [Internet].",href="https://www.jhsph.edu/research/centers-and-institutes/ivac/resources/Nigeria-NRISP-Technical-Policy.pdf"),
+                                    "2013 [cited 2021 Sep 22]",
+                             tags$br(),
+                             "4. Oku A, Oyo-Ita A, Glenton C, Fretheim A, Ames H, Muloliwa A, et al. Communication strategies to promote the uptake of childhood vaccination in Nigeria: a systematic map. Glob Health Action. 2016 Feb 12;9(1).",
+                             tags$br(),
+                             "5. Ado JM, Etsano A, Shuaib F, Damisa E, Mkanda P, Gasasira A, et al. Progress toward poliomyelitis eradication in Nigeria. J Infect Dis. 2014 Nov 1;210 Suppl 1:S40-49.",
+                             tags$br(),
+                             "6. Gunnala R, Ogbuanu IU, Adegoke OJ, Scobie HM, Uba BV, Wannemuehler KA, et al. Routine Vaccination Coverage in Northern Nigeria: Results from 40 District-Level Cluster Surveys, 2014-2015. Borrow R, editor. PLOS ONE. 2016 Dec 9;11(12):e0167835.",
+                             tags$br(),
+                             "7. Oleribe O, Kumar V, Awosika-Olumo A, Taylor SD.",
+                             tags$a("Individual and socioeconomic factors associated with childhood immunization coverage in Nigeria. Pan Afr Med J [Internet].",href="https://panafrican-med-journal.com/content/article/26/220/full/"),
+                             "2017 [cited 2021 Sep 27];26.")
+                  )
 )
 
 server <- function(input, output,session) {
@@ -938,6 +986,39 @@ server <- function(input, output,session) {
       }
   })
   
+  output$nigeria_vaccine_plot <- renderPlotly({
+    vac_plotdata <- filter(vaccine_trends,gsub(" ", "", location_name) == gsub(" ", "", "Nigeria"))
+    if (input$vaccine_plot == "line_trend"){
+      fig_a <- plot_ly(vac_plotdata, x = ~year_id,y=~prop_val, color = ~vaccine_name)%>%
+        add_lines()
+      
+      fig_a <- fig_a %>% 
+        layout(autosize = T,
+               title ="Time Series of Vaccination Coverage",  showlegend = T,
+               xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
+               yaxis = list(title = "Vaccination coverage (%)",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
+      fig_a
+      
+    }
+    else{
+      single_year_vac_plotdata <- filter(vac_plotdata,year_id == input$year)
+      fig1 <- plot_ly(x = ~single_year_vac_plotdata$prop_val, y = ~reorder(single_year_vac_plotdata$vaccine_name, single_year_vac_plotdata$prop_val), name = single_year_vac_plotdata$vaccine_name,
+                      type = 'bar', orientation = 'h',
+                      color = single_year_vac_plotdata$vaccine_name)
+      #marker = list(color = 'rgba(50, 171, 96, 0.6)',
+      #line = list(color = 'rgba(50, 171, 96, 1.0)', width = 1))) 
+      fig1 <- fig1 %>% layout( autosize = T,
+                               title = paste0("Vaccination Coverage in ", input$year),
+                               yaxis = list(title = "Vaccine",showgrid = FALSE, showline = FALSE, showticklabels = TRUE, domain= c(0, 0.85)),
+                               xaxis = list(title = "Vaccination coverage (%)", zeroline = FALSE, showline = FALSE, showticklabels = TRUE, showgrid = TRUE)) 
+      fig1 <- fig1 %>% add_annotations(xref = 'x1', yref = 'y',
+                                       x = single_year_vac_plotdata$prop_val * 1 + 0.05,  y = single_year_vac_plotdata$vaccine_name,
+                                       text = paste(round(single_year_vac_plotdata$prop_val*100, 2), '%'),
+                                       font = list(family = 'Arial', size = 12, color = 'rgba(0, 0, 0, 1)'),
+                                       showarrow = FALSE)
+    }
+  })
+  
   output$all_disease_plot <- renderPlotly({
       print("input")
       print(input$disease_estimate)
@@ -990,21 +1071,31 @@ server <- function(input, output,session) {
           title = "Time Series of Years Lived in Less Than Ideal health per 100,000 population"
           y_title="YLDs per 100,000 population"
       }
-      fig_disa <- plot_ly(disability_plotdata, x = ~year_id,y=~ylds_number_val, color = ~cause_name)%>%
-          add_lines()
-      fig_disa <- fig_disa %>% 
+      fig_dis <- fig_dis %>% 
           layout( autosize = T,
                   title =title,  showlegend = T,
                  xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
                  yaxis = list(title = y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE,type= "log"))
-      fig_disa
+      fig_dis
   })
   
+  output$nigeria_disability_plot <- renderPlotly({
+    disability_plotdata <- filter(disease_trends,location_name == "Nigeria")
+    fig_dis <- plot_ly(disability_plotdata, x = ~year_id,y= ~ylds_number_val, color = ~cause_name)%>%
+        add_lines()
+      title = "Time Series of Number of Years Lived in Less Than Ideal health in Population"
+      y_title = "Years lived with disability in population"
+    fig_dis <- fig_dis %>% 
+      layout( autosize = T,
+              title =title,  showlegend = T,
+              xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
+              yaxis = list(title =y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE,type= "log"))
+    fig_dis
+  })
   
   observeEvent(selected_dis_vac_data(),{
     output$selected_vac_dis_plot <- renderPlotly({
       selected_vac_plotdata <- filter(selected_dis_vac_data()$selected_vac_data,gsub(" ", "", location_name) == gsub(" ", "", "United States of America"))
-      print(selected_vac_plotdata)
       selected_dis_plotdata <- filter(selected_dis_vac_data()$dis_data_for_selected_vac,gsub(" ", "", location_name) == gsub(" ", "", "United States of America"))
       print(selected_dis_plotdata)
       merged_selected_plotdata <- dplyr::left_join(selected_vac_plotdata,selected_dis_plotdata, "year_id", "year_id")
@@ -1041,7 +1132,51 @@ server <- function(input, output,session) {
       
       fig
     })
+    
+    
+    output$selected_nigeria_vac_dis_plot <- renderPlotly({
+      print("preventable_vac_trend")
+      selected_vac_data = filter(preventable_vac_trend, vaccine_trends$vaccine_name=="MCV1")
+      selected_vac_plotdata <- filter(selected_vac_data,location_name == "Nigeria")
+      dis_data_for_selected_vac = filter(merged_data_for_vac_dis, merged_data_for_vac_dis$vaccine_name=="MCV1")
+      selected_dis_plotdata <- filter(dis_data_for_selected_vac,location_name == "Nigeria")
+      merged_selected_plotdata <- dplyr::left_join(selected_vac_plotdata,selected_dis_plotdata, "year_id", "year_id")
+      fig <- plot_ly()
+      # Add traces
+      fig <- plot_ly(merged_selected_plotdata)
+      fig <- fig %>% add_trace(x= ~year_id, y = ~round(deaths_rate_val,8), type = 'scatter', mode = 'lines+makers', color = ~cause_name) 
+      ay <- list(
+        overlaying = "y",
+        side = "right",
+        title = "<b> Vaccine</b> coverage (%)")
+      
+      fig <- fig %>% add_trace(x =  ~year_id, y = ~prop_val, type = 'scatter',name = ~vaccine_name.x,yaxis = "y2", mode = 'lines',line = list(color = 'rgba(49,130,189, 1)', width = 4)) 
+      # Set figure title, x and y-axes titles
+      fig <- fig %>% layout(
+        autosize = T,
+        title = list(text="Vaccine & Corresponding Disease Trend", x=0.25),
+        xaxis = list(title="Year"),
+        yaxis = list(title= "<b> Deaths</b> per 100,000 population"),
+        yaxis2 = ay,
+        legend = list(x = 3000, y = 1.2)
+      )%>%
+        layout(xaxis = list(
+          zerolinecolor = '#ffff',
+          zerolinewidth = 2,
+          gridcolor = 'ffff'),
+          yaxis = list(
+            zerolinecolor = '#ffff',
+            zerolinewidth = 2,
+            gridcolor = 'ffff')
+        )
+      
+      fig
+    })
   })
+  
+  
+  
+  
   
   observeEvent(input$table_cell_clicked,{
       info = input$table_cell_clicked
@@ -1116,13 +1251,13 @@ server <- function(input, output,session) {
         indicator_trend_data <- filter(index_results,gsub(" ", "",location) == gsub(" ", "", info$value))
         fig_a <- plot_ly(indicator_trend_data, x = ~year)
         
-        if (input$indicators == "SDI"){
+        if (input$indicators == "Socio-demographic Index"){
           left_text = round(indicator_trend_data$sdi[1],3)
           right_text =round(indicator_trend_data$sdi[30],3)
           left_y = indicator_trend_data$sdi[1]+0.01
           right_y = indicator_trend_data$sdi[30]+0.02
-          titles = paste0("Time Series of SDI")
-          ytitles = "SDI"
+          titles = paste0("Time Series of SDI in United States of America")
+          ytitles = "Socio-demographic Index"
           fig_a <- fig_a  %>% add_trace(y=~sdi,type='scatter', name = "SDI", mode = 'lines', line = list(color = 'rgb(106, 90, 205)',width=2))
           fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[30]), y = ~c(sdi[1], sdi[30]), type = 'scatter', mode = 'markers', marker = list(color = 'rgb(106, 90, 205)', size = 10))
           
@@ -1358,7 +1493,7 @@ server <- function(input, output,session) {
               fig_dis <- plot_ly(disability_plotdata, x = ~year_id,y= ~ylds_number_val, color = ~cause_name)%>%
                   add_lines()
               title = "Time Series of Years Lived in Less Than Ideal health in Population"
-              y_title = "Years lived with disability in population(Log scale)"
+              y_title = "Years lived with disability in population"
           }
           else if (input$disease_estimate == "percent_val"){
               fig_dis <- plot_ly(disability_plotdata, x = ~year_id,y= ~ylds_percent_val, color = ~cause_name)%>%
@@ -1370,7 +1505,7 @@ server <- function(input, output,session) {
               fig_dis <- plot_ly(disability_plotdata, x = ~year_id,y= ~ylds_rate_val, color = ~cause_name)%>%
                   add_lines()
               title = "Time Series of Years Lived in Less Than Ideal health per 100,000 population"
-              y_title="YLDs per 100,000 population(Log scale)"
+              y_title="YLDs per 100,000 population"
           }
           fig_disa <- plot_ly(disability_plotdata, x = ~year_id,y=~ylds_number_val, color = ~cause_name)%>%
               add_lines()

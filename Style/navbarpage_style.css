@@ -259,3 +259,8 @@ background: #4b2e83;
   background-color: #e8e3d3;
   border-color: #e8e3d3;
 }
+a:focus, a:hover {
+  color: #ffffff;
+  background-color: #b7a57a;
+  text-decoration: underline;
+}
