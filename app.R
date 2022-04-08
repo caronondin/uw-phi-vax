@@ -50,6 +50,7 @@ colnames(sdi_dup)[2] <- "location"
 colnames(sdi_dup)[4] <- "year"
 merged_data_for_vacii_sdi <- dplyr::left_join(index_results,sdi_dup[,-c("sdi")], by=c("location","year"))
 
+
 update = Sys.Date()
 ############################################### ui.R ##################################################
 body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
@@ -229,9 +230,16 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                              )),
                            mainPanel(
                            tabsetPanel(tabPanel("Comparison",
-                                                fluidRow(column(8, " ", style='padding:100px;')),
-                                                fluidRow(column(width = 12, "Comparison Visuals will be updated later......",
-                                                                style='font-family:Avenir, Helvetica;font-size:20px;text-align:center'))),
+                                                fluidRow(column(8, " ", style='padding:20px;')),
+                                                radioButtons("sdi_group_present_comp","SDI Group Present", choices = c("All"="all","Low" ="low","Medium" = "medium","High" = "high"),selected="low",inline = TRUE),
+                                                selectInput(
+                                                  inputId = "my_multi",
+                                                  label = "Search Country :",
+                                                  choices = unique(merged_data_for_vacii_sdi$location),
+                                                  selected = "Nigeria",
+                                                  selectize = TRUE,
+                                                  multiple=TRUE),
+                                                fluidRow(column(12, plotlyOutput("index_trend_plot_com",height = "50vh"))),column(1,"")),
                                        tabPanel("Vaccination Trends",
                                                 fluidRow(column(width = 11,h4(strong("Nigeria")))),
                                                 fluidRow(column(8, " ", style='padding:10px;')),
@@ -328,6 +336,20 @@ server <- function(input, output,session) {
       else{
           filter(year(), sdi_group_present == input$sdi_group_present)
       }
+  })
+  
+  sdi_group_present_comp <- reactive({
+    req(input$sdi_group_present_comp)
+    if (input$sdi_group_present_comp == "all"){
+      all_sdi_group <- merged_data_for_vacii_sdi
+    }
+    else{
+      filter(merged_data_for_vacii_sdi, sdi_group_present== input$sdi_group_present_comp)
+    }
+  })
+  
+  observeEvent(sdi_group_present_comp(),{
+    updateSelectInput(session,"my_multi",selected="Nigeria",choices = unique(sdi_group_present_comp()$location))
   })
     
   output$table = DT::renderDataTable({
@@ -612,6 +634,22 @@ server <- function(input, output,session) {
       fig_a <- fig_a %>% layout(annotations = vii_right) 
       fig_a
     })
+    
+    output$index_trend_plot_com <- renderPlotly({
+        print("here5555")
+        index_trend_data <- index_results %>% 
+          filter(location %in% input$my_multi)
+        
+        fig_a <- plot_ly(index_trend_data, x = ~year)
+        fig_a <- fig_a  %>% add_trace(y=~result,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
+        fig_a <- fig_a %>% 
+          layout( autosize = T,
+                  title = paste0("Time Series of Vaccine Improvement Index"), 
+                  showlegend = TRUE,
+                  xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
+                  yaxis = list(title = "Vaccine Improvement Index",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
+        fig_a
+      })
     
     output$indicator_trend_plot <- renderPlotly({
       indicator_trend_data <- filter(index_results,location == "United States of America")
