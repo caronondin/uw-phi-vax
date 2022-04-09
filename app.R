@@ -211,25 +211,20 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                   tabPanel("Sample Report",
                            sidebarPanel(
                              h4(strong("Sample Report: for Nigeria")),
-                             fluidRow(column(6, " ", style='padding:15px;')),
-                             h5(strong("Comparison with other locations of similar geography or SDI")),
-                             c("The construction of the Vaccine Improvement Index is based, in-part, on research on individual and socioeconomic factors associated with vaccine coverage in Nigeria. Prior research has found that mother’s age, education, and wealth as significantly related to immunization coverage after adjusting for other factors. In addition, the child’s birth order, family size, and place of delivery (home, public, or private facility) were related to vaccination coverage as well (1). "),
-                             fluidRow(column(6, " ", style='padding:15px;')),
-                             h5(strong("Vaccination Trends")),
-                             c("Between 2014 and 2019, Nigeria saw greater-than average improvements in seven routine vaccinations (out of 11 measured) (2). The progress demonstrated in this period contrasts to many years of stalled and even worsening vaccine coverage previously. Between 2005 and 2009, barriers to vaccination included structural issues including lack of security and armed conflict (3), supply chain and service delivery issues (4), and cultural and religious beliefs affecting vaccine hesitancy (5)."),
-                             fluidRow(column(6, " ", style='padding:15px;')),
-                             h5(strong("Mortality and Disability Trends")),
-                             c("Several vaccine-preventable diseases present a large burden on the population in Nigeria. For instance, by 2013 Nigeria was one of three countries in the world with endemic polio; yet, Nigeria also struggled with declining polio vaccine coverage (6). "),
-                             fluidRow(column(6, " ", style='padding:15px;')),
-                             h5(strong("Relationship between Vaccines and Corresponding Diseases")),
-                             c("Greater attention to polio and other vaccine-preventable diseases led to both improved vaccination coverage and decreases in the number of deaths from diseases like measles. Revised national strategic plans for polio and routine immunizations (2013-2015) have also allowed the country to implement additional evidence-based interventions and plans for routine immunization (3–5,7)."),
+                             fluidRow(column(6, " ", style='padding:70px;')),
+                             fluidRow(column(12,h5(strong(textOutput("report_nig_title"))))),
+                             fluidRow(column(6, " ", style='padding:10px;')),
+                             fluidRow(column(12,textOutput("report_nig_body"))),
+                             fluidRow(column(6, " ", style='padding:90px;')),
                              tags$head(tags$style("{color: #0060bf;
                                  font-size: 20px;
                                  }"
                              )
-                             )),
+                             ),
+                             width = 4),
                            mainPanel(
-                           tabsetPanel(tabPanel("Comparison",
+                           tabsetPanel(id="t2",
+                                       tabPanel("Comparison",value = "comp_index",
                                                 fluidRow(column(8, " ", style='padding:20px;')),
                                                 radioButtons("sdi_group_present_comp","SDI Group Present", choices = c("All"="all","Low" ="low","Medium" = "medium","High" = "high"),selected="low",inline = TRUE),
                                                 selectInput(
@@ -239,16 +234,16 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                   selected = "Nigeria",
                                                   selectize = TRUE,
                                                   multiple=TRUE),
-                                                fluidRow(column(12, plotlyOutput("index_trend_plot_com",height = "50vh"))),column(1,"")),
-                                       tabPanel("Vaccination Trends",
+                                                fluidRow(column(12, plotlyOutput("index_trend_plot_com",height = "40vh"))),column(1,"")),
+                                       tabPanel("Vaccination Trends",value = "report_vt",
                                                 fluidRow(column(width = 11,h4(strong("Nigeria")))),
                                                 fluidRow(column(8, " ", style='padding:10px;')),
-                                                fluidRow(column(11,plotlyOutput("nigeria_vaccine_plot",height = "50vh")),column(1,""))),
-                                       tabPanel("Mortality and Disability Trends",
+                                                fluidRow(column(11,plotlyOutput("nigeria_vaccine_plot",height = "55vh")),column(1,""))),
+                                       tabPanel("Mortality and Disability Trends",value = "report_md",
                                                 fluidRow(column(width = 11,h4(strong("Nigeria")))),
                                                 fluidRow(column(8, " ", style='padding:10px;')),
-                                                fluidRow(column(12,plotlyOutput("nigeria_disability_plot", height = "50vh")))),
-                                       tabPanel("Vaccination and Corresponding Diseases Trends",
+                                                fluidRow(column(12,plotlyOutput("nigeria_disability_plot", height = "45vh")))),
+                                       tabPanel("Vaccination and Corresponding Diseases Trends",value = "report_vcdt",
                                                 fluidRow(column(width = 11,h4(strong("Nigeria")))),
                                                 fluidRow(column(width = 11,h5(strong("Selected Vaccination: MCV1")))),
                                                 fluidRow(column(8, " ", style='padding:10px;')),
@@ -1212,7 +1207,24 @@ server <- function(input, output,session) {
     })
   })
   
-  
+  observe({
+    if (input$t2 == "comp_index"){
+      output$report_nig_title<- renderText("Comparison with other locations of similar geography or SDI")
+      output$report_nig_body<- renderText("The construction of the Vaccine Improvement Index is based, in-part, on research on individual and socioeconomic factors associated with vaccine coverage in Nigeria. Prior research has found that mother’s age, education, and wealth as significantly related to immunization coverage after adjusting for other factors. In addition, the child’s birth order, family size, and place of delivery (home, public, or private facility) were related to vaccination coverage as well (1).")
+    }
+    else if(input$t2 == "report_vt"){
+      output$report_nig_title<- renderText("Vaccination Trends")
+      output$report_nig_body<- renderText("Between 2014 and 2019, Nigeria saw greater-than average improvements in seven routine vaccinations (out of 11 measured) (2). The progress demonstrated in this period contrasts to many years of stalled and even worsening vaccine coverage previously. Between 2005 and 2009, barriers to vaccination included structural issues including lack of security and armed conflict (3), supply chain and service delivery issues (4), and cultural and religious beliefs affecting vaccine hesitancy (5).")
+    }
+    else if(input$t2 == "report_md"){
+      output$report_nig_title<- renderText("Mortality and Disability Trends")
+      output$report_nig_body<- renderText("Several vaccine-preventable diseases present a large burden on the population in Nigeria. For instance, by 2013 Nigeria was one of three countries in the world with endemic polio; yet, Nigeria also struggled with declining polio vaccine coverage (6).")
+    }
+    else{
+      output$report_nig_title<- renderText("Relationship between Vaccines and Corresponding Diseases")
+      output$report_nig_body<- renderText("Greater attention to polio and other vaccine-preventable diseases led to both improved vaccination coverage and decreases in the number of deaths from diseases like measles. Revised national strategic plans for polio and routine immunizations (2013-2015) have also allowed the country to implement additional evidence-based interventions and plans for routine immunization (3–5,7).")
+    }
+  })
   
   
   
