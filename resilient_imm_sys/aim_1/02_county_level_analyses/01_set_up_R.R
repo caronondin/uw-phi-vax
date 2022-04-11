@@ -38,8 +38,8 @@ resDir <- paste0(team_drive, "Results/") # location of  any result outputs
 visDir <- paste0(resDir, "graphics/") # location where visualizations are saved
 
 # Source shared functions to prep county-level data for each state-----
-source(paste0(code_dir, "aim_1/county_level_analyses/state_prep_functions/prep_massachusetts.R"))
-source(paste0(code_dir, "aim_1/county_level_analyses/state_prep_functions/prep_arizona.R"))
-source(paste0(code_dir, "aim_1/county_level_analyses/state_prep_functions/prep_washington.R"))
-source(paste0(code_dir, "aim_1/county_level_analyses/state_prep_functions/prep_north_carolina.R"))
-source(paste0(code_dir, "aim_1/county_level_analyses/state_prep_functions/prep_virginia.R"))
+source(paste0(code_dir, "aim_1/02_county_level_analyses/state_prep_functions/prep_massachusetts.R"))
+source(paste0(code_dir, "aim_1/02_county_level_analyses/state_prep_functions/prep_arizona.R"))
+source(paste0(code_dir, "aim_1/02_county_level_analyses/state_prep_functions/prep_washington.R"))
+source(paste0(code_dir, "aim_1/02_county_level_analyses/state_prep_functions/prep_north_carolina.R"))
+source(paste0(code_dir, "aim_1/02_county_level_analyses/state_prep_functions/prep_virginia.R"))

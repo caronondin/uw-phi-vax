@@ -1,0 +1,274 @@
+---
+title: "North Carolina Data Profile"
+author: "UW PHI"
+date: "3/30/2022"
+output:
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# source set-up file
+source("C:/Users/frc2/Documents/uw-phi-vax/resilient_imm_sys/aim_1/03_data_profiles/01_set_up_R.r")
+
+s <- "North Carolina" # state
+c <- c("Lenoir County", "Edgecombe County", "Hertford County") # counties
+r <- "north carolina" # region
+sr <- c("lenoir", "edgecombe", "hertford") # subregion
+```
+
+# 1. State-level trends
+
+```{r}
+# load state level data
+state_data <- readRDS(paste0(prepped_data_dir, "11_merged_data_for_state_profile_docs.RDS")) %>%
+  # filter state
+  filter(state==s)
+
+# reshape data for plotting trends in vaccination gaps
+state_data_gaps <- state_data %>% 
+  select(state, YEAR, income, VACCINE, hispa_diff, black_diff, other_diff) %>%
+  pivot_longer(cols = c(hispa_diff, black_diff, other_diff),
+               names_to = "variable",
+               values_to = "value") %>%
+  mutate(variable_label = case_when(
+    variable=="hispa_diff" ~ "Hispanic",
+    variable=="black_diff" ~ "Black/African-American",
+    variable=="other_diff" ~ "Other or multi-racial"
+  )) %>% 
+  mutate(income_label = case_when(
+    income=="high" ~ 1,
+    income=="med" ~ 2,
+    income=="low" ~ 3 ,
+    income=="miss" ~ 4,
+  ))
+
+# factor income_label
+state_data_gaps$income_label <- factor(state_data_gaps$income_label,
+                                       labels = c("High income", 
+                                                  "Medium income", 
+                                                  "Low income", 
+                                                  "Missing income "))
+  
+
+# plot trends in vaccination coverage among different racial/ethnic groups
+ggplot(state_data_gaps, aes(YEAR, value, group=factor(VACCINE))) + 
+  geom_line(aes(color=VACCINE), show.legend = TRUE) +
+  facet_grid(vars(income_label), vars(variable_label), labeller = label_value) + 
+   labs(title=paste('Differences in percent of children fully vaccinated in each racial/ethnic group'), 
+       subtitle=paste0('compared to white children of same income background in', " ", s),
+       caption="Data Source: 2007 and 2019 National Immunization Survey (NIS)") +
+  ylab('Percentage points') + scale_x_continuous(breaks=c(2007, 2019)) +
+  xlab('Year') +
+  ylim(-.06, .06)
+  # theme_minimal()
+
+```
+
+We calculated percent coverage using data from the National Immunization Survey which provides information on how many children in the state received all recommended vaccines. For each year we compared the vaccination coverage among children who were Black, Hispanic, or Other/multiple-race background to White children of the same income level. A gap greater than 0 suggests that white children are being vaccinated at a higher rate than the group of non-white children they are compared with. In the graphs above, a positive slope indicates increasing differences (worse gap), and a negative slope indicates decreasing differences (an improvement in the gap). 
+
+*What this graphic shows is that children that were Black had the highest gap compared to White children, but that gap seemed to improve at least for the DTP vaccine between the two time periods. For the other racial/ethnic groups the gap was close to 0, meaning no disparity compared to White children. For the MMR vaccine however, the gap between Black and White children only seemed to worsen between the two time periods.* 
+
+# 2. State-level trends by race/ethnicity and income
+
+```{r}
+state_cov <- state_data %>% select(state, YEAR, income, VACCINE, white, hispa, black, other) %>% 
+  pivot_longer(cols = c(white, hispa, black, other),                                                                                          
+               names_to = "race",                                                                                           
+               values_to = "value") %>%
+    mutate(race_label = case_when(
+    race=="hispa" ~ "Hispanic",
+    race=="black" ~ "Black",
+    race=="other" ~ "Other/multiple",
+    race=="white" ~ "White"
+  ))
+
+state_cov$value <- as.numeric(state_cov$value)
+
+# factor the income level
+state_cov <- state_cov %>% 
+  mutate(income_label = case_when(
+    income=="high" ~ 1,
+    income=="med" ~ 2,
+    income=="low" ~ 3,
+    income=="miss" ~ 4
+  ))
+
+# factor income_label
+state_cov$income_label <- factor(state_cov$income_label,
+                                       labels = c("High", 
+                                                  "Medium", 
+                                                  "Low", 
+                                                  "Missing"))
+
+# create raster plot of locations
+ggplot(state_cov, aes(income_label, VACCINE)) +
+  geom_tile(aes(fill = value)) + 
+  geom_text(aes(label = round(value, 2))) +
+  scale_fill_gradient(low = "white", high = "steelblue") +
+  # geom_tile(data=median, size=1, fill=NA, colour="black") +
+  labs(title=paste('Percent of children fully vaccinated'), y = 'Vaccine', x = 'Income level', 
+       subtitle=paste0('in', " ", s),
+       caption="Data Source: 2007 and 2019 National Immunization Survey (NIS)", fill='Darker value indicates \n higher vaccination rate') +
+  facet_grid(vars(race_label), vars(YEAR)) +
+  theme_minimal()
+  
+```
+
+This graphic provides the actual immunization rates as estimated using the NIS Survey and used in calculating the gaps according to race and ethnicity from the first graphic. 
+
+*What this graphic shows is that North Carolina had relatively high vaccination coverage among all racial/ethnic groups for the HEP B and MMR vaccines in 2007. Several racial/ethnic groups saw lower vaccination coverage estimates in 2019. However, the reduction in the gap for the DTP vaccine among Black children is mostly due to the greater improvement among Black children than among White children.* 
+
+# 3. Map of county locations and populations
+
+```{r}
+# load data to be used
+data <- readRDS(paste0(prepped_data_dir, "12_merged_data_for_county_profile_docs.RDS"))
+
+# subset state and counties of interest
+data <- data %>% filter(state==s & county %in% c)
+
+# select columns of interest and variables to plot
+plot_data <- data %>% filter(variable=="total_population") %>%
+  select(county, fips, value)
+
+plot_data$value <- as.numeric(plot_data$value)
+
+# create dataframe of state level mapping shapefile data
+all_state_df <- map_data("state")
+state_df <- subset(all_state_df, region==r)
+
+# create dataframe of county level mapping shapefile data
+all_county_df <- map_data("county")
+subset_county <- subset(all_county_df, region=="north carolina")
+
+plot_data$subregion <- tolower(plot_data$county)
+subset_county$subregion <- paste0(subset_county$subregion, " county")
+
+plot_data <- left_join(plot_data, subset_county, by=c("subregion"))
+plot_data$subregion <- str_to_title(plot_data$subregion) 
+
+ggplot(data=state_df, mapping=aes(x=long, y=lat, group=group)) + 
+  coord_fixed(1.3) + 
+  geom_polygon(color="black", fill="gray") +
+  geom_polygon(data=subset_county, fill=NA, color="white") +
+  geom_polygon(data = plot_data, mapping = aes(x=long, y=lat, group=group, fill=value))+
+  scale_fill_continuous(name = "Population (2019)", label = scales::comma) +
+  geom_text(data= plot_data[c(1, 34, 65),], label=plot_data[c(1, 34, 65),]$subregion, color="black", size=4.5, fontface="bold") +
+  labs(title=paste0('Population of counties selected in ', s),
+       caption="Data Source: US Census Bureau \n 2021 County and Resident Population Estimates") +
+  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank())
+```
+
+*Counties we selected are all in the Northeastern part of the state.*
+
+# 4. Demographics of children under 4 in each county
+
+```{r}
+
+demo_data <- data %>% filter(variable %in% c("Non-Hispanic White",
+ "African-American/Black",
+ "American Indian",
+ "Asian-American",
+  "Hispanic"))
+
+demo_data$value <- as.numeric(demo_data$value)
+
+ggplot(demo_data, aes(fill=variable, y=value, x=county)) + 
+  geom_bar(position = "fill", stat="identity") + 
+  scale_fill_brewer(palette = "Paired") + 
+  labs(title=paste('Demographics of children under 4 in', s, 'in 2019'), y = 'Relative proportions', x = 'County',
+       caption="Data Source: US Census Bureau \n 2021 County and Resident Population Estimates", fill="Race/ethnicity") +
+  theme_minimal()
+```
+
+# Childhood Vaccination data
+
+```{r}
+county_data <- data %>% filter(variable %in% c("Fully vaccinated children in 2015",
+                                         "Fully vaccinated children in 2019",
+                                         "Change between time points")) %>% 
+  select(county, variable, value) %>% 
+  mutate(variable = recode(variable, 
+                           "Fully vaccinated children in 2015"="2015",
+                           "Fully vaccinated children in 2019"="2019",
+                            "Change between time points"="change"))
+
+county_data$value <- as.numeric(county_data$value)
+
+# create raster plot of locations
+ggplot(county_data, aes(variable, county)) +
+  geom_tile(aes(fill = value)) + 
+  geom_text(aes(label = round(value, 2))) +
+  scale_fill_gradient(low = "white", high = "steelblue") +
+  geom_tile(data=county_data  %>% filter(variable=="change"), size=1, fill=NA, colour="black") +
+  labs(title=paste('Vaccination coverage among children'), y = 'County', x = 'Year', 
+       subtitle=paste0('comparing 2015 and 2019, in', " ", s),
+       caption="Data Source: State Department of Health", fill='Darker value indicates \n higher vaccination rate') +
+  # facet_grid(vars(VACCINE), vars(YEAR)) +
+  theme_minimal()
+  
+
+# kable_data$value <- as.numeric(kable_data$value)
+# 
+# # knitr::kable(plot_table %>% filter(county==s[1]), digits = 2)
+# kable_data %>% filter(county==c[1]) %>% kbl(digits=2) %>% kable_paper("hover")
+# kable_data %>% filter(county==c[2]) %>% kbl(digits=2) %>% kable_paper("hover")
+# kable_data %>% filter(county==c[3]) %>% kbl(digits=2) %>% kable_paper("hover")
+```
+
+Negative "change" values indicate that the proportion of children vaccinated decreased between the two time periods. 
+
+*Hertford County saw an improvement of 5 percentage points, a high value compared to other counties in the state.*
+
+# 5. Covid vaccination among adults
+
+```{r}
+
+county_covid_data <- readRDS(paste0(prepped_data_dir, "10_prepped_county_vaccination_data_disaggregated.RDS"))
+
+ggplot(county_covid_data, aes(race_ethnicity, county)) +
+  geom_tile(aes(fill = proportion)) + 
+  geom_text(aes(label = round(proportion, 2))) +
+  scale_fill_gradient(low = "white", high = "steelblue") +
+  # geom_tile(data=county_data  %>% filter(variable=="change"), size=1, fill=NA, colour="black") +
+  labs(title=paste('Proportion of adults vaccinated'), y = 'County', x = 'Race/ethnicity', 
+       subtitle=paste0('by race and ethnicity, in', " ", s),
+       caption="Data Source: State Department of Health \n retrieved week of March 21, 2022", fill='Darker value indicates \n higher vaccination rate') +
+  # facet_grid(vars(VACCINE), vars(YEAR)) +
+  theme_minimal()
+```
+
+*What this graphic shows is that at the county level, White adults had lower Covid-19 vaccination coverage than other racial/ethnic groups. This contrasts with childhood immunization rates in the state (See Graphic 2 above) where white children tended to have higher vaccination coverage than other racial/ethnic groups.*
+
+# 6. County rankings
+
+```{r}
+ranking_data <- data %>% filter(variable %in% c("County level of childhood vaccination", "County level of Covid-19 vaccination")) %>% 
+  mutate(variable_label = case_when(
+    variable=="County level of childhood vaccination" ~ "childhood vaccination",
+    variable=="County level of Covid-19 vaccination" ~ "Covid-19 vaccination"
+  ))
+
+ranking_data$value <- factor(ranking_data$value,
+                             levels = c("low", "medium", "high"))
+ggplot(ranking_data, aes(variable_label, county)) +
+  geom_tile(aes(fill = value)) + 
+  geom_text(aes(label = value)) +
+  # scale_fill_gradient(low = "white", high = "steelblue") +
+  # geom_tile(data=county_data  %>% filter(variable=="change"), size=1, fill=NA, colour="black") +
+  labs(title=paste('Between county-comparisons on childhood and covid vaccines '), y = 'County', x = '', 
+       subtitle=paste0('Rankings based on vaccination levels across all counties in', " ", s),
+       caption="Data Source: State Health Department and CDC Covid Data Tracker \n retrieved March 18, 2022",
+       fill="level of vaccination") +
+  # facet_grid(vars(VACCINE), vars(YEAR)) +
+  theme_minimal()
+
+```
+
+County grouping was determined by ranking all counties according to the proportion of population vaccinated and dividing them into three groups: those in the top 25% were classified as high performers, those in the bottom 25% were classified as low performers, and the remaining were medium performers. The same process was used for both routine childhood immunization data and Covid-19 vaccination data. 
+
+*What this graphic shows is that level of childhood vaccination does not always coincide with levels of vaccination for Covid-19. Edgecombe County was the exception as it seemed to fall within the "medium" group for both.*

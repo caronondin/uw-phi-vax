@@ -15,6 +15,8 @@ library(RColorBrewer)
 library(usmap)
 library(scales)
 library(kableExtra)
+library(maps)
+library(mapdata)
 
 # Define important variables -----
 set.seed(500)

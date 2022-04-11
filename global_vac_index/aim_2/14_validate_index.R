@@ -28,14 +28,19 @@ full_data <- index_data %>% left_join(vax_data, by=c("gbd_location_id"="location
 # subset columns
 full_data <- full_data %>% select(location, region, year, gbd_location_id, iso_code, iso_num_code, result, prop_val_MCV1, prop_val_DTP1, prop_val_DTP3) %>% filter(year!=2020)
 
+
+
+
 ########################################
 ##### METHOD 1 OF VALIDATING INDEX #####
 ########################################
 
+data_subset <- full_data %>% filter(year <2019)
+
 # create a training dataset
-# row.number <- sample(1:nrow(full_data), 0.8*nrow(full_data))
-train <- full_data %>% filter(year<2019)
-test <- full_data %>% filter(year==2019)
+row.number <- sample(1:nrow(data_subset), 0.8*nrow(data_subset))
+train <- data_subset[row.number,]
+test <- data_subset[-row.number,]
 
 # fit a model for each vaccine
 model1 <- glm(prop_val_MCV1~factor(region)+year+result, data=train, family = "binomial")
@@ -47,32 +52,16 @@ plot(model1)
 pred1 <- predict(model1, newdata = test, type = "response")
 BrierScore(model1)
 par(mfrow=c(1,1))
-plot(test$prop_val_MCV1, pred1)
+plot(pred1, test$prop_val_MCV1,
+     xlab='Predicted Vaccination Coverage',
+     ylab='Actual Vaccination Coverage',
+     main='Predicted vs. Actual Values MCV, 1990-2018')
+abline(a=0, b=1)
+BrierScore(test$prop_val_MCV1, pred1)
 
-
-########################################
-##### METHOD 2 OF VALIDATING INDEX #####
-########################################
-
-# create a training dataset
-row.number <- sample(1:nrow(full_data), 0.8*nrow(full_data))
-train <- full_data[row.number,]
-test <- full_data[-row.number,]
-
-# fit a model for each vaccine
-model1 <- glm(prop_val_MCV1~factor(region)+year+result, data=train, family = "binomial")
-summary(model1)
-par(mfrow=c(2,2))
-plot(model1)
-
-# evaluate the success of the model 
-pred1 <- predict(model1, newdata = test, type = "response")
-BrierScore(model1)
-par(mfrow=c(1,1))
-plot(test$prop_val_MCV1, pred1)
 
 # fit second model
-model2 <- glm(prop_val_DTP1~factor(location)+factor(year)+result, data=train, family = "binomial")
+model2 <- glm(prop_val_DTP1~factor(region)+year+result, data=train, family = "binomial")
 summary(model2)
 par(mfrow=c(2,2))
 plot(model2)
@@ -84,7 +73,7 @@ par(mfrow=c(1,1))
 plot(test$prop_val_DTP1, pred2)
 
 # fit third model
-model3 <- glm(prop_val_DTP3~factor(location)+factor(year)+result, data=train, family = "binomial")
+model3 <- glm(prop_val_DTP3~factor(region)+year+result, data=train, family = "binomial")
 summary(model3)
 par(mfrow=c(2,2))
 plot(model3)
@@ -94,6 +83,69 @@ pred3 <- predict(model3, newdata = test, type = "response")
 BrierScore(model3)
 par(mfrow=c(1,1))
 plot(test$prop_val_DTP3, pred3)
+
+########################################
+##### Use the model to predict 
+##### vaccination coverage in 2019
+########################################
+
+# create a dataframe of all locations and vaccines and include the year 2019
+newdata <- with(data, data.frame(ESTIAP = rep(unique(data$ESTIAP), each=224, length.out=12544),
+                                 YEAR = rep(2007:2020, each=16, length.out=12544),
+                                 RACEETHK_R = factor(rep(1:4, each=4, length.out=12544)),
+                                 INCPOV1 = factor(rep(1:4, length.out=12544))))
+
+newdata <- with(full_data, data.frame(location = rep(unique(full_data$location), each=1, length.out=175),
+                                      year = rep(2019, length.out=175)))
+
+newdata <- newdata %>% left_join(full_data, by=c("location", "year"))
+
+
+pred2019mcv <- predict(model1, newdata = newdata, type = "response")
+plot(pred2019mcv, newdata$prop_val_MCV1,
+     xlab='Predicted Vaccination Coverage',
+     ylab='Actual Vaccination Coverage',
+     main='Predicted vs. Actual Values MCV, 2019')
+abline(a=0, b=1)
+BrierScore(pred2019mcv, newdata$prop_val_MCV1)
+
+pred2019dtp1 <- predict(model2, newdata=newdata, type = "response")
+plot(pred2019dtp1, newdata$prop_val_DTP1,
+     xlab='Predicted Vaccination Coverage',
+     ylab='Actual Vaccination Coverage',
+     main='Predicted vs. Actual Values DTP1, 2019')
+abline(a=0, b=1)
+BrierScore(pred2019dtp1, newdata$prop_val_MCV1)
+
+pred2019dtp3 <- predict(model3, newdata=newdata, type = "response")
+plot(pred2019dtp3, newdata$prop_val_DTP3)
+plot(pred2019dtp3, newdata$prop_val_DTP3,
+     xlab='Predicted Vaccination Coverage',
+     ylab='Actual Vaccination Coverage',
+     main='Predicted vs. Actual Values DTP3, 2019')
+abline(a=0, b=1)
+BrierScore(pred2019dtp3, newdata$prop_val_DTP3)
+
+########################################
+##### METHOD 2 OF VALIDATING INDEX #####
+########################################
+
+# create a training dataset
+# row.number <- sample(1:nrow(full_data), 0.8*nrow(full_data))
+# train <- full_data %>% filter(year<2019)
+# test <- full_data %>% filter(year==2019)
+# 
+# # fit a model for each vaccine
+# model1 <- glm(prop_val_MCV1~factor(region)+year+result, data=train, family = "binomial")
+# summary(model1)
+# par(mfrow=c(2,2))
+# plot(model1)
+
+# evaluate the success of the model 
+# pred1 <- predict(model1, newdata = test, type = "response")
+# BrierScore(model1)
+# par(mfrow=c(1,1))
+# plot(test$prop_val_MCV1, pred1)
 
 # # create duplicated columns that will be imputed
 # full_data$prop_val_MCV1_estimated <- full_data$prop_val_MCV1

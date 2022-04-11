@@ -6,7 +6,7 @@
 rm(list=ls())
 
 # source set-up file
-source("C:/Users/frc2/Documents/uw-phi-vax/resilient_imm_sys/aim_1/county_level_analyses/01_set_up_R.r")
+source("C:/Users/frc2/Documents/uw-phi-vax/resilient_imm_sys/aim_1/02_county_level_analyses/01_set_up_R.r")
 
 # load data
 file_list <- read_xlsx(paste0(team_drive, "Data/Documentation/list_of_data_used.xlsx")) %>%

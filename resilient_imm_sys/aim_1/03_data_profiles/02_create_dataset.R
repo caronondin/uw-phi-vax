@@ -70,6 +70,9 @@ dt2 <- dt2 %>%
 
 dt2 <- dt2 %>% pivot_longer(!c(state, county), names_to = "variable", values_to = "value")
 
+# drop values that are missing
+dt2 <- dt2 %>% filter(!is.na(value))
+
 ## dt3 contains information on demographic data
 dt3 <- demo_vacc_data %>% 
   select(state, county, year, TOT_POP_OVERALL, TOT_POP_UNDER_FOUR, 
@@ -87,8 +90,30 @@ dt4 <- unique(dt4)
 dt4 <- dt4 %>% 
   pivot_longer(!c(state, county), names_to = "variable", values_to = "value")
 
+## dt5 contains information on Washington data for the years 2018 and 2019
+dt5 <- read_rds(paste0(prepped_data_dir, "04_extracted_county_level_data.RDS")) %>% 
+  filter(state=="Washington" & 
+           year%in%c(2018, 2019) & 
+           county %in% c("Chelan", "Skagit", "Yakima") &
+           vaccine_name=="full_series")
+
+# rename the variables
+dt5 <- rename(dt5, "value"="proportion", "variable"="year")
+
+# reshape the data
+dt5 <- dt5 %>% 
+  select(state, county, variable, value)
+
+# recode county names to make sure they match with other locations
+dt5 <- dt5 %>% mutate(county = case_when(
+  county=="Chelan" ~ "Chelan County",
+  county=="Skagit" ~ "Skagit County",
+  county=="Yakima" ~ "Yakima County",
+  TRUE ~ county
+))
+
 # bind all component dataframes together
-demo_vacc_data <- rbind(dt1, dt2, dt3, dt4)
+demo_vacc_data <- rbind(dt1, dt2, dt3, dt4, dt5)
 
 # load fips data
 full_map <- usmap::us_map(regions = "counties") %>% select(fips, full, county)
@@ -138,6 +163,7 @@ full_data <- full_data %>% mutate(variable= case_when(
                     variable=="change" ~ "Change between time points", 
                     variable=="2015" ~ "Fully vaccinated children in 2015",
                     variable=="2017" ~ "Fully vaccinated children in 2017",
+                    variable=="2018" ~ "Fully vaccinated children in 2018",
                     variable=="2019" ~ "Fully vaccinated children in 2019",
                     variable=="TOT_POP_OVERALL" ~ "total_population",
                     variable=="TOT_POP_UNDER_FOUR" ~ "under4_population",
@@ -153,9 +179,9 @@ full_data <- full_data %>% mutate(variable= case_when(
                     # variable==PCT_H_UNDER_FOUR ~ "under4_population",
                     variable=="PCT_NHWA_UNDER_FOUR" ~ "Non-Hispanic White",
                     variable=="PCT_BAC_UNDER_FOUR" ~ "African-American/Black",
-                    variable=="PCT_IAC_UNDER_FOUR" ~ "Percent American Indian",
-                    variable=="PCT_AAC_UNDER_FOUR" ~ "Percent Asian-American",
-                    variable=="PCT_H_UNDER_FOUR" ~ "Percent Hispanic",
+                    variable=="PCT_IAC_UNDER_FOUR" ~ "American Indian",
+                    variable=="PCT_AAC_UNDER_FOUR" ~ "Asian-American",
+                    variable=="PCT_H_UNDER_FOUR" ~ "Hispanic",
                     variable=="category" ~ "County level of childhood vaccination",
                     variable=="covid_category" ~ "County level of Covid-19 vaccination",
                     variable=="covid_proportion_18over" ~ "Fully vaccinated adults, Covid-19 vaccine",
