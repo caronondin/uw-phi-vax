@@ -30,6 +30,7 @@ sdi$sdi[sdi$year_id == '2020'] <- NA
 #raw_extracted_dhs <- readRDS("aim_1/New/03_raw_extracted_dhs.RDS")
 #prepped_dhs_for_mov <- readRDS("aim_1/New/04_prepped_dhs_for_mov.RDS")
 disease_trends <- readRDS("aim_1/New/05_disease_trends.RDS")
+codebook <- read.csv("aim_2/vaccine_index_variable_codebook_for_website.csv")
 merged_data_for_visuals <- readRDS("aim_1/New/06_merged_data_for_visuals.RDS")
 merged_data_for_visuals$sdi[merged_data_for_visuals$year_id == '2020'] <- NA
 
@@ -50,6 +51,7 @@ colnames(sdi_dup)[2] <- "location"
 colnames(sdi_dup)[4] <- "year"
 merged_data_for_vacii_sdi <- dplyr::left_join(index_results,sdi_dup[,-c("sdi")], by=c("location","year"))
 
+print(unique(index_results$region))
 
 update = Sys.Date()
 ############################################### ui.R ##################################################
@@ -62,6 +64,7 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                       h4(strong("Improvement Index Ranking Table")),
                       sliderInput("year", "Year", value =2019, min = 1990, max=2019,step=1,sep = "",animate=TRUE),
                       radioButtons("sdi_group_present","SDI Group Present", choices = c("All"="all","Low" ="low","Medium" = "medium","High" = "high"),inline = TRUE),
+                      selectInput("region_table", "Regions", selected = NULL, choices = c("All",unique(index_results$region))),
                       tags$style(HTML('table.dataTable tr.selected td, table.dataTable td.selected {background-color: #92c9e8 !important;}')),
                       DT::dataTableOutput("table")),
                   mainPanel(
@@ -74,7 +77,7 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                       tabsetPanel(id = "t1",
                                   tabPanel("Vaccination Improvement",value="t_sdi",
                                            fluidRow(column(6, " ", style='padding:10px;')),
-                                           fluidRow(column(width = 9, h4(strong(textOutput("yeartitle")),style='text-align:left')),
+                                           fluidRow(column(width = 9,h4(strong(textOutput("yeartitle")),style='text-align:left')),
                                                column(width = 3,div(switchInput(
                                                  inputId = "view",
                                                  onLabel = "Table",
@@ -96,10 +99,10 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                                                      placement = "bottom",
                                                                                      arrow = TRUE))),
                                               conditionalPanel("input.show == 'Improvement Index Mapper'",
-                                                               fluidRow(column(width = 12, "Select location in left Improvement Index Ranking table.",
-                                                                               style='font-family:Avenir, Helvetica;font-size:30;text-align:center')),
                                                                fluidRow(column(12, " ", style='padding:3px;')),
                                                                fluidRow(column(12,plotlyOutput("index_map",height = "40vh")),column(1,"")),
+                                                               fluidRow(column(width = 12, "Select locations in left Improvement Index Ranking table for comparison",
+                                                                               style='font-family:Avenir, Helvetica;font-size:30;text-align:center')),
                                                                fluidRow(column(10,''),column(2,
                                                                        dropMenu(
                                                                          circleButton(label = "", inputId='info2',icon = icon('info')),
@@ -107,7 +110,7 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                                          h5('The Index value is estimated yearly between 1990 and 2019, in order to track improvement or change over time. '),
                                                                          placement = "bottom",
                                                                          arrow = TRUE))),
-                                                               fluidRow(column(12, plotlyOutput("index_trend_plot",height = "30vh"))),column(1,"")),
+                                                               fluidRow(column(12, plotlyOutput("index_trend_plot_multi",height = "30vh"))),column(1,"")),
                                                fluidRow(column(12, " ", style='padding:2px;')),
                                               conditionalPanel("input.show == 'Improvement Indicator Mapper'",
                                                                #fluidRow(column(4,selectInput("indicators", "Indicator:",choices=c("SDI","Development Assistance Per Total Health Spending Categorical","Total Health Spending per Person","Government Health Spending per Total Health Spending",
@@ -118,7 +121,7 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                                         column(width = 8, "Select location in left Improvement Index Ranking table.",
                                                                                style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
                                                                fluidRow(column(11,plotlyOutput("indicator_map",height = "43vh")),column(1,"")),
-                                                               fluidRow(column(11, plotlyOutput("indicator_trend_plot",height = "27vh")),column(1,""))
+                                                               fluidRow(column(11, plotlyOutput("indicator_trend_plot_multi",height = "27vh")),column(1,""))
                                               )),
                                           conditionalPanel("input.view",
                                                            fluidRow(column(11, DT::dataTableOutput("indextable")),column(1,"")))),
@@ -148,7 +151,7 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                              placement = "bottom",
                                                              arrow = TRUE))),
                                            radioButtons("disease_estimate","Choose y-axis:", choices = c("Number Value"="number_val","Percent Value" ="percent_val","Rate Value" = "rate_val"),inline = TRUE),
-                                           fluidRow(column(12,plotlyOutput("all_disease_plot", height = "35vh"))),
+                                           plotlyOutput("all_disease_plot", height = "35vh"),
                                            fluidRow(column(10, " ", style='padding:30px;'),
                                                     column(2,
                                                            dropMenu(
@@ -157,7 +160,7 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                              h5('This graphic shows the combined impact of a disease in a country and how it changes from year to year.'),
                                                              placement = "bottom",
                                                              arrow = TRUE))),
-                                           fluidRow(column(12,plotlyOutput("all_disability_plot", height = "35vh")))),
+                                           plotlyOutput("all_disability_plot", height = "35vh")),
                                   tabPanel(paste0("Vaccination & Corresponding Disease Trends"),value="vac_dis_tab",
                                            fluidRow(column(12,h4(strong(htmlOutput("content_vac_dis"))))),
                                            fluidRow(column(10,selectInput("vaccinations", "Vaccination:",choices=NULL)),
@@ -193,8 +196,8 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                            )),
                                   tabPanel("Data Explorer",
                                            fluidRow(column(5, " ", style='padding:5px;')),
-                                           fluidRow(column(7, radioButtons("dataset","Choose Dataset", choices = c("Improvement Index"= "improvement index","Vaccine Trends" = "vaccine trends","Disease Trends" = "disease trends"),inline = TRUE)),
-                                                    column(5, style = "margin-top: 10px;",div(downloadButton("download","Download Raw Data"),style='float:right'))),
+                                           fluidRow(column(9, radioButtons("dataset","Choose Dataset", choices = c("Improvement Index"= "improvement index","Vaccine Trends" = "vaccine trends","Disease Trends" = "disease trends","Data Dictionary" = "data dictionary"),inline = TRUE)),
+                                                    column(3, style = "margin-top: 10px;",div(downloadButton("download","Download Raw Data"),style='float:right'))),
                                            fluidRow(column(width = 9, "Download custom datasets from the variables that were used to create visuals on the previous tabs. ",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
                                            fluidRow(column(12,DT::dataTableOutput("alldatatable") %>% withSpinner(color="#4b2e83"))))
@@ -226,14 +229,16 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                            tabsetPanel(id="t2",
                                        tabPanel("Comparison",value = "comp_index",
                                                 fluidRow(column(8, " ", style='padding:20px;')),
-                                                radioButtons("sdi_group_present_comp","SDI Group Present", choices = c("All"="all","Low" ="low","Medium" = "medium","High" = "high"),selected="low",inline = TRUE),
-                                                selectInput(
-                                                  inputId = "my_multi",
-                                                  label = "Search Country :",
-                                                  choices = unique(merged_data_for_vacii_sdi$location),
-                                                  selected = "Nigeria",
-                                                  selectize = TRUE,
-                                                  multiple=TRUE),
+                                                fluidRow(column(4,radioButtons("sdi_group_present_comp","SDI Group Present", choices = c("All"="all","Low" ="low","Medium" = "medium","High" = "high"),selected="low",inline = TRUE)),
+                                                                column(4,selectInput("region", "Regions", choices = unique(index_results$region))),
+                                                         column(4,selectInput(
+                                                                      inputId = "my_multi",
+                                                                      label = "Search Country :",
+                                                                      choices = unique(merged_data_for_vacii_sdi$location),
+                                                                      selected = "Nigeria",
+                                                                      selectize = TRUE,
+                                                                      multiple=TRUE))),
+                                                fluidRow(column(8, " ", style='padding:20px;')),
                                                 fluidRow(column(12, plotlyOutput("index_trend_plot_com",height = "40vh"))),column(1,"")),
                                        tabPanel("Vaccination Trends",value = "report_vt",
                                                 fluidRow(column(width = 11,h4(strong("Nigeria")))),
@@ -254,19 +259,20 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                            tags$div(
                              tags$h4(strong("Last update")), 
                              h6(paste0(update)),
+                             tags$br(),
                              tags$h4(strong("Background")),
                              "Improving routine vaccination coverage is an important global health goal. Reaching and maintaining high vaccination coverage helps avoid death and illness from many preventable diseases, especially in children.",
                              tags$br(),tags$br(),"The factors that drive vaccination coverage are many and can differ between countries. The Global Vaccine Index Project is an attempt to organize data on several of these factors into a single index that allows a quick comparison between locations and across time. This project builds on prior research that identified factors that contribute to higher vaccination rates in multiple low and middle income countries.",
                              tags$br(),tags$br(),"As part of the Global Vaccine Index Project, this website offers data and resources to people interested in learning more about vaccination trends, vaccine-preventable diseases, and information on the importance of vaccines to promote health and well-being in communities around the world. ",
                              tags$br(),tags$br(),tags$h4(strong("Sources")),
                              "1. Global Burden of Disease Collaborative Network.",
-                             tags$a("Global Burden of Disease Study 2020, Release 1 (GBD 2020 R1) Routine Childhood Vaccination Coverage 1980-2019 [Internet]",href="https://ghdx.healthdata.org/record/ihme-data/gbd-2020-routine-childhood-vaccination-coverage-1980-2019"),
+                             tags$a("Global Burden of Disease Study 2020, Release 1 (GBD 2020 R1) Routine Childhood Vaccination Coverage 1980-2019 [Internet]",target="_blank", href="https://ghdx.healthdata.org/record/ihme-data/gbd-2020-routine-childhood-vaccination-coverage-1980-2019"),
                                     "Institute for Health Metrics and Evaluation (IHME); 2021 [cited 2021 Jul 21].",
                                     tags$br(),
                              "2. Barau I, Zubairu M, Mwanza MN, Seaman VY. Improving polio vaccination coverage in Nigeria through the use of geographic information system technology. J Infect Dis. 2014 Nov 1;210 Suppl 1:S102-110.",
                              tags$br(),
                              "3. National Primary Health Care Development Agency.",
-                             tags$a("Nigeria: National Routine Immunization Strategic Plan 2013-2015 | NITAG RESOURCE CENTER [Internet].",href="https://www.jhsph.edu/research/centers-and-institutes/ivac/resources/Nigeria-NRISP-Technical-Policy.pdf"),
+                             tags$a("Nigeria: National Routine Immunization Strategic Plan 2013-2015 | NITAG RESOURCE CENTER [Internet].",target="_blank",href="https://www.jhsph.edu/research/centers-and-institutes/ivac/resources/Nigeria-NRISP-Technical-Policy.pdf"),
                                     "2013 [cited 2021 Sep 22]",
                              tags$br(),
                              "4. Oku A, Oyo-Ita A, Glenton C, Fretheim A, Ames H, Muloliwa A, et al. Communication strategies to promote the uptake of childhood vaccination in Nigeria: a systematic map. Glob Health Action. 2016 Feb 12;9(1).",
@@ -276,7 +282,7 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                              "6. Gunnala R, Ogbuanu IU, Adegoke OJ, Scobie HM, Uba BV, Wannemuehler KA, et al. Routine Vaccination Coverage in Northern Nigeria: Results from 40 District-Level Cluster Surveys, 2014-2015. Borrow R, editor. PLOS ONE. 2016 Dec 9;11(12):e0167835.",
                              tags$br(),
                              "7. Oleribe O, Kumar V, Awosika-Olumo A, Taylor SD.",
-                             tags$a("Individual and socioeconomic factors associated with childhood immunization coverage in Nigeria. Pan Afr Med J [Internet].",href="https://panafrican-med-journal.com/content/article/26/220/full/"),
+                             tags$a("Individual and socioeconomic factors associated with childhood immunization coverage in Nigeria. Pan Afr Med J [Internet].",target="_blank",href="https://panafrican-med-journal.com/content/article/26/220/full/"),
                              "2017 [cited 2021 Sep 27];26.")
                   )
 )
@@ -287,7 +293,7 @@ server <- function(input, output,session) {
   })
   
   output$yeartitle <- renderText({ 
-    paste0(input$year)
+    paste0("Year ", input$year)
   })
   
   observeEvent(year(),{
@@ -333,6 +339,20 @@ server <- function(input, output,session) {
       }
   })
   
+  observeEvent(sdi_group_present(),{
+    updateSelectInput(session, 'region_table',choices = c("All",unique(sdi_group_present()$region)))
+  })
+  
+  regionstable <- reactive({
+    req(input$region_table)
+    if (input$region_table =='All'){
+      sdi_group_present()
+    }
+    else{
+      filter(sdi_group_present(),region == input$region_table)
+    }
+  })
+  
   sdi_group_present_comp <- reactive({
     req(input$sdi_group_present_comp)
     if (input$sdi_group_present_comp == "all"){
@@ -344,11 +364,21 @@ server <- function(input, output,session) {
   })
   
   observeEvent(sdi_group_present_comp(),{
-    updateSelectInput(session,"my_multi",selected="Nigeria",choices = unique(sdi_group_present_comp()$location))
+    updateSelectInput(session, 'region', selected = 'Western Sub-Saharan Africa', choices = sdi_group_present_comp()$region)
   })
-    
+  
+  regionselected <- reactive({
+    req(input$region)
+    filter(sdi_group_present_comp(),region == input$region)
+  })
+  
+  observeEvent(regionselected(),{
+    updateSelectInput(session, 'my_multi', selected = 'Nigeria', choices = regionselected()$location)
+  })
+  
+  
   output$table = DT::renderDataTable({
-      sdi_rank_table<-sdi_group_present()[,c("location","result","sdi_group_present")]
+      sdi_rank_table<-regionstable()[,c("location","result","sdi_group_present")]
       print("sorting")
       print(sdi_rank_table)
       sdi_rank_table$rank <- NA
@@ -374,9 +404,9 @@ server <- function(input, output,session) {
           )
       ) %>%
           as.datatable(rownames = FALSE, 
-                       selection = list(mode = 'single',target="cell", selected = matrix(c(0, 1), nrow = 1,ncol = 2)), 
+                       selection = list(mode = 'multiple',target="cell", selected = matrix(c(0, 1), nrow = 1,ncol = 2)), 
                        options = list(paging = FALSE,
-                                      scrollY = '450px', 
+                                      scrollY = '400px', 
                                       scrollY=TRUE, 
                                       autoWidth = FALSE,
                                       ordering = FALSE,
@@ -385,10 +415,52 @@ server <- function(input, output,session) {
           )
   })
   
+  output$index_trend_plot_multi <- renderPlotly({
+    print("here5555")
+    index_trend_data <- filter(index_results,location == "United States of America")
+    vii_left <- list(
+      xref = 'paper',
+      yref = 'y',
+      x = 0.01,
+      y = index_trend_data$result[1]+0.01,
+      xanchor = 'middle',
+      yanchor = 'center',
+      text = ~round(index_trend_data$result[1],3),
+      font = list(family = 'Arial',
+                  size = 16,
+                  color = 'rgba(67,67,67,1)'),
+      showarrow = FALSE)
+    
+    vii_right <- list(
+      xref = 'paper',
+      yref = 'y',
+      x = 0.97,
+      y = index_trend_data$result[30]+0.02,
+      xanchor = 'middle',
+      yanchor = 'center',
+      text = ~round(index_trend_data$result[30],3),
+      font = list(family = 'Arial',
+                  size = 16,
+                  color = 'rgba(67,67,67,1)'),
+      showarrow = FALSE)
+    
+    fig_a <- plot_ly(index_trend_data, x = ~year)
+    fig_a <- fig_a  %>% add_trace(y=~result,type='scatter', name = "vaccine improvement index in United States of America", mode = 'lines', line = list(color = 'rgba(49,130,189, 1)',width=2))
+    fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[30]), y = ~c(result[1], result[30]), type = 'scatter', mode = 'markers', marker = list(color = 'rgba(49,130,189, 1)', size = 10))
+    fig_a <- fig_a %>% 
+      layout( autosize = T,
+              title = paste0("Time Series of Vaccine Improvement Index"), 
+              showlegend = FALSE,
+              xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
+              yaxis = list(title = "Vaccine Improvement Index",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
+    fig_a <- fig_a %>% layout(annotations = vii_left) 
+    fig_a <- fig_a %>% layout(annotations = vii_right) 
+    fig_a
+  })
   
-  observeEvent(sdi_group_present(),{
+  observeEvent(regionstable(),{
     print("map data")
-    map_data <- sdi_group_present()
+    map_data <- regionstable()
     print(map_data)
     
     indicatorsdata <- reactive({
@@ -587,51 +659,8 @@ server <- function(input, output,session) {
           geo = g)
       })
     
-    output$index_trend_plot <- renderPlotly({
-      print("here5555")
-      index_trend_data <- filter(index_results,location == "United States of America")
-      vii_left <- list(
-        xref = 'paper',
-        yref = 'y',
-        x = 0.01,
-        y = index_trend_data$result[1]+0.01,
-        xanchor = 'middle',
-        yanchor = 'center',
-        text = ~round(index_trend_data$result[1],3),
-        font = list(family = 'Arial',
-                    size = 16,
-                    color = 'rgba(67,67,67,1)'),
-        showarrow = FALSE)
-      
-      vii_right <- list(
-        xref = 'paper',
-        yref = 'y',
-        x = 0.97,
-        y = index_trend_data$result[30]+0.02,
-        xanchor = 'middle',
-        yanchor = 'center',
-        text = ~round(index_trend_data$result[30],3),
-        font = list(family = 'Arial',
-                    size = 16,
-                    color = 'rgba(67,67,67,1)'),
-        showarrow = FALSE)
-      
-      fig_a <- plot_ly(index_trend_data, x = ~year)
-      fig_a <- fig_a  %>% add_trace(y=~result,type='scatter', name = "vaccine improvement index in United States of America", mode = 'lines', line = list(color = 'rgba(49,130,189, 1)',width=2))
-      fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[30]), y = ~c(result[1], result[30]), type = 'scatter', mode = 'markers', marker = list(color = 'rgba(49,130,189, 1)', size = 10))
-      fig_a <- fig_a %>% 
-        layout( autosize = T,
-                title = paste0("Time Series of Vaccine Improvement Index"), 
-                showlegend = FALSE,
-                xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
-                yaxis = list(title = "Vaccine Improvement Index",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
-      fig_a <- fig_a %>% layout(annotations = vii_left) 
-      fig_a <- fig_a %>% layout(annotations = vii_right) 
-      fig_a
-    })
     
     output$index_trend_plot_com <- renderPlotly({
-        print("here5555")
         index_trend_data <- index_results %>% 
           filter(location %in% input$my_multi)
         
@@ -646,7 +675,7 @@ server <- function(input, output,session) {
         fig_a
       })
     
-    output$indicator_trend_plot <- renderPlotly({
+    output$indicator_trend_plot_multi <- renderPlotly({
       indicator_trend_data <- filter(index_results,location == "United States of America")
       fig_a <- plot_ly(indicator_trend_data, x = ~year)
       
@@ -840,7 +869,7 @@ server <- function(input, output,session) {
     
     output$indextable = DT::renderDataTable({
       print("table")
-      index_rank_table<-sdi_group_present()[,-c("year","gbd_location_id","iso_code","iso_num_code")]
+      index_rank_table<-regionstable()[,-c("year","gbd_location_id","iso_code","iso_num_code")]
       index_rank_table$rank <- NA
       index_rank_table$rank = dense_rank(desc(index_rank_table$result))
       #index_rank_table <- index_rank_table[,c("rank","location_name","sdi","sdi_group_present")]
@@ -1226,9 +1255,9 @@ server <- function(input, output,session) {
     }
   })
   
-  
-  
+  list_all <- reactiveVal()
   observeEvent(input$table_cell_clicked,{
+     
       info = input$table_cell_clicked
       if (is.null(info$value) || info$col != 1) return()
       updateTabsetPanel(session, 't1', selected = 'Vaccination Trends')
@@ -1242,6 +1271,7 @@ server <- function(input, output,session) {
       print("info value")
       print(info$value)
       
+      
       vacdata = filter(preventable_vac_trend, gsub(" ", "", location_name) == gsub(" ", "", info$value))
       disdata = filter(merged_data_for_vac_dis, gsub(" ", "", location_name) == gsub(" ", "", info$value))
       merged = dplyr::inner_join(vacdata,disdata,"vaccine_name","vaccine_name")
@@ -1254,49 +1284,110 @@ server <- function(input, output,session) {
       output$content_dis <- renderText(info$value)
       output$content_vac_dis <- renderText(info$value)
       
-      output$index_trend_plot <- renderPlotly({
-        index_trend_data <- filter(index_results,gsub(" ", "",location) == gsub(" ", "", info$value))
-        
-        vii_left <- list(
-          xref = 'paper',
-          yref = 'y',
-          x = 0.01,
-          y = index_trend_data$result[1]+0.01,
-          xanchor = 'middle',
-          yanchor = 'center',
-          text = ~round(index_trend_data$result[1],3),
-          font = list(family = 'Arial',
-                      size = 16,
-                      color = 'rgba(67,67,67,1)'),
-          showarrow = FALSE)
-        
-        vii_right <- list(
-          xref = 'paper',
-          yref = 'y',
-          x = 0.97,
-          y = index_trend_data$result[30]+0.02,
-          xanchor = 'middle',
-          yanchor = 'center',
-          text = ~round(index_trend_data$result[30],3),
-          font = list(family = 'Arial',
-                      size = 16,
-                      color = 'rgba(67,67,67,1)'),
-          showarrow = FALSE)
-        
+      if (gsub(" ", "", info$value) %in% list_all()){
+        lst = list_all()
+        list_all(lst[lst!=gsub(" ", "", info$value)])
+      }
+      else{
+        list_all(append(list_all(), gsub(" ", "", info$value)))
+      }
+      
+      output$index_trend_plot_multi <- renderPlotly({
+        index_trend_data <- index_results %>% 
+          filter(gsub(" ", "",location) %in% gsub(" ", "",list_all()))
+
         fig_a <- plot_ly(index_trend_data, x = ~year)
-        fig_a <- fig_a  %>% add_trace(y=~result,type='scatter', name = "vaccine improvement index", mode = 'lines', line = list(color = 'rgba(49,130,189, 1)',width=2))
-        fig_a <- fig_a %>% add_trace(x = ~c(year[1], year[30]), y = ~c(result[1], result[30]), type = 'scatter', mode = 'markers', marker = list(color = 'rgba(49,130,189, 1)', size = 10))
+        fig_a <- fig_a  %>% add_trace(y=~result,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
         fig_a <- fig_a %>% 
           layout( autosize = T,
-                  title = paste0("Time Series of Vaccine Improvement Index in ",info$value), 
-                 showlegend = FALSE,
-                 xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
-                 yaxis = list(title = "Vaccine Improvement Index",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
-        fig_a <- fig_a %>% layout(annotations = vii_left) 
-        fig_a <- fig_a %>% layout(annotations = vii_right) 
+                  title = paste0("Time Series of Vaccine Improvement Index"), 
+                  showlegend = TRUE,
+                  xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
+                  yaxis = list(title = "Vaccine Improvement Index",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
         fig_a
       })
       
+      output$indicator_trend_plot_multi <- renderPlotly({
+        indicator_trend_data <- index_results %>% 
+          filter(gsub(" ", "",location) %in% gsub(" ", "",list_all()))
+        fig_a <- plot_ly(indicator_trend_data, x = ~year)
+        
+        if (input$indicators == "Socio-demographic Index"){
+          titles = paste0("Time Series of SDI")
+          ytitles = "Socio-demographic Index"
+          fig_a <- fig_a  %>% add_trace(y=~sdi,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
+        }
+        else if (input$indicators == "Eligibility to receive DAH"){
+          titles = paste0("Time Series of Eligibility to receive DAH")
+          ytitles = "Eligibility to receive DAH"
+          fig_a <- fig_a  %>% add_trace(y=~dah_eligible,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
+        }
+        else if (input$indicators == "Total Health Spending per Person"){
+          titles=paste0("Time Series of Total Health Spending per Person")
+          ytitles = "Total Health Spending per Person"
+          fig_a <- fig_a  %>% add_trace(y=~the_per_cap_mean,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
+        }
+        else if (input$indicators == "Government Health Spending per Total Health Spending"){
+          titles=paste0("Time Series of Government Health Spending per Total Health Spending")
+          ytitles = "Government Health Spending per Total Health Spending"
+          fig_a <- fig_a  %>% add_trace(y=~ghes_per_the_mean,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
+        }
+        else if (input$indicators == "HAQI"){
+          titles=paste0("Time Series of HAQI")
+          ytitles = "HAQI"
+          fig_a <- fig_a  %>% add_trace(y=~haqi,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
+
+        }
+        else if (input$indicators == "Corruption Perception Index"){
+          titles=paste0("Time Series of Corruption Perception Index")
+          ytitles = "Corruption Perception Index"
+          fig_a <- fig_a  %>% add_trace(y=~cpi,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
+
+        }
+        else if (input$indicators == "Skilled Attendants at Birth"){
+          titles=paste0("Time Series of Skilled Attendants at Birth")
+          ytitles = "Skilled Attendants at Birth"
+          fig_a <- fig_a  %>% add_trace(y=~perc_skill_attend,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
+
+        }
+        else if (input$indicators == "Immigrant Population (%)"){
+          titles=paste0("Time Series of Immigrant Population (%)")
+          ytitles = "Immigrant Population (%)"
+          fig_a <- fig_a  %>% add_trace(y=~imm_pop_perc,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
+          
+        }
+        else if (input$indicators == "Urbanicity (%)"){
+          titles=paste0("Time Series of Urbanicity (%)")
+          ytitles = "Urbanicity (%)"
+          fig_a <- fig_a  %>% add_trace(y=~perc_urban,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
+        }
+        else if (input$indicators == "Agreement Vaccines are Safe"){
+          titles=paste0("Time Series of Agreement Vaccines are Safe")
+          ytitles = "Agreement Vaccines are Safe"
+          fig_a <- fig_a  %>% add_trace(y=~mean_agree_vac_safe,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
+
+        }
+        else if (input$indicators == "Agreement Vaccines are Important"){
+          titles=paste0("Time Series of Agreement Vaccines are Important")
+          ytitles = "Agreement Vaccines are Important"
+          fig_a <- fig_a  %>% add_trace(y=~mean_agree_vac_important,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
+        }
+        else{
+          titles=paste0("Time Series of Agreement Vaccines are Effectivel")
+          ytitles = "Agreement Vaccines are Effective"
+          fig_a <- fig_a  %>% add_trace(y=~mean_agree_vac_effective,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
+        }
+        
+        fig_a <- fig_a %>% 
+          layout( autosize = T,
+                  title = paste0(titles),
+                  showlegend = TRUE,
+                  xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
+                  yaxis = list(title = ytitles,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
+        fig_a
+        
+      })
+
       output$indicator_trend_plot <- renderPlotly({
         indicator_trend_data <- filter(index_results,gsub(" ", "",location) == gsub(" ", "", info$value))
         fig_a <- plot_ly(indicator_trend_data, x = ~year)
@@ -1682,6 +1773,9 @@ server <- function(input, output,session) {
       else if (input$dataset == "disease trends"){
         dataexplorer<-disease_trends
       }
+      else if (input$dataset == "data dictionary"){
+        dataexplorer<-codebook
+      }
       else{
           dataexplorer <- index_results
       }
@@ -1698,6 +1792,10 @@ server <- function(input, output,session) {
             x<-data %>%
               dplyr::select(-c("location_id","cause_id"))
             pl=11
+          }
+          else if(input$dataset == 'data dictionary'){
+            x<-data 
+            pl=8
           }
           else{
               x<-data 
