@@ -1,0 +1,14 @@
+---
+title: "Dynamic Report"
+author: "Ruihan(Bonnie) Bao"
+date: "4/22/2022"
+output: 
+  pdf_document
+params:
+  title: Report
+  plot: NULL
+---
+```{r}
+  params$plot
+
+```

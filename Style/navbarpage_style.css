@@ -264,3 +264,9 @@ a:focus, a:hover {
   background-color: #b7a57a;
   text-decoration: underline;
 }
+
+
+.btn:hover, .btn:focus, .btn.focus {
+    color: #272727;
+    text-decoration: none;
+}
