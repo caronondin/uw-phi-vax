@@ -58,7 +58,7 @@ update = Sys.Date()
 body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                   introjsUI(),
                   theme = shinytheme("flatly"), collapsible = TRUE,
-                  title = div(img(src="https://uw-s3-cdn.s3.us-west-2.amazonaws.com/wp-content/uploads/sites/98/2014/09/07214416/W-Logo_White.png",width= "73px", height="45px"),  strong(toupper("Global Vaccination Improvement Dashboard"))),
+                  title = div(img(src="https://uw-s3-cdn.s3.us-west-2.amazonaws.com/wp-content/uploads/sites/98/2014/09/07214416/W-Logo_White.png",width= "73px", height="45px"),  strong(toupper("Global Vaccine Index Dashboard"))),
                   tabPanel("Visualizations",
                   sidebarPanel(
                       h4(strong("Improvement Index Ranking Table")),
@@ -558,27 +558,6 @@ server <- function(input, output,session) {
               text = ~paste0(location),
               marker = list(line = l))
         }
-        #else if (input$indicators == "Agreement Vaccines are Safe"){
-          #fig <- fig %>% 
-           # add_trace(
-            #  z = ~mean_agree_vac_safe, color = ~mean_agree_vac_safe, type = 'choropleth', locations = ~iso_code, colors="Purples", 
-            #  text = ~paste0(location),
-            #  marker = list(line = l))
-        #}
-        #else if (input$indicators == "Agreement Vaccines are Important"){
-         # fig <- fig %>% 
-         #   add_trace(
-         #     z = ~mean_agree_vac_important, color = ~mean_agree_vac_important, type = 'choropleth', locations = ~iso_code, colors="Purples", 
-          #    text = ~paste0(location),
-          #    marker = list(line = l))
-        #}
-        #else{
-          #fig <- fig %>% 
-            #add_trace(
-            #  z = ~mean_agree_vac_effective, color = ~mean_agree_vac_effective, type = 'choropleth', locations = ~iso_code, colors="Purples", 
-            #  text = ~paste0(location),
-             # marker = list(line = l))
-        #}
         
         fig <-fig%>%
           layout(
@@ -646,37 +625,20 @@ server <- function(input, output,session) {
             center = list(lon = -90, lat = 80)),
           geo = g)
       })
-    
-    #test for download image####################################
-    report_index_trend_plot<- reactive({ 
-      index_trend_data <- index_results %>% 
-        filter(location %in% input$my_multi)
-      
-      fig_a <- plot_ly(index_trend_data, x = ~year)
-      fig_a <- fig_a  %>% add_trace(y=~result,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
-      fig_a <- fig_a %>% 
-        layout( autosize = T,
-                title = paste0("Time Series of Vaccine Improvement Index"), 
-                showlegend = TRUE,
-                xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
-                yaxis = list(title = "Vaccine Improvement Index",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
-      fig_a
-    })
-    ######################################
-    
-    output$index_trend_plot_com <- renderPlotly({
-        index_trend_data <- index_results %>% 
-          filter(location %in% input$my_multi)
-        
-        fig_a <- plot_ly(index_trend_data, x = ~year)
-        fig_a <- fig_a  %>% add_trace(y=~result,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2)
-        fig_a <- fig_a %>% 
+    ##############test##########t##########t##########t##########t
+    reportindextrendplot<-reactive(
+        fig_a <- plot_ly(index_results %>%  filter(location %in% input$my_multi), x = ~year) %>% 
+          add_trace(y=~result,type='scatter', mode = 'lines', name = ~location, color = ~location,width=2) %>% 
           layout( autosize = T,
                   title = paste0("Time Series of Vaccine Improvement Index"), 
                   showlegend = TRUE,
                   xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
                   yaxis = list(title = "Vaccine Improvement Index",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
-        fig_a
+    )
+    
+    ##############test##########t##########t##########t##########t
+    output$index_trend_plot_com <- renderPlotly({
+      reportindextrendplot()
       })
     
     output$indicator_trend_plot_multi <- renderPlotly({
@@ -909,8 +871,7 @@ server <- function(input, output,session) {
   
   output$nigeria_vaccine_plot <- renderPlotly({
     vac_plotdata <- filter(vaccine_trends,gsub(" ", "", location_name) == gsub(" ", "", "Nigeria"))
-    if (input$vaccine_plot == "line_trend"){
-      fig_a <- plot_ly(vac_plotdata, x = ~year_id,y=~prop_val, color = ~vaccine_name)%>%
+    fig_a <- plot_ly(vac_plotdata, x = ~year_id,y=~prop_val, color = ~vaccine_name)%>%
         add_lines()
       
       fig_a <- fig_a %>% 
@@ -919,25 +880,6 @@ server <- function(input, output,session) {
                xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
                yaxis = list(title = "Vaccination coverage (%)",showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE))
       fig_a
-      
-    }
-    else{
-      single_year_vac_plotdata <- filter(vac_plotdata,year_id == input$year)
-      fig1 <- plot_ly(x = ~single_year_vac_plotdata$prop_val, y = ~reorder(single_year_vac_plotdata$vaccine_name, single_year_vac_plotdata$prop_val), name = single_year_vac_plotdata$vaccine_name,
-                      type = 'bar', orientation = 'h',
-                      color = single_year_vac_plotdata$vaccine_name)
-      #marker = list(color = 'rgba(50, 171, 96, 0.6)',
-      #line = list(color = 'rgba(50, 171, 96, 1.0)', width = 1))) 
-      fig1 <- fig1 %>% layout( autosize = T,
-                               title = paste0("Vaccination Coverage in ", input$year),
-                               yaxis = list(title = "Vaccine",showgrid = FALSE, showline = FALSE, showticklabels = TRUE, domain= c(0, 0.85)),
-                               xaxis = list(title = "Vaccination coverage (%)", zeroline = FALSE, showline = FALSE, showticklabels = TRUE, showgrid = TRUE)) 
-      fig1 <- fig1 %>% add_annotations(xref = 'x1', yref = 'y',
-                                       x = single_year_vac_plotdata$prop_val * 1 + 0.05,  y = single_year_vac_plotdata$vaccine_name,
-                                       text = paste(round(single_year_vac_plotdata$prop_val*100, 2), '%'),
-                                       font = list(family = 'Arial', size = 12, color = 'rgba(0, 0, 0, 1)'),
-                                       showarrow = FALSE)
-    }
   })
   
   output$all_disease_plot <- renderPlotly({
@@ -1676,16 +1618,19 @@ server <- function(input, output,session) {
   #****************************************
   #* Download Report
   output$report <- downloadHandler(
-    filename <-  "Sample Report.pdf",
+    filename =   paste0("Nigeria-sample-report_", Sys.Date(), ".pdf"),
     content = function(file) {
-      rmarkdown::render("./report.Rmd",
-          output_file = file, 
-          params = list(
-            title = "Nigeria Sample Report", 
-            plot = report_index_trend_plot()
-          ),
-          envir = new.env(),
-          intermediates_dir = tempdir())
+      rmarkdown::render("report.Rmd",
+                        output_file = file, 
+                        params = list(
+                          data = index_results,
+                          muilti = input$my_multi,
+                          vactrend = vaccine_trends,
+                          dic_trend = disease_trends,
+                          preventable_vac_trend = preventable_vac_trend,
+                          merged_data_for_vac_dis = merged_data_for_vac_dis
+                        ),
+                        envir = new.env(parent = globalenv()))
     }
   )
 }

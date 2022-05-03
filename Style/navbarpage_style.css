@@ -2,6 +2,14 @@
     box-sizing: border-box;
   }
 
+  .nav-bar {
+    text-align: right;
+    background-color: #4b2e83;
+    width: 79%;
+    margin-top: 12px;
+    display: inline-block;
+    }
+  
   .navbar-brand {
     float: left;
     padding: 10px 15px;
@@ -19,7 +27,7 @@
     font-family: "Encode Sans Compressed",sans-serif;
     src: "Style/Encode Sans Family";
     color: #ffffff; /*title color*/
-    font-size: 22px; 
+    font-size: 18px; 
   }
 
 .navbar-default .navbar-nav>li>a {
