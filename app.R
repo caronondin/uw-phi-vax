@@ -21,6 +21,8 @@ library(shinycssloaders)
 library(shinyWidgets)
 library(shinyhelper)
 library(rintrojs)
+library(shinyBS)
+
 
 #setwd("~/Desktop/PHI - Research Assitant/Winter/vax/aim1")
 vaccine_trends <- readRDS("aim_1/New/01_vaccine_trends.RDS")
@@ -63,13 +65,18 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                   sidebarPanel(
                       h4(strong("Improvement Index Ranking Table")),
                       sliderInput("year", "Year", value =2019, min = 1990, max=2019,step=1,sep = "",animate=TRUE),
-                      fluidRow(column(8,radioButtons("sdi_group_present","2019 SDI Group Present", choices = c("All"="all","Low" ="low","Medium" = "medium","High" = "high"),inline = TRUE)),
-                               column(4,dropMenu(
-                                 circleButton(label = "What is SDI?","What is SDI?", inputId='sdiinfo',icon = icon('info')),
-                                 h4(strong('SDI')),
-                                 h5('The Socio-demographic Index (SDI) is a summary measure that identifies where countries sit on the spectrum of development.'),
-                                 placement = "bottom",
-                                 arrow = TRUE),style='text-align:center')),
+                      fluidRow(column(8,radioButtons("sdi_group_present","2019 SDI Group", choices = c("All"="all","Low" ="low","Medium" = "medium","High" = "high"),inline = TRUE)),
+                               column(4,tags$i(
+                                 class = "glyphicon glyphicon-info-sign", 
+                                 style = "color:#2c3e50;;",
+                                 title = "The Socio-demographic Index (SDI) is a summary measure that identifies where countries sit on the spectrum of development."
+                               ))),
+                                      #dropMenu(
+                                # circleButton(label = "What is SDI?","What is SDI?", inputId='sdiinfo',icon = icon('info')),
+                                 #h4(strong('SDI')),
+                                # h5('The Socio-demographic Index (SDI) is a summary measure that identifies where countries sit on the spectrum of development.'),
+                                # placement = "bottom",
+                                # arrow = TRUE),style='text-align:center')),
                       selectInput("region_table", "Regions", selected = NULL, choices = c("All",unique(index_results$region))),
                       tags$style(HTML('table.dataTable tr.selected td, table.dataTable td.selected {background-color: #92c9e8 !important;}')),
                       DT::dataTableOutput("table")),
@@ -238,7 +245,7 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                            tabsetPanel(id="t2",
                                        tabPanel("Comparison",value = "comp_index",
                                                 fluidRow(column(8, " ", style='padding:20px;')),
-                                                fluidRow(column(4,radioButtons("sdi_group_present_comp","2019 SDI Group Present", choices = c("All"="all","Low" ="low","Medium" = "medium","High" = "high"),selected="low",inline = TRUE)),
+                                                fluidRow(column(4,radioButtons("sdi_group_present_comp","2019 SDI Group", choices = c("All"="all","Low" ="low","Medium" = "medium","High" = "high"),selected="low",inline = TRUE)),
                                                                 column(4,selectInput("region", "Regions", choices = unique(index_results$region))),
                                                          column(4,selectInput(
                                                                       inputId = "my_multi",
@@ -393,7 +400,7 @@ server <- function(input, output,session) {
       sdi_rank_table$rank <- NA
       sdi_rank_table$rank = dense_rank(desc(sdi_rank_table$result))
       sdi_rank_table <- sdi_rank_table[,c("rank","location","result","sdi_group_present")]
-      colnames(sdi_rank_table) <- c('Rank','Location','Improvement Index', "2019 SDI Group Present")
+      colnames(sdi_rank_table) <- c('Rank','Location','Improvement Index', "2019 SDI Group")
       sdi_rank_table<-sdi_rank_table[order(sdi_rank_table$Rank),]
       true_false_formatter <-
           formatter("span",
@@ -409,7 +416,7 @@ server <- function(input, output,session) {
               'Improvement Index' = color_tile("white", "#569eca"),
               #'SDI' = color_tile("white", "pink"),
               ## use custom formatter for TRUE/FALSE values
-              '2019 SDI Group Present' = true_false_formatter
+              '2019 SDI Group' = true_false_formatter
           )
       ) %>%
           as.datatable(rownames = FALSE, 
@@ -731,7 +738,7 @@ server <- function(input, output,session) {
                 #                     "SDI Group Present","Rank")
       colnames(index_rank_table) = c("Location", "Region","Eligibility to receie DAH","Socio-demographic Index","Total Health Spending per Person",
                                      "Government Health Spending per Total Health Spending","Development Assistance Per Person","HAQI","Corruption Perception Index","Skilled Attendants at Birth","Immigrant Population (%)",
-                                     "Urbanicity (%)","Improvement Index","location_id","level","2019 SDI Group Present","Rank")
+                                     "Urbanicity (%)","Improvement Index","location_id","level","2019 SDI Group","Rank")
       index_rank_table <- index_rank_table[,c(17,1,13,3,4,5,6,7,8,9,10,11,12)]
 
       customGreen0 = "#DeF7E9"
@@ -790,7 +797,7 @@ server <- function(input, output,session) {
     colnames(index_rank_table) = c("Location", "Region","Eligibility to receie DAH","Socio-demographic Index","Total Health Spending per Person",
                                    "Government Health Spending per Total Health Spending","Development Assistance Per Person","HAQI","Corruption Perception Index","Skilled Attendants at Birth","Immigrant Population (%)",
                                    "Urbanicity (%)","Improvement Index","location_id","level",
-                                   "2019 SDI Group Present","Rank")
+                                   "2019 SDI Group","Rank")
     index_rank_table <- index_rank_table[,c(17,1,13,2,3,4,5,6,7,8,9,10,11)]
     
     customGreen0 = "#DeF7E9"
