@@ -66,17 +66,18 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                       h4(strong("Improvement Index Ranking Table")),
                       sliderInput("year", "Year", value =2019, min = 1990, max=2019,step=1,sep = "",animate=TRUE),
                       fluidRow(column(8,radioButtons("sdi_group_present","2019 SDI Group", choices = c("All"="all","Low" ="low","Medium" = "medium","High" = "high"),inline = TRUE)),
-                               column(4,tags$i(
-                                 class = "glyphicon glyphicon-info-sign", 
-                                 style = "color:#2c3e50;;",
-                                 title = "The Socio-demographic Index (SDI) is a summary measure that identifies where countries sit on the spectrum of development."
-                               ))),
-                                      #dropMenu(
-                                # circleButton(label = "What is SDI?","What is SDI?", inputId='sdiinfo',icon = icon('info')),
-                                 #h4(strong('SDI')),
-                                # h5('The Socio-demographic Index (SDI) is a summary measure that identifies where countries sit on the spectrum of development.'),
-                                # placement = "bottom",
-                                # arrow = TRUE),style='text-align:center')),
+                               column(4,
+                                      #tags$i(
+                                # class = "glyphicon glyphicon-info-sign", 
+                                # style = "color:#2c3e50;;",
+                                # title = "The Socio-demographic Index (SDI) is a summary measure that identifies where countries sit on the spectrum of development."
+                               #))),
+                                dropMenu(
+                                 circleButton(label = "What is SDI?","What is SDI?", inputId='sdiinfo',icon = icon('info')),
+                                 h4(strong('SDI')),
+                                 h5('The Socio-demographic Index (SDI) is a summary measure that identifies where countries sit on the spectrum of development.'),
+                                 placement = "bottom",
+                                 arrow = TRUE),style='text-align:center')),
                       selectInput("region_table", "Regions", selected = NULL, choices = c("All",unique(index_results$region))),
                       tags$style(HTML('table.dataTable tr.selected td, table.dataTable td.selected {background-color: #92c9e8 !important;}')),
                       DT::dataTableOutput("table")),
@@ -100,8 +101,8 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                            conditionalPanel("!input.view",
                                                             fluidRow(column(12, " ", style='padding:3px;')),
                                                             fluidRow(column(10, radioButtons(inputId = "show",label = NULL,
-                                                                                             choices = c("Improvement Index","Improvement Indicator"),
-                                                                                             selected = "Improvement Index",
+                                                                                             choices = c("Vaccination Improvement Index(VIX)","Improvement Indicator"),
+                                                                                             selected = "Vaccination Improvement Index(VIX)",
                                                                                              inline = TRUE)), 
                                                                             column(2,
                                                                                    dropMenu(
@@ -111,10 +112,10 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                                                      h5("A higher number (or darker shading on the map) indicates a better score."),
                                                                                      placement = "bottom",
                                                                                      arrow = TRUE))),
-                                              conditionalPanel("input.show == 'Improvement Index'",
+                                              conditionalPanel("input.show == 'Vaccination Improvement Index(VIX)'",
                                                                fluidRow(column(12, " ", style='padding:3px;')),
                                                                fluidRow(column(12,plotlyOutput("index_map",height = "40vh")),column(1,"")),
-                                                               fluidRow(column(width = 12, "Select locations in left Improvement Index Ranking table for comparison",
+                                                               fluidRow(column(width = 12, "Select locations in left Vaccination Improvement Index Ranking table for comparison",
                                                                                style='font-family:Avenir, Helvetica;font-size:30;text-align:center')),
                                                                fluidRow(column(10,''),column(2,
                                                                        dropMenu(
@@ -131,7 +132,7 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                                  #                                                                 "Agreement Vaccines are Important","Agreement Vaccines are Effective"),width = "500px")),
                                                                fluidRow(column(4,selectInput("indicators", "Indicator:",choices=c("Socio-demographic Index","Eligibility to receive DAH","Total Health Spending per Person","Government Health Spending per Total Health Spending",
                                                                                                                                   "Development Assistance Per Person","HAQI","Corruption Perception Index","Skilled Attendants at Birth","Immigrant Population (%)","Urbanicity (%)"),width = "500px")),
-                                                                        column(width = 8, "Select location in left Improvement Index Ranking table.",
+                                                                        column(width = 8, "Select location in left Vaccination Improvement Index Ranking table.",
                                                                                style='font-family:Avenir, Helvetica;font-size:30;text-align:left')),
                                                                fluidRow(column(11,plotlyOutput("indicator_map",height = "43vh")),column(1,"")),
                                                                fluidRow(column(11, plotlyOutput("indicator_trend_plot_multi",height = "27vh")),column(1,""))
@@ -140,7 +141,7 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                                            fluidRow(column(11, DT::dataTableOutput("indextable")),column(1,"")))),
                                   tabPanel("Vaccination Trends", value = "t_vac",
                                            fluidRow(column(width = 11,h4(strong(htmlOutput("content_vac"))))),
-                                           fluidRow(column(width = 10, "Select location in left Improvement Index Ranking table",
+                                           fluidRow(column(width = 10, "Select location in left Vaccination Improvement Index Ranking table",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left'),
                                                     column(2,
                                                            dropMenu(
@@ -154,7 +155,7 @@ body <-navbarPage(tags$head(includeCSS("Style/navbarpage_style.css")),
                                            fluidRow(column(11,plotlyOutput("all_vaccine_plot",height = "50vh")),column(1,""))),
                                   tabPanel("Mortality & Disability Trends",value = "d_vac",
                                            fluidRow(column(width = 11,h4(strong(htmlOutput("content_dis"))))),
-                                           fluidRow(column(width = 10, "Select location in left Improvement Index Ranking table",
+                                           fluidRow(column(width = 10, "Select location in left Vaccination Improvement Index Ranking table",
                                                            style='font-family:Avenir, Helvetica;font-size:30;text-align:left'),
                                                     column(2,
                                                            dropMenu(
@@ -400,7 +401,8 @@ server <- function(input, output,session) {
       sdi_rank_table$rank <- NA
       sdi_rank_table$rank = dense_rank(desc(sdi_rank_table$result))
       sdi_rank_table <- sdi_rank_table[,c("rank","location","result","sdi_group_present")]
-      colnames(sdi_rank_table) <- c('Rank','Location','Improvement Index', "2019 SDI Group")
+      sdi_rank_table$result = round(sdi_rank_table$result,4)
+      colnames(sdi_rank_table) <- c('Rank','Location','Vaccination Improvement Index', "2019 SDI Group")
       sdi_rank_table<-sdi_rank_table[order(sdi_rank_table$Rank),]
       true_false_formatter <-
           formatter("span",
@@ -413,7 +415,7 @@ server <- function(input, output,session) {
           sdi_rank_table,
           list(
               ## a coloured bar with length proportional to value
-              'Improvement Index' = color_tile("white", "#569eca"),
+              'Vaccination Improvement Index' = color_tile("white", "#569eca"),
               #'SDI' = color_tile("white", "pink"),
               ## use custom formatter for TRUE/FALSE values
               '2019 SDI Group' = true_false_formatter
@@ -905,7 +907,7 @@ server <- function(input, output,session) {
           fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~round(deaths_percent_val,8), color = ~cause_name)%>%
               add_lines()
           title = "Time Series of Deaths, Disease or Disability Percent"
-          y_title="Deaths for a particular cuase/Deaths from all causes"
+          y_title="Particular cause Death/All causes Death"
       }
       else{
           fig_dis <- plot_ly(disease_plotdata, x = ~year_id,y= ~round(deaths_rate_val,8), color = ~cause_name)%>%
@@ -917,7 +919,7 @@ server <- function(input, output,session) {
           layout( autosize = T,
                   title =title,  showlegend = T,
                  xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
-                 yaxis = list(title =y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE,type= "log"))
+                 yaxis = list(title =y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE,type= "log",tickfont = list(size = 1)))
       fig_dis
   })
   
@@ -945,7 +947,7 @@ server <- function(input, output,session) {
           layout( autosize = T,
                   title =title,  showlegend = T,
                  xaxis = list(title = "Year",showgrid = FALSE, zeroline = FALSE, showticklabels = TRUE),
-                 yaxis = list(title = y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE,type= "log"))
+                 yaxis = list(title = y_title,showgrid = FALSE, zeroline = TRUE, showticklabels = TRUE,type= "log",tickfont = list(size = 1)))
       fig_dis
   })
   
