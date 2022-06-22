@@ -1,0 +1,41 @@
+
+Call:
+lm(formula = dalys_measles_rate ~ prop_val_MCV1 + factor(region) + 
+    year, data = full_data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3981.2  -644.0   -38.6   492.3 11022.4 
+
+Coefficients:
+                                             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                                102640.502   4362.740  23.527  < 2e-16 ***
+prop_val_MCV1                               -5015.872    142.117 -35.294  < 2e-16 ***
+factor(region)Australasia                     323.397    219.828   1.471  0.14131    
+factor(region)Caribbean                       154.204    154.169   1.000  0.31725    
+factor(region)Central Asia                     61.879    160.408   0.386  0.69969    
+factor(region)Central Europe                  370.163    154.462   2.396  0.01659 *  
+factor(region)Central Latin America            43.518    160.403   0.271  0.78617    
+factor(region)Central Sub-Saharan Africa      305.936    175.041   1.748  0.08056 .  
+factor(region)East Asia                       541.241    219.767   2.463  0.01382 *  
+factor(region)Eastern Europe                  415.800    166.450   2.498  0.01252 *  
+factor(region)Eastern Sub-Saharan Africa     2091.272    153.493  13.625  < 2e-16 ***
+factor(region)High-income Asia Pacific        398.573    184.109   2.165  0.03044 *  
+factor(region)High-income North America       380.100    219.902   1.729  0.08396 .  
+factor(region)North Africa and Middle East    600.718    148.965   4.033 5.59e-05 ***
+factor(region)Oceania                         -95.687    198.465  -0.482  0.62973    
+factor(region)South Asia                      881.212    176.088   5.004 5.79e-07 ***
+factor(region)Southeast Asia                  459.392    154.163   2.980  0.00290 ** 
+factor(region)Southern Latin America          484.471    196.930   2.460  0.01392 *  
+factor(region)Southern Sub-Saharan Africa     642.796    170.129   3.778  0.00016 ***
+factor(region)Tropical Latin America          384.532    219.907   1.749  0.08042 .  
+factor(region)Western Europe                  206.429    149.591   1.380  0.16766    
+factor(region)Western Sub-Saharan Africa     2491.151    151.187  16.477  < 2e-16 ***
+year                                          -49.065      2.192 -22.385  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1318 on 5227 degrees of freedom
+Multiple R-squared:  0.5565,	Adjusted R-squared:  0.5546 
+F-statistic: 298.1 on 22 and 5227 DF,  p-value: < 2.2e-16
+
