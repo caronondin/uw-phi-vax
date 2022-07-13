@@ -1,6 +1,6 @@
 # Author: Francisco Rios Casas
 # Purpose: Load and prep UN skilled attendant data
-# Date: November 08, 2021
+# Date: July 12, 2022
 
 # Read in list of files to prep
 file_list <- read_excel(paste0(g_drive, "data/list_of_data_used.xlsx")) %>% 

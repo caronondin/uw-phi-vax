@@ -1,15 +1,12 @@
 # Author: Francisco Rios Casas
 # Purpose: Load and prep IHME DAH data files and health spending files
-# Date: December 27, 2021
+# Date: July 12, 2022
 
-<<<<<<< HEAD
 # clear environment
 rm(list=ls())
 
 source(paste0("C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_2/01_set_up_R.R"))
 
-=======
->>>>>>> f69c799a4807616ef2ea1a38653a66a91d6d70c2
 # Read in list of files to prep
 file_list <- read_excel(paste0(g_drive, "data/list_of_data_used.xlsx")) %>%
   filter(data_type=="index_variables" & data_source=="ihme")
@@ -35,12 +32,6 @@ dt1 <- rename(dt1,
 # Load location map to merge location names and iso numeric code
 location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_mapping.RDS"))
 
-<<<<<<< HEAD
-# Load the location map codebook
-location_map <- readRDS(paste0(codebook_directory, "location_iso_codes_final_mapping.RDS"))
-
-=======
->>>>>>> f69c799a4807616ef2ea1a38653a66a91d6d70c2
 # Merge onto file
 merged_data <- dt1 %>% left_join(location_map, by=c("gbd_location_id", "iso_code"))
 
@@ -49,32 +40,3 @@ final_data <- merged_data %>% select(location, year, gbd_location_id, iso_code, 
 
 # Save data
 saveRDS(final_data, file=paste0(prepped_data_dir, "aim_2/01_prepped_ihme_health_spending_data.RDS"))
-<<<<<<< HEAD
-=======
-
-# Part II: Create list of non-eligible countries
-dt2 <- as.data.table(final_data)
-
-# check to see which countries have never received any funds
-zero_funds <- dt2[,.(sum_received=sum(dah_per_the_mean, na.rm=TRUE)),
-                          by=c("iso_code", "location", "gbd_location_id",
-                               "iso_num_code")] %>% filter(sum_received==0)
-
-# load two different ways of calculating eligibility: Global Fund and World Bank
-gf_elibility_list <- readRDS(paste0(codebook_directory, "gf_eligible_locations_map.RDS"))
-world_bank_groups <- readRDS(paste0(codebook_directory, "world_bank_income_groups.RDS"))
-
-# Merge additional columns indicating eligibility
-mergeVars <- c("iso_code", "location", "gbd_location_id", "iso_num_code")
-subset <- zero_funds %>% left_join(gf_elibility_list, by=mergeVars) %>%
-  left_join(world_bank_groups, by=mergeVars)
-
-# re-code missing in global fund eligibility
-subset[is.na(eligible_per_gf), eligible_per_gf:=0]
-
-# Crete vector of ineligible locations
-ineligible <- subset[which(subset$eligible_per_gf==0)]$location
-
-# Save object to be used in later analysis
-saveRDS(ineligible, file=paste0(codebook_directory, "locations_ineligible_for_dah.RDS"))
->>>>>>> f69c799a4807616ef2ea1a38653a66a91d6d70c2

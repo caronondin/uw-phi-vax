@@ -1,6 +1,6 @@
 # Author: Francisco Rios Casas
 # Purpose: Load and prep World Bank Income Data to determine DAH eligibility
-# Date: March 7 2022
+# Date: July 12 2022
 
 # clear environment
 rm(list=ls())

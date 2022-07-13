@@ -7,6 +7,9 @@ rm(list=ls())
 # set up files
 source(paste0("C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_3/01_set_up_R.R"))
 
+# load plm package
+library(plm)
+
 # Load data set
 full_data <- readRDS(file=paste0(prepped_data_dir, "aim_3/02_prepped_full_data.RDS"))
 
@@ -55,8 +58,15 @@ pred2019mcv <- predict(model1, newdata = worst_performer, type = "response")
 # actual vaccination coverage in 2019:  .245
 
 # fit model that predicts disease burden according to level of vaccination coverage
+
+# outcome variable: burden (in DALYs per 100,000 persons)
+# predictor variable: vaccination coverage (as percentage)
+
+# transform the outcome variable
+full_data$log_dalys_measles_rate <- log(full_data$dalys_measles_rate+1)
+
 # predict new disease burden with new vaccination coverage levels in Somalia
-model2 <- lm(formula = dalys_measles_rate ~ prop_val_MCV1+factor(region)+year, data=full_data)
+model2 <- lm(formula = log_dalys_measles_rate ~ prop_val_MCV1+location+year, data=full_data)
 
 sink("lm.txt")
 print(summary(model2))
@@ -77,7 +87,7 @@ ggplotRegression <- function (fit) {
          ylab = "Measles DALYs")
 }
 
-ggplotRegression(model1)
+# ggplotRegression(model1)
 ggplotRegression(model2)
 
 

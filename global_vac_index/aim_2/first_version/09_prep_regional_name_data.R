@@ -1,6 +1,6 @@
 # Author: Francisco Rios 
 # Purpose: Prep geographic area variable to help control for regional variation
-# Date: Last modified March 7, 2022
+# Date: Last modified July 12, 2022
 
 # clear environment
 rm(list=ls())

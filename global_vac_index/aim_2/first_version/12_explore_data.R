@@ -1,6 +1,6 @@
 # Purpose: Create visuals to inspect data
 # Author: Francisco Rios 
-# Date: Dec 13, 2021
+# Date: July 12, 2022
 
 rm(list=ls())
 
