@@ -5,7 +5,9 @@
 rm(list=ls())
 
 # set up files
-source(paste0("C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_3/01_set_up_R.R"))
+if (Sys.info()[6]=="frc2"){
+  source(paste0("C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_3/01_set_up_R.R"))
+}
 
 # load plm package
 library(plm)
@@ -19,7 +21,7 @@ full_data <- readRDS(file=paste0(prepped_data_dir, "aim_3/02_prepped_full_data.R
 ##### Measles 2019
 ########################################
 
-# subset data to exclude 2019
+# subset data to exclude 2019 since this will be the year of prediction
 data_subset <- full_data %>% filter(year <2019)
 
 # create a training dataset
@@ -36,20 +38,20 @@ newdata <- with(full_data, data.frame(location = rep(unique(full_data$location),
 
 newdata <- newdata %>% left_join(full_data, by=c("location", "year"))
 
-# create dataset with worst performer and best performer
+# split data according to worst performer and best performer
 worst_performer <- newdata %>% filter(location=="Somalia")
 best_performer <- newdata %>% filter(location=="Eswatini")
 
 # set index value for worst performer to equal the best performer's value
 worst_performer$result <- best_performer$result
 
-# use measles model to predict vaccination coverage given new index value
+# use Model 1 (measles) to predict vaccination coverage given new index value
 pred2019mcv <- predict(model1, newdata = worst_performer, type = "response")
 
 ########################################
 ##### Part 2:  
-##### counter factual of disease burden
-##### under different levels of coverage
+##### counterfactual analysis: disease burden
+##### under different levels of vax coverage
 ########################################
 
 # fit model predicting disease burden based on vaccination coverage for measles
@@ -62,13 +64,13 @@ pred2019mcv <- predict(model1, newdata = worst_performer, type = "response")
 # outcome variable: burden (in DALYs per 100,000 persons)
 # predictor variable: vaccination coverage (as percentage)
 
-# transform the outcome variable
+# log transform the outcome variable
 full_data$log_dalys_measles_rate <- log(full_data$dalys_measles_rate+1)
 
 # predict new disease burden with new vaccination coverage levels in Somalia
 model2 <- lm(formula = log_dalys_measles_rate ~ prop_val_MCV1+location+year, data=full_data)
 
-sink("lm.txt")
+sink(paste0(file_folder, "/Results/aim_3/01_regression_output.txt"))
 print(summary(model2))
 sink()  # returns output to the console
 
@@ -90,9 +92,6 @@ ggplotRegression <- function (fit) {
 # ggplotRegression(model1)
 ggplotRegression(model2)
 
-
-# plot(dalys_measles_rate ~ prop_val_MCV1, data = full_data)
-
 # create new data that has different levels of vaccination coverage ranging from worst to best
 somalia_data <- with(full_data, data.frame(location = rep("Somalia", each=1, length.out=6),
                                       year = rep(2019, each=6),
@@ -104,8 +103,21 @@ somalia_newdata <- somalia_data %>% left_join(full_data_subset, by=c("location",
 
 # Use model 2 to predict disease burden under different levels of vaccination coverage
 pred2019measdalys <- predict(model2, newdata = somalia_newdata, type = "response")
-  
-  # 
+
+# save table of predicted disease burden under different levels of vaccination coverage
+# have to create the actual table first pulling from somalia_newdata values I believe...
+write.csv(pred2019measdalys, file=paste0())
+
+
+
+
+
+
+
+
+
+# old code to scrap--eventually
+  # # plot(dalys_measles_rate ~ prop_val_MCV1, data = full_data)
   # plot(pred2019mcv, newdata$prop_val_MCV1,
   #      xlab='Predicted Vaccination Coverage',
   #      ylab='Actual Vaccination Coverage',
