@@ -14,7 +14,7 @@ set.seed(500)
 # set shared team drive and repo automatically based on user
 if (Sys.info()[7]=="frc2"){
   if (Sys.info()[2]=='10 x64'){
-    file_drive  <- 'C:/Users/frc2/UW/og_phi_global_vaccination_improvement_project - General'
+    file_drive  <- 'C:/Users/frc2/UW/og_phi_global_vaccination_improvement_project - General/'
     code_dir <- 'C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_2/'
   } else if (Sys.info()[2]=='Server x64'){
     # file_drive  <- 'G:/Shared with Me/Merck Vaccine Improvement Index Project/'

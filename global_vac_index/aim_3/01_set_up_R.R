@@ -23,7 +23,7 @@ if (Sys.info()[6]=="frc2"){
 } else {
   file_folder  <- '/Volumes/GoogleDrive/.shortcut-targets-by-id/1P7ITMVB9x01fuYfHW8-uWogw4SpbuvwO/Merck Vaccine Improvement Index Project/'
   code_dir <- '~/Documents/uw-phi-vax/'
-}
+} 
 }
 
 
