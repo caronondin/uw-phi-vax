@@ -4,7 +4,7 @@
 
 rm(list=ls())
 
-source(paste0("C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_2/01_set_up_R.R"))
+source(paste0("C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_2/first_version/01_set_up_R.R"))
 
 # Load final data for analysis
 final_data <- readRDS(paste0(prepped_data_dir, "aim_2/10_prepped_data_for_analysis.RDS"))
@@ -22,11 +22,11 @@ for (i in 1:length(normVars)) {
   final_data[, (v):=(get(v)-min)/(max-min)]
 }
 
-# Calculate the geometric mean--some locations only utilize 11 variables and some utilize 12
+# Calculate the geometric mean--some locations only utilize 8 variables and some utilize 9
 final_data <- final_data %>% 
   mutate(n_for_geo_mean = case_when(
-    dah_eligible==TRUE  ~ 12,
-    dah_eligible==FALSE ~ 11))
+    dah_eligible==TRUE  ~ 9,
+    dah_eligible==FALSE ~ 8))
 
 final_data$product <- NA
 

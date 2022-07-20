@@ -8,7 +8,7 @@ output: html_document
 # clear environment
 # rm(list=ls())
 
-source(paste0("C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_2/01_set_up_R.R"))
+source(paste0("C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_2/first_version/01_set_up_R.R"))
 
 # library(sklearn)
 library(DescTools)
@@ -93,10 +93,10 @@ plot(test$prop_val_DTP3, pred3)
 ########################################
 
 # create a dataframe of all locations and vaccines and include the year 2019
-newdata <- with(data, data.frame(ESTIAP = rep(unique(data$ESTIAP), each=224, length.out=12544),
-                                 YEAR = rep(2007:2020, each=16, length.out=12544),
-                                 RACEETHK_R = factor(rep(1:4, each=4, length.out=12544)),
-                                 INCPOV1 = factor(rep(1:4, length.out=12544))))
+# newdata <- with(data, data.frame(ESTIAP = rep(unique(data$ESTIAP), each=224, length.out=12544),
+#                                  YEAR = rep(2007:2020, each=16, length.out=12544),
+#                                  RACEETHK_R = factor(rep(1:4, each=4, length.out=12544)),
+#                                  INCPOV1 = factor(rep(1:4, length.out=12544))))
 
 newdata <- with(full_data, data.frame(location = rep(unique(full_data$location), each=1, length.out=175),
                                       year = rep(2019, length.out=175)))
