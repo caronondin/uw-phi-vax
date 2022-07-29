@@ -8,7 +8,7 @@ rm(list=ls())
 source(paste0("C:/Users/frc2/Documents/uw-phi-vax/global_vac_index/aim_3/01_set_up_R.R"))
 
 # Read in list of files to prep
-file_list <- data.table(read_excel(paste0(g_drive, "data/list_of_data_used.xlsx")))
+file_list <- data.table(read_excel(paste0(file_folder, "data/list_of_data_used.xlsx")))
 
 # Filter file list
 file_list <- file_list %>% filter(data_type=="counterfactual_outcomes")
