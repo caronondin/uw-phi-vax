@@ -3,3 +3,6 @@
 .RData
 .Ruserdata
 rdhs.json
+.DS_Store
+.Rhistory
+.Rhistory
