@@ -126,5 +126,34 @@ plot(pred2019dtp3, newdata$prop_val_DTP3,
 abline(a=0, b=1)
 BrierScore(pred2019dtp3, newdata$prop_val_DTP3)
 
+######################################## #####
+##### VALIDATING INDEX For certain years #####
+######################################## #####
+
+data_subset <- full_data %>% filter(year <2019 & year >2015)
+
+# create a training dataset
+row.number <- sample(1:nrow(data_subset), 0.8*nrow(data_subset))
+train <- data_subset[row.number,]
+test <- data_subset[-row.number,]
+
+# fit a model for each vaccine
+model1 <- glm(prop_val_MCV1~factor(region)+year+result, data=train, family = "binomial")
+summary(model1)
+par(mfrow=c(2,2))
+plot(model1)
+
+# evaluate the success of the model 
+pred1 <- predict(model1, newdata = test, type = "response")
+BrierScore(model1)
+par(mfrow=c(1,1))
+plot(pred1, test$prop_val_MCV1,
+     xlab='Predicted Vaccination Coverage',
+     ylab='Actual Vaccination Coverage',
+     main='Predicted vs. Actual Values MCV, 2015-2018')
+abline(a=0, b=1)
+BrierScore(test$prop_val_MCV1, pred1)
+
+
 ```
 
