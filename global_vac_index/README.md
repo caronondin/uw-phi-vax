@@ -1,7 +1,7 @@
 # uw-phi-vax
 Repository to store code used in the Vaccine Improvement Project at the UW Population Health Initiative
 
-Last updated by Caroline Nondin (caroln4@uw.edu) on Nov 15th 2022. 
+Last updated by Francisco Rios Casas (frc2@uw.edu) on September 20, 2021. 
 
 ## Main files included in this repo:
   
@@ -32,15 +32,6 @@ Last updated by Caroline Nondin (caroln4@uw.edu) on Nov 15th 2022.
    * "prep_dx_trend_data.R": extracts vaccine-preventable disease data.  References list_of_data_used. 
    * "prep_vax_trend_data.R": extracts vaccination coverage  data. References list_of_data_used. 
    * "strip_chars.R": removes special characters from datasets to faciliate merge, such as among location names. 
-
-## Files included in the "Liberia" folder: 
- * "01_set_up_R_Lib.R": lists important packages, file paths, functions and order of scripts to carry out analyses for Liberia dataset. 
- * "05_run_exctract_dha_Lib.R": Extract all necessary DHS data for the Liberia dataset. 
- * "06_prep_dhs_data_Lib.R": Prep of DHS data for MOV analyses for Liberia dataset. 
- * "07_mov_survival_analyses_Lib.R": Creates survival curves and calculates hazard ratios for mov immunizations for Liberia dataset. 
- * "08_mov_results_tables_Lib.R": create table of coverage cascade for vaccinations for Liberia dataset. 
-### Functions file Lib: 
- * "extract_dhs_data_Lib.R": Extract dhs data from stata files for Liberia dataset. 
 
 ## Files included in the "Archive" folder:
   This folder contains files that are no longer used or not part of the main data prep or analysis.
