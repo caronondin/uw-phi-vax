@@ -39,7 +39,7 @@ Last updated by Caroline Nondin (caroln4@uw.edu) on Nov 15th 2022.
  * "06_prep_dhs_data_Lib.R": Prep of DHS data for MOV analyses for Liberia dataset. 
  * "07_mov_survival_analyses_Lib.R": Creates survival curves and calculates hazard ratios for mov immunizations for Liberia dataset. 
  * "08_mov_results_tables_Lib.R": create table of coverage cascade for vaccinations for Liberia dataset. 
-# Functions file Lib: 
+### Functions file Lib: 
  * "extract_dhs_data_Lib.R": Extract dhs data from stata files for Liberia dataset. 
 
 ## Files included in the "Archive" folder:
